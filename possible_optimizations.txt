@@ -1,0 +1,10 @@
+refers to pseudocode in "On pruning and gorwing kn..."
+
+GrowOrder, line 12:
+	   precompute C(hw) log P_KN(w|h) with ML estimates for 
+	   P_KN before add_gram. Check if add_gram can ever possibly 
+	   be needed : IMPLEMENTED 12.9.2006, only slightly faster execution
+
+GrowOrder, line 5:
+	   probabilities for a history can be precomputed and used in 
+	   all probability calculations

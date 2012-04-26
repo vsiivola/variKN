@@ -1,0 +1,26 @@
+Teemu Hirsimaki has donated significant amount of code for this
+project. He has written the original versions of the following files: 
+
+ conf.hh 
+ conf.cc
+ io.hh
+ io.cc
+ str.hh
+ str.cc
+ Endian.hh
+ GramSorter.hh
+ GramSorter.cc
+ TreeGram.hh
+ TreeGram.cc
+ TreeGramArpaReader.hh
+ TreeGramArpaReader.cc 
+ Vocabulary.hh
+ Vocabulary.cc
+
+Janne Pylkkönen donated a matlab version of the quadratic fit
+function, which was converted to C++ code in QFit.hh and QFit.cc.
+
+I would like to thank the persons mentioned above for their
+contributions. 
+
+Vesa Siivola

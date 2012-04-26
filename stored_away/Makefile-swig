@@ -1,0 +1,25 @@
+OS = $(shell uname -s)
+
+CXX = g++
+CXXFLAGS = -g -Wall -Wno-sign-compare -fPIC 
+
+ifeq ($(OS),Darwin)
+INCLUDES = -I.. -I/opt/local/include/python2.5 
+LDFLAGS = -bundle -flat_namespace -undefined dynamic_lookup -L..
+endif
+
+ifeq ($(OS),Linux)
+INCLUDES = -I.. -I/usr/include/python2.5 
+LDFLAGS = -shared -L..
+endif
+
+all:Perplexity.py _Perplexity.so 
+
+Perplexity_wrap.cc Perplexity.py: Perplexity.i
+	swig -c++ -python -shadow -o Perplexity_wrap.cc Perplexity.i
+
+_Perplexity.so: Perplexity_wrap.cc ../libvarikn.a
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(INCLUDES) Perplexity_wrap.cc ../libvarikn.a -o _Perplexity.so
+
+clean:
+	rm -f Perplexity.py _Perplexity.so Perplexity_wrap.o Perplexity_wrap.cc
