@@ -233,12 +233,12 @@ void MultiOrderCounts_Generic_BOT<KT, CT, BOT>::WriteCounts(FILE *out) {
   for (int o=1; o<=order(); o++) {
     v.resize(o);
     fprintf(out,"\\%d-gram counts\n",o);
-    StepCountsOrder(true, o, &v[0], &val);
-    while (StepCountsOrder(false, o, &v[0], &val)) {
+    this->StepCountsOrder(true, o, &v[0], &val);
+    while (this->StepCountsOrder(false, o, &v[0], &val)) {
       if (val==0) continue;
       print_indices(out, v);
       fprintf(out," ");
-      write_num(out, val);
+      this->write_num(out, val);
       fprintf(out,"\n");
     }
     v.resize(o-1);
@@ -314,7 +314,7 @@ void MultiOrderCounts_Generic_BOT<KT, CT, BOT>::ReadCounts(FILE *in) {
 	v[i-1]=str::str2long(&vec[i], &ok);
 	//fprintf(stderr,"Putting %s=%d, %d\n", vec[i].c_str(), v[i-1], ok);
       }
-      read_num(&val, &vec[order+2], &ok);
+      this->read_num(&val, &vec[order+2], &ok);
       //fprintf(stderr,"Val %s=%d (%d)\n", vec[order+2].c_str(), val, ok);
       if (!ok) {
 	fprintf(stderr,"Error reading line %ld:\n%s\nExit2.\n", lineno, line.c_str());
@@ -322,7 +322,7 @@ void MultiOrderCounts_Generic_BOT<KT, CT, BOT>::ReadCounts(FILE *in) {
       }
       //fprintf(stderr,"Setcount ");print_indices(stderr,v);
       //fprintf(stderr,"val %d\n", val);
-      SetCount(v, val);
+      this->SetCount(v, val);
       continue;
     }
     for (int i=1;i<order;i++) {

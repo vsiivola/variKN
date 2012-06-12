@@ -95,7 +95,7 @@ InterKn_int_disc<KT, ICT>::InterKn_int_disc(
   InterKn_t<KT, ICT>(absolute, data, optisource, prunedata_name)
 {
   this->moc = new MultiOrderCounts_1nzer<KT, ICT>;
-  constructor_helper(vocab, read_counts, order, ndrop, nfirst, 
+  this->constructor_helper(vocab, read_counts, order, ndrop, nfirst, 
 		     datastorage, hashsize, sent_boundary);
 }
 
@@ -110,7 +110,7 @@ InterKn_int_disc3<KT, ICT>::InterKn_int_disc3(
   InterKn_t<KT, ICT>(absolute, data, optisource, prunedata_name)
 {
   this->moc = new MultiOrderCounts_3nzer<KT, ICT>;
-  constructor_helper(vocab, read_counts, order, ndrop, nfirst, 
+  this->constructor_helper(vocab, read_counts, order, ndrop, nfirst, 
 		     datastorage, hashsize, sent_boundary);
 }
 
@@ -297,7 +297,7 @@ void InterKn_t<KT, CT>::prune_model_fbase
 
   treshold=treshold*this->model_cost_scale;
   
-  set_order(moc->order());
+  this->set_order(moc->order());
   if (this->m_absolute_discounting) recorrect_kn=false;
   
   for (int o=this->order();o>=2;o--) {
@@ -454,7 +454,7 @@ template <typename KT, typename CT> template <typename BOT>
 void InterKn_t<KT, CT>::add_zeroprob_grams_fbase(BOT *dummy) {
   std::vector<KT> v;
   CT num;
-  set_order(moc->order());
+  this->set_order(moc->order());
 
   for (int o=this->m_order;o>=2;o--) {
     v.resize(o);
@@ -632,7 +632,7 @@ void InterKn_t<KT, CT>::constructor_helper(
 	this->input_data_size=moc->InitializeCountsFromStorage(datastorage, order, sent_start_idx);
       }
     } else {
-      if ( KT_is_short((KT *)NULL) || ndrop!=0 || (nfirst<9999999 && nfirst>=1)) {
+      if ( this->KT_is_short((KT *)NULL) || ndrop!=0 || (nfirst<9999999 && nfirst>=1)) {
 	if (ndrop!=0 || (nfirst<9999999 && nfirst>=1)) {
 	  if (vocabname.length()) {
 	    fprintf(stderr,"ndrop or nfirst may not be specified with vocabin. Exit.\n");
@@ -644,7 +644,7 @@ void InterKn_t<KT, CT>::constructor_helper(
 	nc_tmp.count(datain.file, true);
 	datain.close();
 	fprintf(stderr,"Shrinking\n");
-	if (!KT_is_short((KT *) NULL))  nc_tmp.shrink(ndrop, nfirst);
+	if (!this->KT_is_short((KT *) NULL))  nc_tmp.shrink(ndrop, nfirst);
 	else {
 	  nc_tmp.shrink(0, std::min(65534,nfirst));
 	}
@@ -673,7 +673,7 @@ void InterKn_t<KT, CT>::constructor_helper(
     }
   }
 
-  set_order(moc->order());
+  this->set_order(moc->order());
 
   if (read_counts != 1) {
     fprintf(stderr,"Estimating bo counts\n");

@@ -205,7 +205,7 @@ public:
   virtual inline void init_disc(float x);
   virtual void estimate_nzer_counts();
   virtual inline void prune_model(float treshold, bool recorrect_kn, Storage_t<KT, ICT> *real_counts) {
-    prune_model_fbase(treshold, recorrect_kn, real_counts, (MultiOrderCounts_counter_types::bo_c<ICT> *) NULL);
+    this->prune_model_fbase(treshold, recorrect_kn, real_counts, (MultiOrderCounts_counter_types::bo_c<ICT> *) NULL);
   }
   virtual float kn_prob(const int order, const KT *i, const ICT num);
   virtual float kn_coeff(const int order, const KT *i);
@@ -252,7 +252,7 @@ public:
   //inline sikMatrix <KT, int> *get_ct_matrix(int o, int *foo, InterKn::disc3 *bar) {return this->moc->m_counts[o];}
 
   inline void prune_model(float treshold, bool recorrect_kn, Storage_t<KT, ICT> *real_counts) {
-    prune_model_fbase(treshold, recorrect_kn, real_counts, (MultiOrderCounts_counter_types::bo_3c<ICT> *) NULL);
+    this->prune_model_fbase(treshold, recorrect_kn, real_counts, (MultiOrderCounts_counter_types::bo_3c<ICT> *) NULL);
   }
   float kn_prob(const int order, const KT *i, const ICT num);
   virtual inline float kn_coeff(const int order, const KT *i) {

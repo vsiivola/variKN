@@ -380,19 +380,19 @@ class MultiOrderCounts_1nzer : public MultiOrderCounts_Generic_BOT
 public:
   typedef typename MultiOrderCounts<KT,CT>::bo_c bo_c;
   inline void IncrementBackoffNzer(const int order,const KT *v,const CT value){
-    IncrementBackoffNzer_1nzer(order, v, value);}
+    this->IncrementBackoffNzer_1nzer(order, v, value);}
   inline CT GetBackoffNzer(const int order, const KT *v) {
-    return GetBackoffNzer_1nzer(order, v);}
+    return this->GetBackoffNzer_1nzer(order, v);}
   inline void IncrementBackoffCacheNzer(const int order, const KT *v,
 					const CT value) {
-    IncrementBackoffCacheNzer_1nzer(order, v, value);
+    this->IncrementBackoffCacheNzer_1nzer(order, v, value);
 }
 
 private:
   inline void WriteCounts_BOhelper(FILE *out, bo_c *bo) {
-    write_num(out, bo->nzer);fprintf(out," ");
-    write_num(out, bo->den);fprintf(out," ");
-    write_num(out, bo->prune_den);
+    this->write_num(out, bo->nzer);fprintf(out," ");
+    this->write_num(out, bo->den);fprintf(out," ");
+    this->write_num(out, bo->prune_den);
   }
 
   inline void ReadCounts_BOhelper(bo_c *bo, std::string *s, bool *ok) {
@@ -439,19 +439,19 @@ public:
   }
   inline void IncrementBackoffNzer(const int order,const KT *v, const int pos,
 				   const CT value) {
-    IncrementBackoffNzer_3nzer(order, v, pos, value);
+    this->IncrementBackoffNzer_3nzer(order, v, pos, value);
   }
   //void RemoveBackDefs(struct matrix *m);
 
   /* Caching functions (for fast deletion of recently added entried */
   inline void IncrementBackoffCacheNzer(const int order, const KT *v, 
 					      const CT *value) {
-    IncrementBackoffCacheNzer_3nzer(order, v, value);
+    this->IncrementBackoffCacheNzer_3nzer(order, v, value);
   }
 
   inline void IncrementBackoffCacheNzer(const int order, const KT *v,
 					const int pos, const CT value) {
-    IncrementBackoffCacheNzer_3nzer(order, v, pos, value);
+    this->IncrementBackoffCacheNzer_3nzer(order, v, pos, value);
   }
 
 private:
