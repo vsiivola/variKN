@@ -12,7 +12,8 @@ The descriptions of Revised Kneser pruning and Kneser-Ney growing can
 be found in the paper Vesa Siivola and Teemu Hirsimäki and Sami
 Virpioja, "On Growing and Pruning Kneser-Ney Smoothed N-Gram Models",
 IEEE Transactions on Speech, Audio and Language Processing,
-15(5):1617-1624, 2007. 
+15(5):1617-1624, 2007 (available at 
+https://sites.google.com/site/vesassiivola/publications/TASLP2007.pdf?attredirects=0). 
 
 The package provides a more accurate pruning for Kneser-Ney smoothed
 models than the other implementations I know of. Also, it is possible
@@ -23,10 +24,11 @@ toolkit is poorly documented - you can look at the paper Vesa Siivola,
 Mathias Creutz and Mikko Kurimo: "Morfessor and VariKN machine
 learning tools for speech and language technology", Proceedings of the
 8th International Conference on Speech Communication and Technology
-(INTERSPEECH'07), 2007 for guidelines on typical use but that is about
+(INTERSPEECH'07), 2007 (available at 
+https://sites.google.com/site/vesassiivola/publications/is2007less.pdf?attredirects=0) for guidelines on typical use but that is about
 it. If you are interested in a well supported toolkit that provides a
 wide range of functionality, you might want to look at the srilm
-toolkit.
+toolkit (http://www-speech.sri.com/projects/srilm/).
 
 If it looks like there is interest in using the toolkit but the
 documentation is inadequate, let me know the main sticking points
