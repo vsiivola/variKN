@@ -122,8 +122,10 @@ Useful tricks:
 * Language wrappers DLLs can be built for Python using Swig.  
   These are built automatically if the languages are detected by
   cmake. You can explicitly enable/disable building for these
-  wrappers by passing -DPYTHON=1 (-DPYTHON=0). On mac os x, you can 
-  force the python version to macports with -DMACPORTS_PYTHON_VER=2.6
+  wrappers by passing -DPYTHON=1 (-DPYTHON=0). On Mac OS X, you can 
+  force the python version to macports with -DMACPORTS_PYTHON_VERSION=2.6 .
+  For using python 3 on other platforms than macports, see the comments
+  in python-wrapper/CMakelists.txt.
 
 
           

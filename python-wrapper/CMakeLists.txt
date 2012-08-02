@@ -1,21 +1,36 @@
-FIND_PACKAGE(PythonLibs)
+FIND_PACKAGE(PythonInterp QUIET) 
+FIND_PACKAGE(PythonLibs QUIET)
 FIND_PACKAGE(SWIG 2.0)
+
+#################################################
+# An ugly hack to force cmake to use python3.
+# You need to set the paths manually corresponding
+# to where your py3 is installed.
+if ("${CMAKE_USE_PYTHON_VERSION}" VERSION_GREATER "2.9.9")
+  set(PYTHON_INCLUDE_PATH /usr/include/python3.2mu)
+  set(PYTHON_LIBRARIES /usr/lib/libpython3.2mu.so)
+  set(PYTHON_EXECUTABLE /usr/bin/python3)
+  set(PYTHON_VERSION ${CMAKE_USE_PYTHON_VERSION})
+endif()
 
 if (PYTHONLIBS_FOUND AND SWIG_FOUND)
     INCLUDE(${SWIG_USE_FILE})
     set(LIBRARY_OUTPUT_PATH ${LIBRARY_OUTPUT_PATH}/python)
     
-    IF (APPLE AND MACPORTS_PYTHON_VER)
+    IF (APPLE AND MACPORTS_PYTHON_VERSION)
         #set( PLATFORM_LINKFLAGS "-framework Foundation")
         set( MACPORTS_ROOT /opt )
     
         set( MACPORTS_PYTHON ${MACPORTS_ROOT}/local/Library/Frameworks/Python.framework )
         IF( EXISTS ${MACPORTS_PYTHON} )
-          set(PYTHON_VER ${MACPORTS_PYTHON_VER})
+          set(PYTHON_VERSION ${MACPORTS_PYTHON_VERSION})
     
           # override the includes
-          set( PYTHON_INCLUDE_PATH ${MACPORTS_PYTHON}/Versions/${PYTHON_VER}/include/python${PYTHON_VER})
-             
+          if ( MACPORTS_PYTHON_VERSION VERSION_GREATER 3.1 )
+            set( PYTHON_INCLUDE_PATH ${MACPORTS_PYTHON}/Versions/${PYTHON_VERSION}/include/python${PYTHON_VERSION}m)
+          else()
+            set( PYTHON_INCLUDE_PATH ${MACPORTS_PYTHON}/Versions/${PYTHON_VERSION}/include/python${PYTHON_VERSION})
+          endif()
           # dodge the issue of what framework to bind to
           # note: this may cause binary portability problems,
           # but it should be ok if someone builds and uses this
@@ -25,22 +40,37 @@ if (PYTHONLIBS_FOUND AND SWIG_FOUND)
           
           message("overriding system python for ${MACPORTS_PYTHON}")
         ENDIF( EXISTS ${MACPORTS_PYTHON} )
-    ELSEIF(UNIX)
-        #set( PLATFORM_LINKFLAGS ${GLIB2_LDFLAGS})
-    ENDIF (APPLE AND MACPORTS_PYTHON_VER)
+    ENDIF (APPLE AND MACPORTS_PYTHON_VERSION)
+
+    ###########################
     INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/..)
           
    # swig settings
-    SET(CMAKE_SWIG_FLAGS "-shadow")
+    if ( DEFINED PYTHON_VERSION AND PYTHON_VERSION VERSION_GREATER "2.9.9") 
+        message("Using python ver >2, disabling FILE * typemaps")
+        SET(CMAKE_SWIG_FLAGS "-shadow" "-DPYTHON3" "-py3")
+    else( )
+      SET(CMAKE_SWIG_FLAGS "-shadow")    
+    endif()
+
     SET(CMAKE_SWIG_OUTDIR ${LIBRARY_OUTPUT_PATH})
     SET_SOURCE_FILES_PROPERTIES(Perplexity.i PROPERTIES CPLUSPLUS ON)
-
     # create lib    
     swig_add_module(varikn_python python Perplexity.i )
     swig_link_libraries(varikn_python varikn ${PYTHON_LIBRARIES} ${PLATFORM_LINKFLAGS})
     set_target_properties(${SWIG_MODULE_varikn_python_REAL_NAME} PROPERTIES OUTPUT_NAME "_Perplexity")
-    
-    # the swig target name is horrid, so make nice top-level name for it
+    # make nice top-level target name
     add_custom_target(varikn_python ALL 
                       DEPENDS ${SWIG_MODULE_varikn_REAL_NAME})
+
+    message(STATUS "detecting Python")
+    message(STATUS "\t PYTHON_INCLUDE_PATH= ${PYTHON_INCLUDE_PATH}")
+    message(STATUS "\t PYTHON_LIBRARIES= ${PYTHON_LIBRARIES}")
+    message(STATUS "\t PYTHON_EXECUTABLE= ${PYTHON_EXECUTABLE}")
+    message(STATUS "\t Swig ${SWIG_VERSION}")    
+    if (NOT PYTHONLIBS_FOUND)
+      message(FATAL_ERROR "Unable to find Python libs")
+    elseif (NOT SWIG_FOUND)
+      message(FATAL_ERROR "Unable to find Swig")
+    endif (NOT PYTHONLIBS_FOUND)
 endif(PYTHONLIBS_FOUND AND SWIG_FOUND)

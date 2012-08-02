@@ -1,7 +1,4 @@
-# -*- tab-width: 2 -*-
-
-%include exception.i
-
+%include "exception.i"
 %module Perplexity
 
 %exception {
@@ -39,13 +36,16 @@
 %typemap(out) std::string& {
   $result = Py_BuildValue("s#",$1->c_str(),$1->size());
 }
- 
+
+#ifndef PYTHON3 
+## Python 3 no longer supports FILE* typemaps, this can be enabled for py2
 %typemap(in) FILE* {
         if (!(PyFile_Check($input))) {
                 PyErr_SetString(PyExc_TypeError, "not a file pointer");
                 return NULL;
         }
         $1=PyFile_AsFile($input);}
+#endif
 #endif
 
 %include PerplexityFuncs.hh
