@@ -1,5 +1,5 @@
-FIND_PACKAGE(PythonInterp QUIET) 
-FIND_PACKAGE(PythonLibs QUIET)
+FIND_PACKAGE(PythonInterp) 
+FIND_PACKAGE(PythonLibs)
 FIND_PACKAGE(SWIG 2.0)
 
 #################################################

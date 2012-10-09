@@ -430,13 +430,17 @@ TreeGram::read(FILE *file, bool binary)
 
   // Read the order and the number of nodes
   int number_of_nodes;
-  fscanf(file, "%d %d\n", &m_order, &number_of_nodes);
+  if (fscanf(file, "%d %d\n", &m_order, &number_of_nodes)!=2) {
+    throw ReadError();
+  }
 
   // Read the counts for each order
   int sum = 0;
   m_order_count.resize(m_order);
   for (int i = 0; i < m_order; i++) {
-    fscanf(file, "%d\n", &m_order_count[i]);
+    if (fscanf(file, "%d\n", &m_order_count[i]) != 1) {
+      throw ReadError();
+    }
     sum += m_order_count[i];
   }
 
