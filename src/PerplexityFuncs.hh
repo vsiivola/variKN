@@ -48,8 +48,6 @@ public:
   int get_hitorder(int i);
 
 private:
-  //NGram *m_lm;
-  //NGram *m_lm2;
   NGram *m_lm;
   NGram *m_lm2;
   std::vector<int> ccs_vector;
