@@ -12,5 +12,5 @@ add_custom_command( OUTPUT ${TESTDATAPATH}/ax10.txt
                            ${TESTDATAPATH}/bx10.txt
                     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/generate_data.sh ${TESTDATAPATH} )
 add_custom_target(do_data DEPENDS ${TESTDATAPATH}/ax10.txt)
-add_test( UnitTests  ${TESTPATH}/UnitTests )
+add_test( UnitTests  ${TESTPATH}/UnitTests ${TESTDATAPATH})
 add_dependencies( UnitTests do_data )
