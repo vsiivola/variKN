@@ -127,5 +127,6 @@ Useful tricks:
   For using python 3 on other platforms than macports, see the comments
   in python-wrapper/CMakelists.txt.
 
+TEST:
 
-          
+Unit tests can be ran with "ctest --verbose". Unfortunately, there are currently only a very few tests.

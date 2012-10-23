@@ -107,6 +107,4 @@ int main(int argc, char *argv[]) {
   if (print_sami) lm.print_results_sami(out.file);
   lm.print_results(out.file);
   lm.print_hitrates(out.file);
-
-  //fprintf(out.p,"logprob (base10) %g, logprob (base2) %g\n",logprob,logprob/log10(2.0));
 }
