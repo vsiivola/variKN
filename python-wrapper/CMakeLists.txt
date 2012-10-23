@@ -46,9 +46,10 @@ if (PYTHONLIBS_FOUND AND SWIG_FOUND)
     INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/..)
           
    # swig settings
-    if ( DEFINED PYTHON_VERSION AND PYTHON_VERSION VERSION_GREATER "2.9.9") 
-        message("Using python ver >2, disabling FILE * typemaps")
-        SET(CMAKE_SWIG_FLAGS "-shadow" "-DPYTHON3" "-py3")
+   message("Python version ${PYTHON_VERSION}")
+   if(PYTHON_INCLUDE_PATH MATCHES "(python3)")
+      message("Using python ver >2, disabling FILE * typemaps")
+      SET(CMAKE_SWIG_FLAGS "-shadow" "-DPYTHON3" "-py3")
     else( )
       SET(CMAKE_SWIG_FLAGS "-shadow")    
     endif()

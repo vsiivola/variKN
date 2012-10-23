@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Interpolation is experimental. Both models MUST have the same vocabulary, this is not checked by the code (yet).\n");
     lm.set_interpolation(config["interpolate"].get_str());
     if (config["inter_coeff"].specified) {
-      lm.set_alpha(config["inter_coff"].get_double());
+      lm.set_alpha(config["inter_coeff"].get_double());
     }
   } else if (config["inter_coeff"].specified) {
     fprintf(stderr, "Only on lm specified, cannot set interpolation coff. Exit\n");
