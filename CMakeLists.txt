@@ -68,4 +68,7 @@ install(TARGETS varikn  ARCHIVE DESTINATION lib/${OUTPUT_DIR_NAME})
 #
 add_subdirectory(app)
 add_subdirectory(python-wrapper)   
+enable_testing()
+add_subdirectory(tests)   
+
 
