@@ -52,7 +52,7 @@ int test_main( int argc, char *argv[] )             // note the name!
   fprintf(stdout, "Perplexity of a against a:\n");
   float h = perplexity(datadir+"/a.arpa", "", datadir+"/ax20.txt");
   fprintf(stderr,"h1 %f\n", h );
-  BOOST_REQUIRE( h < 1.01 );
+  BOOST_REQUIRE( h > -0.01 );
 
   fprintf(stdout, "Perplexity of b against a:\n");
   create_varigram_lm(datadir+"/bx20.txt", datadir+"/vocab.txt", datadir+"/bx20.txt", 3, datadir+"/b.arpa");
@@ -63,10 +63,10 @@ int test_main( int argc, char *argv[] )             // note the name!
   fprintf(stdout, "Perplexity of b against b:\n");
   h = perplexity(datadir+"/b.arpa", "", datadir+"/bx20.txt");
   fprintf(stderr,"h3 %f\n", h );
-  BOOST_REQUIRE( h < 1.01 );
+  BOOST_REQUIRE( h > -0.01 );
 
   fprintf(stdout, "Perplexity of ab interp 0.0:\n");
-  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0);
+  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.01);
   fprintf(stderr,"h4 %f\n", h );
   // BOOST_REQUIRE( abs(lp) < 0.01 );
 
@@ -76,9 +76,14 @@ int test_main( int argc, char *argv[] )             // note the name!
   BOOST_REQUIRE( abs(h-2) < 0.01 );
 
   fprintf(stdout, "Perplexity of ab interp 1.0:\n");
-  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 1.0);
+  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.99);
   fprintf(stderr,"h6 %f\n", h );
   // BOOST_REQUIRE( abs(lp) < 0.01 );
+
+  fprintf(stdout, "Perplexity of ab interp 0.0 against a:\n");
+  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 1.00);
+  fprintf(stderr,"h7 %f\n", h );
+  BOOST_REQUIRE( h > -0.01 );
 
   /*
     // six ways to detect and report the same error:
