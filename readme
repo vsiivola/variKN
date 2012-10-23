@@ -84,14 +84,14 @@ Useful tricks:
   mkdir .build
   cd .build
   cmake .. -G "Visual Studio 9 2008"
-  start sre.sln
+  start Project.sln
 
   or to create an XCode project:
 
   mkdir .build
   cd .build
   cmake .. -G Xcode
-  open sre.xcodeproj
+  open Project.xcodeproj
 
 * Note on Windows MSVC (MS Visual Studio):  In order for CMake to know 
   where the MSVC tools are, it needs to run in an MSVC-compatible 
