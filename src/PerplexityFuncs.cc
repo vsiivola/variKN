@@ -4,7 +4,6 @@
 // Functions for calculating perplexity
 #include <algorithm> 
 #include "PerplexityFuncs.hh"
-#include "math.h"
 #include "def.hh"
 #include "TreeGram.hh"
 #include "HashGram.hh"
@@ -295,7 +294,7 @@ void Perplexity::print_results_sami(FILE *out) {
     fprintf(out,"- Word entropy = %.2f bits\n\n", -m_perplexity/log10(2.0));
 }
 
-void Perplexity::print_results(FILE *out) {
+double Perplexity::print_results(FILE *out) {
   fprintf(out,"\nDropped:   ");
   fprintf(out,"%d UNKS, %.2f %%\n",m_num_unks,100.0*m_num_unks/(m_num_pwords+m_num_unks+m_num_ccs));
   fprintf(out,"           %d TUNKS, %.2f %%\n",m_num_tunks,100.0*m_num_tunks/(m_num_ptokens+m_num_tunks+m_num_ccs));
@@ -315,6 +314,7 @@ void Perplexity::print_results(FILE *out) {
     fprintf(out,"Tokenwise perplexity %.2f (- %dth root)\n",pow(10,-m_token_perplexity),m_num_ptokens);
     fprintf(out,"    equals %.2f bits\n",-m_token_perplexity/log10(2.0));
   }
+  return -m_perplexity/log10(2.0);
 }
 
 void Perplexity::set_interpolation(std::string lm_name) {

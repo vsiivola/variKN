@@ -9,6 +9,7 @@
 #include <deque>
 #include <string>
 #include <vector>
+#include <math.h>
 
 #include "io.hh"
 #include "NGram.hh"
@@ -28,7 +29,7 @@ public:
   float logprob(const char *word, float &cur_word_lp);
   float raw_logprob(const char *sentence);
   void print_hitrates(FILE *out);
-  void print_results(FILE *out);  
+  double print_results(FILE *out);  
   void print_results_sami(FILE *out);
   
   enum wb_type { EVERYTIME=0, LISTED=1, MATHIAS_INVERSE=2 };
