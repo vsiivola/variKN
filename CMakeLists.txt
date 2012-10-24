@@ -68,8 +68,8 @@ install(TARGETS varikn  ARCHIVE DESTINATION lib/${OUTPUT_DIR_NAME})
 #
 add_subdirectory(app)
 add_subdirectory(python-wrapper)   
-IF(NOT WIN32)
+IF(CMAKE_ENABLE_TESTING)
   enable_testing()
   add_subdirectory(tests)   
-ENDIF(NOT WIN32)
+ENDIF(CMAKE_ENABLE_TESTING)
 

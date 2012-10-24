@@ -129,4 +129,4 @@ Useful tricks:
 
 TEST:
 
-Unit tests can be ran with "ctest --verbose". Unfortunately, there are currently only a very few tests.
+Building Unit tests can be enabled with "-DCMAKE_ENABLE_TESTING=1". The tests do not work on Windows yet. Unit tests can be ran with "make test" or "ctest --verbose". Unit tests require the unit test library from Boost.
