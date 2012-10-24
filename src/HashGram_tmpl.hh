@@ -279,7 +279,9 @@ float HashGram_t<KT>::log_prob_i_helper(const std::vector<KT> &gram) {
     if (n>1) prob *= pow(10, backoffs[n-1]->getvalue(&gram[gram.size()-n]));
     
     float p = probs[n]->getvalue(&gram[gram.size()-n]);
-    if (p<=MINLOGPROB) continue;
+    if (p<=MINLOGPROB && n>1) {
+        continue;
+    }
     m_last_order=n;
     prob+=pow(10,p);
   }
