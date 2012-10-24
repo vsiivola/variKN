@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
   bool bryan_wc=false; //config["bryan_wc"].specified;
   bool unkwarn=config["unkwarn"].specified;
   int freegram=0;
-  if (config["freegram"].specified) {
+  if (config["freegram"].specified or config["interpolate"].specified) {
     if (config["smallvocab"].specified) freegram=-1;
     else freegram=1;
   }
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
 
   Perplexity lm(lm_name,lm_type,ccs_name, wb_name, unk_symbol, mathias_wb, freegram);
   if (config["interpolate"].specified) { 
-    fprintf(stderr, "Interpolation is mostly BROKEN and very experimental. Both models must have the same vocabulary in the same order.\n");
+    fprintf(stderr, "Warning: Interpolation is very experimental.\n");
     lm.set_interpolation(config["interpolate"].get_str());
     if (config["inter_coeff"].specified) {
       lm.set_alpha(config["inter_coeff"].get_double());
