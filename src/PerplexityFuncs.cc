@@ -8,9 +8,13 @@
 #include "TreeGram.hh"
 #include "HashGram.hh"
 
-Perplexity::Perplexity(const char *lm_name) {
+Perplexity::Perplexity(const char *lm_name, bool hashgram) {
   init_variables();
-  m_lm = new TreeGram;
+  if (hashgram) {
+    m_lm = new HashGram_t<int>;
+  } else {
+    m_lm = new TreeGram;
+  }
   m_need_destruct_m_lm=true;
   m_lm->set_oov("<UNK>");
   m_tmpstring_length = 100;
@@ -139,6 +143,7 @@ float Perplexity::raw_logprob(const char *sentence_in) {
 }
 
 float Perplexity::logprob(const char *word, float &cur_word_lp) {
+  //fprintf(stderr, "\"%s\":\n", word);
   cur_word_lp=0.0;
   if (m_cur_init_hist && m_cur_init_hist==m_init_hist) history.clear();
   else if (history.size() == m_lm->order())
@@ -175,9 +180,14 @@ float Perplexity::logprob(const char *word, float &cur_word_lp) {
 
   history.push_back(idx);
   float lp=m_lm->log_prob(history);
+  //fprintf(stderr, "  Cur lp %f\n", lp);
   if (m_lm2) {
+    float lp2 = m_lm2->log_prob(history);
+    //fprintf(stderr, "  New lp %f\n", lp2);
+      
     lp=(float)safelogprob(m_alpha*pow(10,lp) + 
-		   (1-m_alpha)*pow(10,m_lm2->log_prob(history)));
+		   (1-m_alpha)*pow(10,lp2));
+    //fprintf(stderr, "  Interp lp %f\n", lp);
   }
   ngram_hits[0]++;
   ngram_hits[m_lm->last_order()]++;
@@ -318,10 +328,23 @@ double Perplexity::print_results(FILE *out) {
 }
 
 void Perplexity::set_interpolation(std::string lm_name) {
-  TreeGram *tmp_lm;
-  tmp_lm=new TreeGram;
+  HashGram_t<int> *tmp_lm;
+  tmp_lm=new HashGram_t<int>;
+
+  // Add all words from m_lm to tmp_lm
+  std::vector<int> gram(1);
+  for (int i=0;i<m_lm->num_words();i++) {
+    gram[0] = tmp_lm->add_word(m_lm->word(i));
+    //tmp_lm->probs[1]->setvalue(&gram[0], -59);
+  }
+
   io::Stream in(lm_name,"r");
   tmp_lm->read(in.file, false);
+
+  // Add all words from tmp_lm to m_lm
+  for (int i=0;i<tmp_lm->num_words();i++) {
+    m_lm->add_word(tmp_lm->word(i));
+  }
 
   if (m_lm->order()>=tmp_lm->order()) 
     m_lm2=tmp_lm;
@@ -330,10 +353,14 @@ void Perplexity::set_interpolation(std::string lm_name) {
     m_lm=tmp_lm;
     m_alpha=1-m_alpha;
   }
-
   
   assert(m_lm->num_words()==m_lm2->num_words());
   for (int i=0;i<m_lm->num_words();i++) {
     assert(m_lm->word(i)==m_lm2->word(i));
   }
+
+  //io::Stream fh1("out1.arpa", "w");
+  //io::Stream fh2("out2.arpa", "w");
+  //m_lm->write(fh1.file);
+  //m_lm2->write(fh2.file);
 }

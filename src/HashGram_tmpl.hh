@@ -251,13 +251,15 @@ float HashGram_t<KT>::log_prob_bo_helper(const std::vector<KT> &gram)
     //fprintf(stderr, "looptill %d, gramidx %d, ", looptill,looptill-n);
     //print_indices(&gram_ptr[looptill-n],n);
     const float prob=probs[n]->getvalue(&gram_ptr[looptill-n]);
-    
+
     // Full gram found?
     if (prob>MINLOGPROB) {
       //fprintf(stderr,"full gram n=%d, prob %.4f(%.4f), limit %.4f\n",n,prob,log_prob+prob,MINLOGPROB); 
       log_prob += prob;
       m_last_order = n;
       break;
+    } else if (n==1) {
+      log_prob += MINLOGPROB;
     }
     
     if (n==1) break;

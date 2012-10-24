@@ -32,7 +32,7 @@ float perplexity(std::string model1, std::string model2, std::string infname, fl
   io::Stream txtin(infname,"r");
   io::Stream out("-","w");
   
-  Perplexity lm(model1, 0, "", "", "", false, false);
+  Perplexity lm(model1, 0, "", "", "", false, true);
   if (model2 != "") {
     lm.set_interpolation(model2);
     lm.set_alpha(alpha);
@@ -41,16 +41,12 @@ float perplexity(std::string model1, std::string model2, std::string infname, fl
   return lm.print_results(out.file);
 }
 
-int test_main( int argc, char *argv[] )             // note the name!
-{
-  fprintf(stderr, "Running tests\n"); 
-  std::string datadir(argv[1]);
-  fprintf(stderr, "datadir: %s\n", argv[1]);
+void create_simple_models(std::string datadir) {
+  float h;
 
   create_lm(datadir+"/ax20.txt", datadir+"/vocab.txt", datadir+"/ax20.txt", 3, datadir+"/a.arpa");
-
   fprintf(stdout, "Perplexity of a against a:\n");
-  float h = perplexity(datadir+"/a.arpa", "", datadir+"/ax20.txt");
+  h = perplexity(datadir+"/a.arpa", "", datadir+"/ax20.txt");
   fprintf(stderr,"h1 %f\n", h );
   BOOST_REQUIRE( h > -0.01 );
 
@@ -59,6 +55,10 @@ int test_main( int argc, char *argv[] )             // note the name!
   h = perplexity(datadir+"/b.arpa", "", datadir+"/ax20.txt");
   fprintf(stderr,"h2 %f\n", h );
   BOOST_REQUIRE( h > 10.0 );
+}
+
+void test_interpolation(std::string datadir) {
+  float h;
 
   fprintf(stdout, "Perplexity of b against b:\n");
   h = perplexity(datadir+"/b.arpa", "", datadir+"/bx20.txt");
@@ -68,12 +68,11 @@ int test_main( int argc, char *argv[] )             // note the name!
   fprintf(stdout, "Perplexity of ab interp 0.0:\n");
   h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.01);
   fprintf(stderr,"h4 %f\n", h );
-  // BOOST_REQUIRE( abs(lp) < 0.01 );
 
   fprintf(stdout, "Perplexity of ab interp 0.5:\n");
   h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.5);
-  fprintf(stderr,"h5 %f\n", h );
-  BOOST_REQUIRE( abs(h-2) < 0.01 );
+  fprintf(stderr,"h5 %f %f\n", h, fabs(h-1.0) );
+  BOOST_REQUIRE( fabs(h-1.0) < 0.01 );
 
   fprintf(stdout, "Perplexity of ab interp 1.0:\n");
   h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.99);
@@ -84,7 +83,29 @@ int test_main( int argc, char *argv[] )             // note the name!
   h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 1.00);
   fprintf(stderr,"h7 %f\n", h );
   BOOST_REQUIRE( h > -0.01 );
+}
 
+void test_interpolated_different_vocabs(std::string datadir) {
+  create_lm(datadir+"/ax20.txt", datadir+"/vocab.txt", datadir+"/ax20.txt", 3, datadir+"/a-novocab.arpa");
+  create_varigram_lm(datadir+"/bx20.txt", "", datadir+"/bx20.txt", 3, datadir+"/b-novocab.arpa");
+  fprintf(stdout, "Perplexity of ab interp 0.5 (novocab):\n");
+  float h = perplexity(datadir+"/a-novocab.arpa", datadir+"/b-novocab.arpa", datadir+"/abx20.txt", 0.5);
+  fprintf(stderr,"novocab %f\n", h );
+  BOOST_REQUIRE( fabs(h-1.0) < 0.01 );
+}
+
+int test_main( int argc, char *argv[] )             // note the name!
+{
+  // FIXME: Use the BOOST unit test framework properly
+  fprintf(stderr, "Running tests\n"); 
+  fprintf(stderr, "datadir: %s\n", argv[1]);
+  std::string datadir(argv[1]);
+  
+  create_simple_models(datadir);
+  test_interpolation(datadir);
+  test_interpolated_different_vocabs(datadir);
+
+  return 0;
   /*
     // six ways to detect and report the same error:
     BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error

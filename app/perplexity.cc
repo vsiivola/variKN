@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     ('W',"wb=FILE","arg","","Word break symbol file. One token per line.")
     ('u',"unk=STRING","arg","","Unk symbol (defaul <UNK>, case sensitive)")
     ('U',"unkwarn","","","Warn if unknown tokens are seen")
-    ('i',"interpolate=FLOAT","arg","","Interpolate with given arpa LM.")
+    ('i',"interpolate=FLOAT","arg","","Interpolate with given arpa LM. Currently mostly broken, do not use.")
     ('I',"inter_coeff=FLOAT","arg","-1","Interpolation coefficient.")
     //('X',"mathias_wb","","","Assume word break, unless token ends with '>'")
     //('Y',"bryan_wc","","","All underscores '_' are considered word breaks")
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
 
   Perplexity lm(lm_name,lm_type,ccs_name, wb_name, unk_symbol, mathias_wb, freegram);
   if (config["interpolate"].specified) { 
-    fprintf(stderr, "Interpolation is experimental. Both models MUST have the same vocabulary, this is not checked by the code (yet).\n");
+    fprintf(stderr, "Interpolation is mostly BROKEN and very experimental. Both models must have the same vocabulary in the same order.\n");
     lm.set_interpolation(config["interpolate"].get_str());
     if (config["inter_coeff"].specified) {
       lm.set_alpha(config["inter_coeff"].get_double());
@@ -94,8 +94,6 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Only on lm specified, cannot set interpolation coff. Exit\n");
     exit(-1);
   }
-
-
 
   lm.set_unk_warn(unkwarn);
   lm.bryan_wc=bryan_wc;
