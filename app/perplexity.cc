@@ -37,6 +37,10 @@ int main(int argc, char *argv[]) {
       fprintf(stderr,"Either -arpa or -bin needs to be specified. Exit.\n");
       exit(-1);
     }
+    if ( config["interpolate"].specified ) {
+      fprintf(stderr,"Interpolation of binary models is not implemented (yet?). Exit.\n");
+      exit(-1);
+    }
     lm_name=config["bin"].get_str();
     lm_type=1;
   }
