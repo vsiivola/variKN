@@ -1,9 +1,10 @@
 #include <boost/test/minimal.hpp>
-#include <stdio.h>
+#include <cstdio>
 
 #include <InterKn.hh>
 #include <VarigramFuncs.hh>
 #include <PerplexityFuncs.hh>
+#include <InterTreeGram.hh>
 
 void create_lm(std::string dataname, std::string vocabname, std::string optiname, int n,
                std::string outfname) {
@@ -94,6 +95,15 @@ void test_interpolated_different_vocabs(std::string datadir) {
   BOOST_REQUIRE( fabs(h-1.0) < 0.01 );
 }
 
+void test_intertreegram(std::string datadir) {
+  std::vector< std::string > lm_names;
+  lm_names.push_back(std::string(datadir+"/a-novocab.arpa"));
+  lm_names.push_back(std::string(datadir+"/b-novocab.arpa"));
+  
+  InterTreeGram itg(lm_names);
+   
+}
+
 int test_main( int argc, char *argv[] )             // note the name!
 {
   // FIXME: Use the BOOST unit test framework properly
@@ -101,9 +111,10 @@ int test_main( int argc, char *argv[] )             // note the name!
   fprintf(stderr, "datadir: %s\n", argv[1]);
   std::string datadir(argv[1]);
   
-  create_simple_models(datadir);
-  test_interpolation(datadir);
-  test_interpolated_different_vocabs(datadir);
+  //create_simple_models(datadir);
+  //test_interpolation(datadir);
+  //test_interpolated_different_vocabs(datadir);
+  test_intertreegram(datadir);
 
   return 0;
   /*
