@@ -111,9 +111,9 @@ int test_main( int argc, char *argv[] )             // note the name!
   fprintf(stderr, "datadir: %s\n", argv[1]);
   std::string datadir(argv[1]);
   
-  //create_simple_models(datadir);
-  //test_interpolation(datadir);
-  //test_interpolated_different_vocabs(datadir);
+  create_simple_models(datadir);
+  test_interpolation(datadir);
+  test_interpolated_different_vocabs(datadir);
   test_intertreegram(datadir);
 
   return 0;

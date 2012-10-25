@@ -12,14 +12,9 @@ HashGram_t<KT>::~HashGram_t() {
   for (size_t i=1;i<backoffs.size();i++) delete backoffs[i];
 }
 
-void HashGram::read_error()
-{
-  fprintf(stderr, "HashGram::read(): error on line %d\n", m_lineno);
-  exit(1);
-}
-
 template <typename KT>
 void HashGram_t<KT>::read_real(FILE *file) {
+  m_lineno = 0;
   std::string line;
   std::vector<std::string> vec;
 
@@ -27,80 +22,27 @@ void HashGram_t<KT>::read_real(FILE *file) {
   line.reserve(128); 
   vec.reserve(16);
 
-  bool ok = true;
+  bool interpolated;
 
-  m_lineno = 0;
-
-  // Find header
-  while (1) {
-    ok = str::read_line(&line, file, true);
-    m_lineno++;
-
-    if (!ok) {
-      fprintf(stderr, "HashGram::read(): "
-	      "error on line %d while waiting \\data\\", m_lineno);
-      exit(1);
-    }
-
-    if (line == "\\interpolated") m_type=INTERPOLATED;
-
-    if (line == "\\data\\")
-      break;
-  }
-
-  // Read header
-  int order = 1;
-  int number_of_nodes = 0;
-  int max_order_count = 0;
-  while (1) {
-    ok = str::read_line(&line, file, true);
-    m_lineno++;
-
-    if (!ok) {
-      fprintf(stderr, "HashGram::read(): "
-	      "error on line %d while reading counts", m_lineno);
-      exit(1);
-    }
-    
-    // Header ends in a \-command
-    if (line[0] == '\\')
-      break;
-
-    // Skip empty lines
-    if (line.find_first_not_of(" \t\n") == line.npos)
-      continue;
-
-    // All non-empty header lines must be ngram counts
-    if (line.substr(0, 6) != "ngram ")
-      read_error();
-    {
-      std::string tmp(line.substr(6));
-      str::split(&tmp, "=", false, &vec);
-    }
-    if (vec.size() != 2)
-      read_error();
-
-    int count = atoi(vec[1].c_str());
-    if (count > max_order_count)
-      max_order_count = count;
-    number_of_nodes += count;
-    m_counts.push_back(count);
-    
-    if (atoi(vec[0].c_str()) != order || m_counts.back() < 0)
-      read_error();
-    order++;
+  read_header(file, interpolated, line);
+  if (interpolated) {
+    m_type=INTERPOLATED;
   }
 
   m_order=m_counts.size();
   probs.resize(m_order+1);
   backoffs.resize(m_order+1);
-  // Read ngrams order by order
-  for (order = 1; order <= m_counts.size(); order++) {
+  
+  bool ok = true;
+
+  // Read ngrams order by order  
+  for (int order = 1; order <= m_counts.size(); order++) {
     fprintf(stderr,"Reserving %d grams for order %d\n", m_counts[order-1], order);
     probs[order]=new sikMatrix<KT, float>(order,m_counts[order-1], MINLOGPROB);
     backoffs[order]=new sikMatrix<KT, float>(order,m_counts[order-1], 0.0);
 
     // We must always have the correct header line at this point
+    fprintf(stderr, "DEBUG '%s'", line.c_str());
     if (line[0] != '\\') {
       fprintf(stderr, "HashGram::read(): "
 	      "\\%d-grams expected on line %d\n", order, m_lineno);

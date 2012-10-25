@@ -78,7 +78,7 @@ public:
 
 protected:
   int m_last_order;
-  std::vector<int> m_counts;
+  //std::vector<int> m_counts;
   int m_order;
   Type m_type;
 };

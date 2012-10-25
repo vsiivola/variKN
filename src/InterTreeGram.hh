@@ -24,8 +24,6 @@ public:
   float log_prob_i(const Gram &gram) { assert(false); } // Interpolated
 
 private:
-  Vocabulary m_vocab();
-
   void initialize_vocab(std::vector< std::string > );
 };
 #endif

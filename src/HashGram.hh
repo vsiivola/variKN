@@ -8,8 +8,9 @@
 #include <cstdio>
 #include "NGram.hh"
 #include "sikMatrix.hh"
+#include "ArpaReader.hh"
 
-class HashGram : public NGram {
+class HashGram : public NGram, public ArpaReader {
 public:
   HashGram () : m_print_zerograms(false) {}
   virtual ~HashGram() {}
@@ -20,9 +21,6 @@ public:
   virtual void add_zeroprob_grams() = 0;
 
 protected:
-  inline void read_error();
-  int m_lineno;
-
   struct twofloat {
     twofloat(float a, float b): float1(a), float2(b) {}
     twofloat() {}

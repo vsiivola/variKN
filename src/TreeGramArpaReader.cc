@@ -5,22 +5,11 @@
 // internal prefix tree format.
 #include <stdlib.h>
 #include <assert.h>
+//#include <map>
 
 #include "GramSorter.hh"
 #include "TreeGramArpaReader.hh"
 #include "str.hh"
-
-TreeGramArpaReader::TreeGramArpaReader()
-  : m_lineno(0)
-{
-}
-
-void
-TreeGramArpaReader::read_error()
-{
-  fprintf(stderr, "TreeGramArpaReader::read(): error on line %d\n", m_lineno);
-  exit(1);
-}
 
 void
 TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram)
@@ -33,69 +22,18 @@ TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram)
   vec.reserve(16);
 
   bool ok = true;
-
+  bool interpolated;
+  read_header(file, interpolated, line);
+  if (interpolated) {
+    tree_gram->set_type(TreeGram::INTERPOLATED);
+  }
   m_lineno = 0;
 
-  // Find header
-  while (1) {
-    ok = str::read_line(&line, file, true);
-    m_lineno++;
-
-    if (!ok) {
-      fprintf(stderr, "TreeGramArpaReader::read(): "
-	      "error on line %d while waiting \\data\\", m_lineno);
-      exit(1);
-    }
-
-    if (line == "\\interpolated")
-      tree_gram->set_type(TreeGram::INTERPOLATED);
-
-    if (line == "\\data\\")
-      break;
-  }
-
-  // Read header
-  int order = 1;
   int number_of_nodes = 0;
-  int max_order_count = 0;
-  while (1) {
-    ok = str::read_line(&line, file, true);
-    m_lineno++;
-
-    if (!ok) {
-      fprintf(stderr, "TreeGramArpaReader::read(): "
-	      "error on line %d while reading counts", m_lineno);
-      exit(1);
-    }
-    
-    // Header ends in a \-command
-    if (line[0] == '\\')
-      break;
-
-    // Skip empty lines
-    if (line.find_first_not_of(" \t\n") == line.npos)
-      continue;
-
-    // All non-empty header lines must be ngram counts
-    if (line.substr(0, 6) != "ngram ")
-      read_error();
-    {
-      std::string tmp(line.substr(6));
-      str::split(&tmp, "=", false, &vec);
-    }
-    if (vec.size() != 2)
-      read_error();
-
-    int count = atoi(vec[1].c_str());
-    if (count > max_order_count)
-      max_order_count = count;
-    number_of_nodes += count;
-    m_counts.push_back(count);
-    
-    if (atoi(vec[0].c_str()) != order || m_counts.back() < 0)
-      read_error();
-    order++;
-  }
+  for(std::vector<int>::iterator j=m_counts.begin();j!=m_counts.end();++j)
+    number_of_nodes += *j;
+  int order = m_counts.size();
+  fprintf(stdout, "order2 %d\n", order);
 
   tree_gram->reserve_nodes(number_of_nodes);
 

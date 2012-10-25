@@ -8,20 +8,14 @@
 
 #include <stdio.h>
 #include "TreeGram.hh"
-#include <map>
+#include "ArpaReader.hh"
 
-class TreeGramArpaReader {
+class TreeGramArpaReader : public ArpaReader{
 public:
-  TreeGramArpaReader();
+  //TreeGramArpaReader() ;
   void read(FILE *file, TreeGram *tree_gram);
   void write(FILE *file, TreeGram *tree_gram);
   void write_interpolated(FILE *file, TreeGram *treegram);
-
-private:
-  void read_error();
-
-  std::vector<int> m_counts;
-  int m_lineno;
 };
 
 #endif /* TREEGRAMARPAREADER_HH */
