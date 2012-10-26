@@ -6,6 +6,7 @@
 #include "conf.hh"
 #include "io.hh"
 #include "TreeGram.hh"
+//#include "HashGram.hh"
 
 int main (int argc, char **argv) {
   conf::Config config;
@@ -17,7 +18,8 @@ int main (int argc, char **argv) {
   io::Stream out(config.arguments[1], "w");
 
   TreeGram ng;
-  
+  //HashGram_t<int> ng;
+
   fprintf(stderr,"Reading\n");
   ng.read(in.file);
   in.close();

@@ -50,7 +50,6 @@ ArpaReader::read_header(FILE *file, bool &interpolated, std::string &line)
   int max_order_count = 0;
   while (1) {
     ok = str::read_line(&line, file, true);
-    //fprintf(stderr,"got line %s\n", line.c_str());
     m_lineno++;
 
     if (!ok) {
@@ -147,7 +146,6 @@ ArpaReader::next_gram(FILE *file, std::string &line, std::vector<int> &gram, flo
       read_error();
     str::clean(&line, " \t\n");
     m_lineno++;
-    fprintf(stderr,"got line %d (%d %d): %s\n", m_lineno, m_read_order, m_gram_num, line.c_str());
 
     // Ignore empty lines
     if (line.find_first_not_of(" \t\n") == line.npos) {
