@@ -8,13 +8,9 @@
 #include "TreeGram.hh"
 #include "HashGram.hh"
 
-Perplexity::Perplexity(const char *lm_name, bool hashgram) {
+Perplexity::Perplexity(const char *lm_name) {
   init_variables();
-  if (hashgram) {
-    m_lm = new HashGram_t<int>;
-  } else {
-    m_lm = new TreeGram;
-  }
+  m_lm = new TreeGram;
   m_need_destruct_m_lm=true;
   m_lm->set_oov("<UNK>");
   m_tmpstring_length = 100;

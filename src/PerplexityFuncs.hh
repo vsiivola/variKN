@@ -16,7 +16,7 @@
 
 class Perplexity {
 public:
-  Perplexity(const char *, bool hashgram=false);
+  Perplexity(const char *);
   Perplexity(NGram *lm, const std::string ccs_name, 
 	     const std::string wb_name, const bool mathias_wb);
   Perplexity(const std::string lm_name, const int type, 

@@ -9,10 +9,11 @@
 #include "ArpaReader.hh"
 
 class InterTreeGram : public NGram {
-  friend TreeGram;
+  //friend TreeGram;
   
 public:
   InterTreeGram ( std::vector< std::string > );
+  ~InterTreeGram ( );
   void read(FILE *, bool) { assert(false); }
   void write(FILE *, bool) { assert(false); }
   float log_prob_bo(const std::vector<int> &gram) { assert(false); } // backoff, default
@@ -25,6 +26,8 @@ public:
   float log_prob_i(const Gram &gram) { assert(false); } // Interpolated
 
 private:
-  void initialize_vocab(std::vector< std::string > );
+  void initialize_models(std::vector< std::string > );
+
+  std::vector<TreeGram *> m_models;
 };
 #endif

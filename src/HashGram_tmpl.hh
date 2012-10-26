@@ -39,9 +39,6 @@ void HashGram_t<KT>::read_real(FILE *file) {
     }
     // Inefficiency due to abstracting ArpaReader out
     std::vector<KT> gram(tmp_gram.begin(), tmp_gram.end());  
-
-    print_indices(stderr, gram); 
-    fprintf(stderr,"order %d lp %f bo %f %p\n", order, log_prob, back_off, probs[order]);
     if (log_prob>MINLOGPROB) {
       probs[order]->setvalue(&gram[0],log_prob);
     }
