@@ -12,7 +12,7 @@ class InterTreeGram : public NGram {
   //friend TreeGram;
   
 public:
-  InterTreeGram ( std::vector< std::string > );
+  InterTreeGram ( std::vector< std::string >, std::vector<float> );
   ~InterTreeGram ( );
   void read(FILE *, bool) { assert(false); }
   void write(FILE *, bool) { assert(false); }
@@ -26,8 +26,7 @@ public:
   float log_prob_i(const Gram &gram) { assert(false); } // Interpolated
 
 private:
-  void initialize_models(std::vector< std::string > );
-
   std::vector<TreeGram *> m_models;
+  std::vector<float> m_coeffs;
 };
 #endif

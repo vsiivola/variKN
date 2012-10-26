@@ -102,8 +102,12 @@ void test_intertreegram(std::string datadir) {
   std::vector< std::string > lm_names;
   lm_names.push_back(std::string(datadir+"/a-novocab.arpa"));
   lm_names.push_back(std::string(datadir+"/b-novocab.arpa"));
-  
-  InterTreeGram itg(lm_names);
+
+  std::vector< float> coeffs;
+  coeffs.push_back(0.5);
+  coeffs.push_back(0.5);
+
+  InterTreeGram itg(lm_names, coeffs);
    
 }
 

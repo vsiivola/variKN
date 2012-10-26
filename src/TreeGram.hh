@@ -60,7 +60,6 @@ public:
   };
 
   void reserve_nodes(int nodes); 
-  void set_interpolation(const std::vector<float> &interpolation);
 
   /// Adds a new gram to the language model.
   // 
@@ -152,7 +151,6 @@ private:
   void fetch_gram(const Gram &gram, int first);
 
   std::vector<int> m_order_count;	// number of grams in each order
-  std::vector<float> m_interpolation;	// FIXME: remove this, unused
   std::vector<Node> m_nodes;		// storage for the nodes
   std::vector<int> m_fetch_stack;	// indices of the gram requested
   //int m_last_order;			// order of the last hit

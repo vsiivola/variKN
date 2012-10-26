@@ -32,12 +32,6 @@ TreeGram::reserve_nodes(int nodes)
 }
 
 void
-TreeGram::set_interpolation(const std::vector<float> &interpolation)
-{
-  m_interpolation = interpolation;
-}
-
-void
 TreeGram::print_gram(FILE *file, const Gram &gram)
 {
   for (int i = 0; i < gram.size(); i++) {
@@ -475,11 +469,6 @@ TreeGram::flip_endian()
   assert(sizeof(m_nodes[0].log_prob == 4));
   assert(sizeof(m_nodes[0].back_off == 4));
   assert(sizeof(m_nodes[0].child_index == 4));
-
-  if (m_type == INTERPOLATED) {
-    assert(m_interpolation.size() == m_order);
-    Endian::convert(&m_interpolation[0], 4 * m_order);
-  }
 
   for (int i = 0; i < m_nodes.size(); i++) {
     Endian::convert(&m_nodes[i].word, 4);

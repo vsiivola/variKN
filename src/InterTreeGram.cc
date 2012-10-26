@@ -2,17 +2,23 @@
 #include "TreeGramArpaReader.hh"
 #include "InterTreeGram.hh"
 
-InterTreeGram::InterTreeGram(std::vector< std::string > lm_names) {
-  initialize_models(lm_names);
-}
-
-InterTreeGram::~InterTreeGram(void) {
-  for (std::vector<TreeGram *>::iterator j=m_models.begin();j!=m_models.end();++j) {
-    delete *j;
+InterTreeGram::InterTreeGram(std::vector< std::string > lm_names, std::vector<float> coeffs) {
+  if (lm_names.size() != coeffs.size()) {
+    fprintf(stderr, "InterTreeGram::InterTreeGram: There must be as many interpolation coeffs as there are LMs. Exit.\n");
+    exit(1);
   }
-}
 
-void InterTreeGram::initialize_models(std::vector< std::string > lm_names) {
+  float coeff_sum=0.0;
+  for(std::vector<float>::iterator j=coeffs.begin();j!=coeffs.end();++j) {
+    coeff_sum += *j;
+  }
+
+  if (coeff_sum < 0.99 || coeff_sum>1.01) {
+    fprintf(stderr, "InterTreeGram::InterTreeGram: Interpolation coeffs must sum to 1 (!=%f). Exit.\n", coeff_sum);
+    exit(1);
+  }
+  m_coeffs = coeffs;
+
   // Combine vocab from all models
   for ( std::vector<std::string>::iterator it = lm_names.begin(); it != lm_names.end(); it ++) {
     fprintf(stdout, "INTERTREEGRAM %s\n", it->c_str());
@@ -40,3 +46,11 @@ void InterTreeGram::initialize_models(std::vector< std::string > lm_names) {
     m_models.push_back(lm);
   }
 }
+
+InterTreeGram::~InterTreeGram(void) {
+  for (std::vector<TreeGram *>::iterator j=m_models.begin();j!=m_models.end();++j) {
+    delete *j;
+  }
+}
+
+
