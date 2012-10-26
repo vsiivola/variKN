@@ -28,10 +28,16 @@ Perplexity::Perplexity(const char *lm_name) {
 }
 
 Perplexity::Perplexity(NGram *lm, const std::string ccs_name, 
-		       const std::string wb_name, const bool mathias_wb) {
+		       const std::string wb_name, const std::string unk_symbol, const bool mathias_wb) {
   init_variables();
   m_lm=lm;
   m_need_destruct_m_lm=false;
+
+  if (unk_symbol.length())
+    m_lm->set_oov(unk_symbol);
+  else
+    m_lm->set_oov("<UNK>");
+
   init_special_symbols(ccs_name,wb_name, mathias_wb);
 }
 

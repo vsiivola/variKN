@@ -29,6 +29,7 @@ public:
   float log_prob_bo(const Gram &gram) { assert(false); } // Keep this version lean and mean
   float log_prob_i(const Gram &gram) { assert(false); } // Interpolated
 
+  void test_write(std::string fname, int idx);
 private:
   std::vector<TreeGram *> m_models;
   std::vector<float> m_coeffs;

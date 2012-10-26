@@ -28,7 +28,6 @@ TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram)
   int number_of_nodes = 0;
   for(std::vector<int>::iterator j=areader.counts.begin();j!=areader.counts.end();++j)
     number_of_nodes += *j;
-  fprintf(stdout, "order2 %ld\n", areader.counts.size());
 
   tree_gram->reserve_nodes(number_of_nodes);
   std::vector<int> tmp_gram;
@@ -37,6 +36,7 @@ TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram)
   int prev_order = 1;
   
   GramSorter *sorter = new GramSorter(1, areader.counts[0]);
+  fprintf(stderr, "num words before areader %d\n", tree_gram->num_words());
   while ( areader.next_gram(file, line, tmp_gram, log_prob, back_off)) {
     int cur_order = tmp_gram.size();
     TreeGram::Gram gram(tmp_gram.begin(), tmp_gram.end());

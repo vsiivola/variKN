@@ -29,6 +29,24 @@ void create_varigram_lm(std::string dataname, std::string vocabname, std::string
   out.close();
 }
 
+float itg_perplexity(std::string model1, std::string model2, std::string infname, bool use_hashgram=false, float alpha=0.5) {
+  std::vector< std::string > lm_names;
+  lm_names.push_back(model1);
+  lm_names.push_back(model2);
+
+  std::vector< float> coeffs;
+  coeffs.push_back(alpha);
+  coeffs.push_back(1.0-alpha);
+
+  InterTreeGram itg(lm_names, coeffs);
+  io::Stream txtin(infname,"r");
+  io::Stream out("-","w");
+  
+  Perplexity lm(&itg, "", "", "", false);
+  lm.logprob_file(txtin.file, NULL);
+  return lm.print_results(out.file);
+}
+
 float perplexity(std::string model1, std::string model2, std::string infname, bool use_hashgram=false, float alpha=0.5) {
   io::Stream txtin(infname,"r");
   io::Stream out("-","w");
@@ -75,8 +93,10 @@ void test_interpolation(std::string datadir) {
 
   fprintf(stdout, "Perplexity of ab interp 0.5:\n");
   h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.5);
+  float h2 = itg_perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.5);
   fprintf(stderr,"h5 %f %f\n", h, fabs(h-1.0) );
   BOOST_REQUIRE( fabs(h-1.0) < 0.01 );
+  BOOST_REQUIRE( fabs(h-h2) < 0.01 );
 
   fprintf(stdout, "Perplexity of ab interp 1.0:\n");
   h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.99);
@@ -85,12 +105,14 @@ void test_interpolation(std::string datadir) {
 
   fprintf(stdout, "Perplexity of ab interp 0.0 against a:\n");
   h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 1.00);
+  h2 = itg_perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 1.00);
   fprintf(stderr,"h7 %f\n", h );
   BOOST_REQUIRE( h > -0.01 );
+  BOOST_REQUIRE( fabs(h-h2) < 0.01 );
 }
 
 void test_interpolated_different_vocabs(std::string datadir) {
-  create_lm(datadir+"/ax20.txt", datadir+"/vocab.txt", datadir+"/ax20.txt", 3, datadir+"/a-novocab.arpa");
+  create_lm(datadir+"/ax20.txt", "", datadir+"/ax20.txt", 3, datadir+"/a-novocab.arpa");
   create_varigram_lm(datadir+"/bx20.txt", "", datadir+"/bx20.txt", 3, datadir+"/b-novocab.arpa");
   fprintf(stdout, "Perplexity of ab interp 0.5 (novocab):\n");
   float h = perplexity(datadir+"/a-novocab.arpa", datadir+"/b-novocab.arpa", datadir+"/abx20.txt", 0.5);
@@ -100,15 +122,16 @@ void test_interpolated_different_vocabs(std::string datadir) {
 
 void test_intertreegram(std::string datadir) {
   std::vector< std::string > lm_names;
-  lm_names.push_back(std::string(datadir+"/a-novocab.arpa"));
   lm_names.push_back(std::string(datadir+"/b-novocab.arpa"));
+  lm_names.push_back(std::string(datadir+"/a-novocab.arpa"));
 
   std::vector< float> coeffs;
   coeffs.push_back(0.5);
   coeffs.push_back(0.5);
 
   InterTreeGram itg(lm_names, coeffs);
-   
+  itg.test_write("foo-itg1.arpa", 0);
+  itg.test_write("foo-itg2.arpa", 1);
 }
 
 int test_main( int argc, char *argv[] )             // note the name!
@@ -119,8 +142,8 @@ int test_main( int argc, char *argv[] )             // note the name!
   std::string datadir(argv[1]);
   
   // FIXME: Write unit test to read and write a arpa file with treegram and hashgram
-  create_simple_models(datadir);
-  test_interpolation(datadir);
+  //create_simple_models(datadir);
+  //test_interpolation(datadir);
   test_interpolated_different_vocabs(datadir);
   test_intertreegram(datadir);
 

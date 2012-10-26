@@ -29,6 +29,11 @@ InterTreeGram::InterTreeGram(std::vector< std::string > lm_names, std::vector<fl
     std::string line;
     bool dummy;
     areader.read_header(lm_in.file, dummy, line);
+
+    std::vector<int> tmp_gram(1);
+    float log_prob, back_off;
+    // This adds all words to vocab and discards the other information
+    while( areader.next_gram(lm_in.file, line, tmp_gram, log_prob, back_off) && tmp_gram.size()==1) {}
   }
 
   // Initialize all models
@@ -40,11 +45,15 @@ InterTreeGram::InterTreeGram(std::vector< std::string > lm_names, std::vector<fl
     for (int i=0; i<num_words(); i++) {
       lm->add_word(word(i));
     }
+    int real_num_words = num_words();
+    //copy_vocab_to(*lm);
+    assert(lm->num_words() == real_num_words);
 
     // Read n_grams
     TreeGramArpaReader tgar;
     tgar.read(lm_in.file, lm);
     m_models.push_back(lm);
+    assert(lm->num_words() == real_num_words);
   }
 }
 
@@ -62,3 +71,9 @@ float InterTreeGram::log_prob(std::vector<int> &gram) {
   return safelogprob(prob);
 }
 
+void InterTreeGram::test_write(std::string fname, int idx) {
+  io::Stream lm_out(fname, "w");
+  TreeGramArpaReader tga;
+
+  tga.write(lm_out.file, m_models[idx]);
+}

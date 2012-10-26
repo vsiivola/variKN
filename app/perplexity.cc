@@ -4,6 +4,7 @@
 // Calculate the perplexity of the test corpus given a language model
 #include <math.h>
 #include "PerplexityFuncs.hh"
+#include "InterTreeGram.hh"
 #include "conf.hh"
 
 int main(int argc, char *argv[]) {
@@ -57,7 +58,7 @@ int main(int argc, char *argv[]) {
   bool bryan_wc=false; //config["bryan_wc"].specified;
   bool unkwarn=config["unkwarn"].specified;
   int freegram=0;
-  if (config["freegram"].specified or config["interpolate"].specified) {
+  if (config["freegram"].specified) {
     if (config["smallvocab"].specified) freegram=-1;
     else freegram=1;
   }
@@ -87,26 +88,48 @@ int main(int argc, char *argv[]) {
   if (unk_symbol.length()) fprintf(stderr,", unk_symbol %s", unk_symbol.c_str());
   fprintf(stderr,"\n");
 
-  Perplexity lm(lm_name,lm_type,ccs_name, wb_name, unk_symbol, mathias_wb, freegram);
+  Perplexity *lm=NULL;
   if (config["interpolate"].specified) { 
-    fprintf(stderr, "Warning: Interpolation is very experimental.\n");
-    lm.set_interpolation(config["interpolate"].get_str());
-    if (config["inter_coeff"].specified) {
-      lm.set_alpha(config["inter_coeff"].get_double());
+    // Interpolate the old way, using PerplexityFuncs
+    if (config["freegram"].specified) {
+      lm = new Perplexity(lm_name,lm_type,ccs_name, wb_name, unk_symbol, mathias_wb, true);
+      lm->set_interpolation(config["interpolate"].get_str());
+      if (config["inter_coeff"].specified) {
+        lm->set_alpha(config["inter_coeff"].get_double());
+      }
+    } else {
+      // Interpolate the new way, using InterTreeGram
+      std::vector< std::string > lm_names;
+      lm_names.push_back(lm_name);
+      lm_names.push_back(config["interpolate"].get_str());
+      
+      std::vector< float> coeffs;
+      float coeff = 0.5;
+      if (config["inter_coeff"].specified) {
+        coeff =config["inter_coeff"].get_double();
+      }
+      coeffs.push_back(coeff);
+      coeffs.push_back(1.0-coeff);
+      InterTreeGram itg(lm_names, coeffs);
+      lm = new Perplexity(&itg, ccs_name, wb_name, unk_symbol, mathias_wb );
     }
-  } else if (config["inter_coeff"].specified) {
-    fprintf(stderr, "Only on lm specified, cannot set interpolation coff. Exit\n");
-    exit(-1);
+  } else {
+    lm = new Perplexity(lm_name,lm_type,ccs_name, wb_name, unk_symbol, mathias_wb, freegram);
+    if (config["inter_coeff"].specified) {
+      fprintf(stderr, "Only on lm specified, cannot set interpolation coff. Exit\n");
+      exit(-1);
+    }
   }
-
-  lm.set_unk_warn(unkwarn);
-  lm.bryan_wc=bryan_wc;
-
-  if (init_hist) lm.set_init_hist(init_hist);
-  if (stream_out.file) lm.logprob_file(txtin.file, stream_out.file, stream_interval);
-  else lm.logprob_file(txtin.file, NULL);
-
-  if (print_sami) lm.print_results_sami(out.file);
-  lm.print_results(out.file);
-  lm.print_hitrates(out.file);
+  
+  lm->set_unk_warn(unkwarn);
+  lm->bryan_wc=bryan_wc;
+  
+  if (init_hist) lm->set_init_hist(init_hist);
+  if (stream_out.file) lm->logprob_file(txtin.file, stream_out.file, stream_interval);
+  else lm->logprob_file(txtin.file, NULL);
+  
+  if (print_sami) lm->print_results_sami(out.file);
+  lm->print_results(out.file);
+  lm->print_hitrates(out.file);
+  delete lm;
 }

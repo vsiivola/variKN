@@ -223,6 +223,12 @@ TreeGram::find_path(const Gram &gram)
 void
 TreeGram::add_gram(const Gram &gram, float log_prob, float back_off)
 {
+  //fprintf(stderr,"Add gram [ ");
+  for (int i=0; i<gram.size(); i++) {
+    //fprintf(stderr, "%d ", gram[i]);
+  }
+  //fprintf(stderr," ] %f %f\n", log_prob, back_off);
+
   if (m_nodes.empty()) {
     fprintf(stderr, "TreeGram::add_gram(): "
 	    "nodes must be reserved before calling this function\n");
