@@ -1,4 +1,5 @@
 #include "io.hh"
+#include "def.hh"
 #include "TreeGramArpaReader.hh"
 #include "InterTreeGram.hh"
 
@@ -53,4 +54,11 @@ InterTreeGram::~InterTreeGram(void) {
   }
 }
 
+float InterTreeGram::log_prob(std::vector<int> &gram) {
+  double prob=0.0;
+  for (int i=0; i<m_models.size(); i++) {
+    prob += m_coeffs[i] * pow(10, m_models[i]->log_prob(gram));
+  }
+  return safelogprob(prob);
+}
 

@@ -14,6 +14,10 @@ class InterTreeGram : public NGram {
 public:
   InterTreeGram ( std::vector< std::string >, std::vector<float> );
   ~InterTreeGram ( );
+
+  float log_prob(std::vector<int> &gram);
+
+  // NGram.hh wants us to implement these, but these are actually not needed
   void read(FILE *, bool) { assert(false); }
   void write(FILE *, bool) { assert(false); }
   float log_prob_bo(const std::vector<int> &gram) { assert(false); } // backoff, default
