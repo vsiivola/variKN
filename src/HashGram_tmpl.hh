@@ -14,7 +14,7 @@ HashGram_t<KT>::~HashGram_t() {
 
 template <typename KT>
 void HashGram_t<KT>::read_real(FILE *file) {
-  ArpaReader areader((Vocabulary *) this);
+  ArpaReader areader(this);
   bool interpolated;
   std::string line;
 
