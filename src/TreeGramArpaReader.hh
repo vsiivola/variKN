@@ -8,11 +8,9 @@
 
 #include <stdio.h>
 #include "TreeGram.hh"
-#include "ArpaReader.hh"
 
-class TreeGramArpaReader : public ArpaReader{
+class TreeGramArpaReader {
 public:
-  //TreeGramArpaReader() ;
   void read(FILE *file, TreeGram *tree_gram);
   void write(FILE *file, TreeGram *tree_gram);
   void write_interpolated(FILE *file, TreeGram *treegram);

@@ -10,124 +10,61 @@
 #include "GramSorter.hh"
 #include "TreeGramArpaReader.hh"
 #include "str.hh"
+#include "ArpaReader.hh"
 
 void
 TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram)
 {
   std::string line;
-  std::vector<std::string> vec;
-
-  // Just for efficiency
-  line.reserve(128); 
-  vec.reserve(16);
-
+  ArpaReader areader(tree_gram);
   bool ok = true;
   bool interpolated;
-  read_header(file, interpolated, line);
+
+  areader.read_header(file, interpolated, line);
   if (interpolated) {
     tree_gram->set_type(TreeGram::INTERPOLATED);
   }
-  m_lineno = 0;
 
   int number_of_nodes = 0;
-  for(std::vector<int>::iterator j=m_counts.begin();j!=m_counts.end();++j)
+  for(std::vector<int>::iterator j=areader.counts.begin();j!=areader.counts.end();++j)
     number_of_nodes += *j;
-  int order = m_counts.size();
-  fprintf(stdout, "order2 %d\n", order);
+  fprintf(stdout, "order2 %ld\n", areader.counts.size());
 
   tree_gram->reserve_nodes(number_of_nodes);
+  std::vector<int> tmp_gram;
 
-  // Read ngrams order by order
-  for (order = 1; order <= m_counts.size(); order++) {
+  float log_prob, back_off;
+  int prev_order = 1;
+  
+  GramSorter *sorter = new GramSorter(1, areader.counts[0]);
+  while ( areader.next_gram(file, line, tmp_gram, log_prob, back_off)) {
+    int cur_order = tmp_gram.size();
+    TreeGram::Gram gram(tmp_gram.begin(), tmp_gram.end());
 
-    // We must always have the correct header line at this point
-    if (line[0] != '\\') {
-      fprintf(stderr, "TreeGramArpaReader::read(): "
-	      "\\%d-grams expected on line %d\n", order, m_lineno);
-      exit(1);
-    }
-    str::clean(&line, " \t");
-    str::split(&line, "-", false, &vec);
-
-    if (atoi(vec[0].substr(1).c_str()) != order || vec[1] != "grams:") {
-      fprintf(stderr, "TreeGramArpaReader::read(): "
-	      "unexpected command on line %d: %s\n", m_lineno, line.c_str());
-      exit(1);
-    }
-
-    // Read the grams of each order into the sorter
-    GramSorter sorter(order, m_counts[order - 1]);
-    TreeGram::Gram gram;
-    gram.resize(order);
-    for (int w = 0; w < m_counts[order-1]; w++) {
-
-      // Read and split the line
-      if (!str::read_line(&line, file))
-	read_error();
-      str::clean(&line, " \t\n");
-      m_lineno++;
-
-      // Ignore empty lines
-      if (line.find_first_not_of(" \t\n") == line.npos) {
-	w--;
-	continue;
+    if (cur_order > prev_order) {
+      // Sort all grams read above and add them to the tree gram.
+      sorter->sort();
+      assert(sorter->num_grams() == areader.counts[prev_order - 1]);
+      for (int i = 0; i < sorter->num_grams(); i++) {
+        GramSorter::Data data = sorter->data(i);
+        TreeGram::Gram gram = sorter->gram(i);
+        tree_gram->add_gram(gram, data.log_prob, data.back_off);
       }
-
-      str::split(&line, " \t", true, &vec);
-
-      // Check the number of columns on the line
-      if (vec.size() < order + 1 || vec.size() > order + 2) {
-	fprintf(stderr, "TreeGramArpaReader::read(): "
-		"%d columns on line %d\n", (int) vec.size(), m_lineno);
-	exit(1);
-      }
-      if (order == m_counts.size() && vec.size() != order + 1)
-	fprintf(stderr, "WARNING: %d columns on line %d\n", (int) vec.size(), 
-		m_lineno);
-
-      // FIXME: should we deny new words in higher order ngrams?
-
-      // Parse log-probability, back-off weight and word indices
-      // FIXME: check the conversion of floats
-      float log_prob = strtod(vec[0].c_str(), NULL);
-      float back_off = 0;
-      if (vec.size() == order + 2)
-	back_off = strtod(vec[order + 1].c_str(), NULL);
-
-      // Add the gram to sorter
-      //fprintf(stderr,"add gram [");
-      for (int i = 0; i < order; i++) {
-	gram[i] = tree_gram->add_word(vec[i + 1]);
-	//fprintf(stderr," %d", gram[i]);
-      }
-      sorter.add_gram(gram, log_prob, back_off);
-      //fprintf(stderr,"] = [%f %f]\n",log_prob,back_off);
+      delete sorter;
+      sorter = new GramSorter(cur_order, areader.counts[cur_order-1]);
+      prev_order=cur_order;
     }
-
-    // Sort all grams read above and add them to the tree gram.
-    sorter.sort();
-    assert(sorter.num_grams() == m_counts[order - 1]);
-    for (int i = 0; i < sorter.num_grams(); i++) {
-      GramSorter::Data data = sorter.data(i);
-      gram = sorter.gram(i);
-
-      tree_gram->add_gram(gram, data.log_prob, data.back_off);
-    }
-
-    // Skip empty lines before the next order.
-    while (1) {
-      if (!str::read_line(&line, file, true)) {
-	if (ferror(file))
-	  read_error();
-	if (feof(file))
-	  break;
-      }
-      m_lineno++;
-
-      if (line.find_first_not_of(" \t\n") != line.npos)
-	break;
-    }
+    sorter->add_gram(gram, log_prob, back_off);
   }
+  // FIXME: Repeating the same code
+  // Finally, sort and add the highest order
+  assert(sorter->num_grams() == areader.counts.back());
+  for (int i = 0; i < sorter->num_grams(); i++) {
+    GramSorter::Data data = sorter->data(i);
+    TreeGram::Gram gram = sorter->gram(i);
+    tree_gram->add_gram(gram, data.log_prob, data.back_off);
+  }
+  delete sorter;
   tree_gram->finalize();
 }
 

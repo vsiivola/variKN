@@ -14,115 +14,38 @@ HashGram_t<KT>::~HashGram_t() {
 
 template <typename KT>
 void HashGram_t<KT>::read_real(FILE *file) {
-  m_lineno = 0;
-  std::string line;
-  std::vector<std::string> vec;
-
-  // Just for efficiency
-  line.reserve(128); 
-  vec.reserve(16);
-
+  ArpaReader areader((Vocabulary *) this);
   bool interpolated;
+  std::string line;
 
-  read_header(file, interpolated, line);
+  areader.read_header(file, interpolated, line);
   if (interpolated) {
     m_type=INTERPOLATED;
   }
 
-  m_order=m_counts.size();
+  m_order=areader.counts.size();
   probs.resize(m_order+1);
   backoffs.resize(m_order+1);
-  
-  bool ok = true;
 
-  // Read ngrams order by order  
-  for (int order = 1; order <= m_counts.size(); order++) {
-    fprintf(stderr,"Reserving %d grams for order %d\n", m_counts[order-1], order);
-    probs[order]=new sikMatrix<KT, float>(order,m_counts[order-1], MINLOGPROB);
-    backoffs[order]=new sikMatrix<KT, float>(order,m_counts[order-1], 0.0);
-
-    // We must always have the correct header line at this point
-    fprintf(stderr, "DEBUG '%s'", line.c_str());
-    if (line[0] != '\\') {
-      fprintf(stderr, "HashGram::read(): "
-	      "\\%d-grams expected on line %d\n", order, m_lineno);
-      exit(1);
+  std::vector<int> tmp_gram(1);  
+  float log_prob, back_off;
+  int prev_order = 0;
+  while ( areader.next_gram(file, line, tmp_gram, log_prob, back_off)) {
+    int order = tmp_gram.size();
+    if (order > prev_order) {
+      probs[order]=new sikMatrix<KT, float>(order,areader.counts[order-1], MINLOGPROB);
+      backoffs[order]=new sikMatrix<KT, float>(order,areader.counts[order-1], 0.0);
     }
-    str::clean(&line, " \t");
-    str::split(&line, "-", false, &vec);
+    // Inefficiency due to abstracting ArpaReader out
+    std::vector<KT> gram(tmp_gram.begin(), tmp_gram.end());  
 
-    if (atoi(vec[0].substr(1).c_str()) != order || vec[1] != "grams:") {
-      fprintf(stderr, "HashGram::read(): "
-	      "unexpected command on line %d: %s\n", m_lineno, line.c_str());
-      exit(1);
+    //print_indices(stderr, gram); 
+    //fprintf(stderr,"order %d lp %f bo %f %p\n", order, log_prob, back_off, probs[order]);
+    if (log_prob>MINLOGPROB) {
+      probs[order]->setvalue(&gram[0],log_prob);
     }
-
-    // Read the grams of each order into the sorter
-    std::vector<KT> gram(order);
-    for (int w = 0; w < m_counts[order-1]; w++) {
-
-      // Read and split the line
-      if (!str::read_line(&line, file))
-	read_error();
-      str::clean(&line, " \t\n");
-      m_lineno++;
-
-      // Ignore empty lines
-      if (line.find_first_not_of(" \t\n") == line.npos) {
-	w--;
-	continue;
-      }
-
-      str::split(&line, " \t", true, &vec);
-
-      // Check the number of columns on the line
-      if (vec.size() < order + 1 || vec.size() > order + 2) {
-	fprintf(stderr, "HashGram::read(): "
-		"%d columns on line %d\n", (int) vec.size(), m_lineno);
-	exit(1);
-      }
-      if (order == m_counts.size() && vec.size() != order + 1)
-	fprintf(stderr, "WARNING: %d columns on line %d\n", (int) vec.size(), 
-		m_lineno);
-
-      // FIXME: should we deny new words in higher order ngrams?
-
-      // Parse log-probability, back-off weight and word indices
-      // FIXME: check the conversion of floats
-      float log_prob = strtod(vec[0].c_str(), NULL);
-      float back_off = 0;
-      if (vec.size() == order + 2)
-	back_off = strtod(vec[order + 1].c_str(), NULL);
-
-      // Add the gram to sorter
-      //fprintf(stderr,"add gram [");
-      for (int i = 0; i < order; i++) {
-	gram[i] = add_word(vec[i + 1]);
-      }
-      if (log_prob>MINLOGPROB) {
-	probs[order]->setvalue(&gram[0],log_prob);
-	//fprintf(stderr, "%f ",log_prob); 
-      }
-      //print_indices(gram); 
-      if (back_off<0) {
-	backoffs[order]->setvalue(&gram[0],back_off); 
-	//fprintf(stderr," %f",back_off);
-      }
-      //fprintf(stderr,"\n");
-    }
-
-    // Skip empty lines before the next order.
-    while (1) {
-      if (!str::read_line(&line, file, true)) {
-	if (ferror(file))
-	  read_error();
-	if (feof(file))
-	  break;
-      }
-      m_lineno++;
-
-      if (line.find_first_not_of(" \t\n") != line.npos)
-	break;
+    if (back_off<0) {
+      backoffs[order]->setvalue(&gram[0],back_off); 
     }
   }
 }

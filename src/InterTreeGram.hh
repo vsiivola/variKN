@@ -6,6 +6,7 @@
 #define INTERTREEGRAM_HH
 
 #include "TreeGram.hh"
+#include "ArpaReader.hh"
 
 class InterTreeGram : public NGram {
   friend TreeGram;

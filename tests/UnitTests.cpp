@@ -29,11 +29,11 @@ void create_varigram_lm(std::string dataname, std::string vocabname, std::string
   out.close();
 }
 
-float perplexity(std::string model1, std::string model2, std::string infname, float alpha=0.5) {
+float perplexity(std::string model1, std::string model2, std::string infname, bool use_hashgram=false, float alpha=0.5) {
   io::Stream txtin(infname,"r");
   io::Stream out("-","w");
   
-  Perplexity lm(model1, 0, "", "", "", false, true);
+  Perplexity lm(model1, 0, "", "", "", false, false);
   if (model2 != "") {
     lm.set_interpolation(model2);
     lm.set_alpha(alpha);
@@ -47,8 +47,11 @@ void create_simple_models(std::string datadir) {
 
   create_lm(datadir+"/ax20.txt", datadir+"/vocab.txt", datadir+"/ax20.txt", 3, datadir+"/a.arpa");
   fprintf(stdout, "Perplexity of a against a:\n");
-  h = perplexity(datadir+"/a.arpa", "", datadir+"/ax20.txt");
+  h = perplexity(datadir+"/a.arpa", "", datadir+"/ax20.txt", false);
   fprintf(stderr,"h1 %f\n", h );
+  BOOST_REQUIRE( h > -0.01 );
+  h = perplexity(datadir+"/a.arpa", "", datadir+"/ax20.txt", true);
+  fprintf(stderr,"h1.1 %f\n", h );
   BOOST_REQUIRE( h > -0.01 );
 
   fprintf(stdout, "Perplexity of b against a:\n");
@@ -111,6 +114,7 @@ int test_main( int argc, char *argv[] )             // note the name!
   fprintf(stderr, "datadir: %s\n", argv[1]);
   std::string datadir(argv[1]);
   
+  // FIXME: Write unit test to read and write a arpa file with treegram and hashgram
   create_simple_models(datadir);
   test_interpolation(datadir);
   test_interpolated_different_vocabs(datadir);

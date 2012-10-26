@@ -10,7 +10,7 @@
 #include "sikMatrix.hh"
 #include "ArpaReader.hh"
 
-class HashGram : public NGram, public ArpaReader {
+class HashGram : public NGram {
 public:
   HashGram () : m_print_zerograms(false) {}
   virtual ~HashGram() {}
