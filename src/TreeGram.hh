@@ -66,7 +66,7 @@ public:
   // The grams must be inserted in sorted order.  The only exception
   // is the OOV 1-gram, which can be updated any time.  It exists by
   // default with very small log-prob and zero back-off.
-  void add_gram(const Gram &gram, float log_prob, float back_off);
+  void add_gram(const Gram &gram, float log_prob, float back_off, bool add_missing_unigrams=false);
   void read(FILE *file, bool binary=false);
   void write(FILE *file, bool binary=false);
   void write_real(FILE *file, bool reflip);
@@ -139,14 +139,14 @@ public:
                           std::vector<float> &result_buffer);
 
   void print_debuglist();
-  void finalize();
+  void finalize(bool add_missing_unigrams=false);
   void convert_to_backoff();
 
 private:
   int binary_search(int word, int first, int last);
   void print_gram(FILE *file, const Gram &gram);
   void find_path(const Gram &gram);
-  void check_order(const Gram &gram);
+  void check_order(const Gram &gram, bool add_missing_unigrams=false);
   void flip_endian();
   void fetch_gram(const Gram &gram, int first);
 

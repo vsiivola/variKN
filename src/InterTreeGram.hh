@@ -15,7 +15,7 @@ public:
   InterTreeGram ( std::vector< std::string >, std::vector<float> );
   ~InterTreeGram ( );
 
-  float log_prob(std::vector<int> &gram);
+  float log_prob(const Gram &gram);
 
   // NGram.hh wants us to implement these, but these are actually not needed
   void read(FILE *, bool) { assert(false); }
@@ -26,7 +26,7 @@ public:
   float log_prob_bo(const std::vector<unsigned short> &gram) { assert(false); } // backoff, default
   float log_prob_i(const std::vector<unsigned short> &gram) { assert(false); } // Interpolated
 
-  float log_prob_bo(const Gram &gram) { assert(false); } // Keep this version lean and mean
+  inline float log_prob_bo(const Gram &gram) { log_prob(gram); } // Keep this version lean and mean
   float log_prob_i(const Gram &gram) { assert(false); } // Interpolated
 
   void test_write(std::string fname, int idx);

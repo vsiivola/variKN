@@ -11,7 +11,7 @@
 
 class TreeGramArpaReader {
 public:
-  void read(FILE *file, TreeGram *tree_gram);
+  void read(FILE *file, TreeGram *tree_gram, bool add_missing_unigrams=false);
   void write(FILE *file, TreeGram *tree_gram);
   void write_interpolated(FILE *file, TreeGram *treegram);
 };

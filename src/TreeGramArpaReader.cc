@@ -4,16 +4,16 @@
 // Routines for reading and writing arpa format files from and to the 
 // internal prefix tree format.
 #include <stdlib.h>
-#include <assert.h>
-//#include <map>
+#include <cassert>
 
 #include "GramSorter.hh"
 #include "TreeGramArpaReader.hh"
 #include "str.hh"
 #include "ArpaReader.hh"
+#include "def.hh"
 
 void
-TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram)
+TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram, bool add_missing_unigrams)
 {
   std::string line;
   ArpaReader areader(tree_gram);
@@ -36,7 +36,6 @@ TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram)
   int prev_order = 1;
   
   GramSorter *sorter = new GramSorter(1, areader.counts[0]);
-  fprintf(stderr, "num words before areader %d\n", tree_gram->num_words());
   while ( areader.next_gram(file, line, tmp_gram, log_prob, back_off)) {
     int cur_order = tmp_gram.size();
     TreeGram::Gram gram(tmp_gram.begin(), tmp_gram.end());
@@ -48,7 +47,7 @@ TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram)
       for (int i = 0; i < sorter->num_grams(); i++) {
         GramSorter::Data data = sorter->data(i);
         TreeGram::Gram gram = sorter->gram(i);
-        tree_gram->add_gram(gram, data.log_prob, data.back_off);
+        tree_gram->add_gram(gram, data.log_prob, data.back_off, add_missing_unigrams);
       }
       delete sorter;
       sorter = new GramSorter(cur_order, areader.counts[cur_order-1]);
@@ -62,10 +61,10 @@ TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram)
   for (int i = 0; i < sorter->num_grams(); i++) {
     GramSorter::Data data = sorter->data(i);
     TreeGram::Gram gram = sorter->gram(i);
-    tree_gram->add_gram(gram, data.log_prob, data.back_off);
+    tree_gram->add_gram(gram, data.log_prob, data.back_off, add_missing_unigrams);
   }
   delete sorter;
-  tree_gram->finalize();
+  tree_gram->finalize(add_missing_unigrams);
 }
 
 void
@@ -93,8 +92,9 @@ TreeGramArpaReader::write(FILE *out, TreeGram *tree_gram)
       fprintf(out, "%g", iter.node().log_prob);
 
       // Word indices in the ngram
-      for (int j = 1; j <= order; j++)
+      for (int j = 1; j <= order; j++) {
 	fprintf(out, " %s", tree_gram->word(iter.node(j).word).c_str());
+      }
 
       // Possible backoff
       if (iter.has_children())
@@ -127,7 +127,7 @@ TreeGramArpaReader::write_interpolated(FILE *out, TreeGram *tree_gram)
       for (int j = 1; j <= order; j++) {
 	indices[j-1]=iter.node(j).word;
       }
-      
+
       // Log-probability
       float lp=tree_gram->log_prob_i(indices); // This bypasses Clustermap->wg2cg()
 
@@ -141,8 +141,9 @@ TreeGramArpaReader::write_interpolated(FILE *out, TreeGram *tree_gram)
       fprintf(out, "%g", lp);
 
       // Word indices in the ngram
-      for (int j = 1; j <= order; j++)
+      for (int j = 1; j <= order; j++) {
 	fprintf(out, " %s", tree_gram->word(indices[j-1]).c_str());
+      }
 
       // Possible backoff
       if (iter.has_children()) 

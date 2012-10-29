@@ -42,18 +42,27 @@ InterTreeGram::InterTreeGram(std::vector< std::string > lm_names, std::vector<fl
     TreeGram *lm = new TreeGram;
 
     // Copy vocab;
-    for (int i=0; i<num_words(); i++) {
-      lm->add_word(word(i));
-    }
     int real_num_words = num_words();
-    //copy_vocab_to(*lm);
+    copy_vocab_to(*lm);
     assert(lm->num_words() == real_num_words);
+    for (int i=0; i<num_words(); i++) {
+      assert(lm->word(i)==word(i));
+    }
 
     // Read n_grams
     TreeGramArpaReader tgar;
-    tgar.read(lm_in.file, lm);
+    tgar.read(lm_in.file, lm, true);
+
+    //io::Stream lm_out("whaat", "w");
+    //TreeGramArpaReader tga2;
+    //tga2.write(lm_out.file, lm);
+    
     m_models.push_back(lm);
     assert(lm->num_words() == real_num_words);
+
+    if (lm->order()>m_order) {
+      m_order = lm->order();
+    }
   }
 }
 
@@ -63,7 +72,7 @@ InterTreeGram::~InterTreeGram(void) {
   }
 }
 
-float InterTreeGram::log_prob(std::vector<int> &gram) {
+float InterTreeGram::log_prob(const Gram &gram) {
   double prob=0.0;
   for (int i=0; i<m_models.size(); i++) {
     prob += m_coeffs[i] * pow(10, m_models[i]->log_prob(gram));
@@ -74,6 +83,5 @@ float InterTreeGram::log_prob(std::vector<int> &gram) {
 void InterTreeGram::test_write(std::string fname, int idx) {
   io::Stream lm_out(fname, "w");
   TreeGramArpaReader tga;
-
   tga.write(lm_out.file, m_models[idx]);
 }

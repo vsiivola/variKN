@@ -67,16 +67,23 @@ void create_simple_models(std::string datadir) {
   fprintf(stdout, "Perplexity of a against a:\n");
   h = perplexity(datadir+"/a.arpa", "", datadir+"/ax20.txt", false);
   fprintf(stderr,"h1 %f\n", h );
-  BOOST_REQUIRE( h > -0.01 );
+  BOOST_REQUIRE( h < 0.01 );
   h = perplexity(datadir+"/a.arpa", "", datadir+"/ax20.txt", true);
   fprintf(stderr,"h1.1 %f\n", h );
-  BOOST_REQUIRE( h > -0.01 );
+  BOOST_REQUIRE( h < 0.01 );
 
   fprintf(stdout, "Perplexity of b against a:\n");
   create_varigram_lm(datadir+"/bx20.txt", datadir+"/vocab.txt", datadir+"/bx20.txt", 3, datadir+"/b.arpa");
   h = perplexity(datadir+"/b.arpa", "", datadir+"/ax20.txt");
   fprintf(stderr,"h2 %f\n", h );
   BOOST_REQUIRE( h > 10.0 );
+
+
+  fprintf(stdout, "Perplexity of ab against ab:\n");
+  create_lm(datadir+"/abx20.txt", "", datadir+"/abx20.txt", 3, datadir+"/ab.arpa");
+  h = perplexity(datadir+"/ab.arpa", "", datadir+"/abx20.txt");
+  fprintf(stderr,"h2 %f\n", h );
+  BOOST_REQUIRE( h < 0.01 );
 }
 
 void test_interpolation(std::string datadir) {
@@ -85,7 +92,7 @@ void test_interpolation(std::string datadir) {
   fprintf(stdout, "Perplexity of b against b:\n");
   h = perplexity(datadir+"/b.arpa", "", datadir+"/bx20.txt");
   fprintf(stderr,"h3 %f\n", h );
-  BOOST_REQUIRE( h > -0.01 );
+  BOOST_REQUIRE( h < 0.01 );
 
   fprintf(stdout, "Perplexity of ab interp 0.0:\n");
   h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.01);
@@ -107,7 +114,7 @@ void test_interpolation(std::string datadir) {
   h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 1.00);
   h2 = itg_perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 1.00);
   fprintf(stderr,"h7 %f\n", h );
-  BOOST_REQUIRE( h > -0.01 );
+  BOOST_REQUIRE( h < 0.01 );
   BOOST_REQUIRE( fabs(h-h2) < 0.01 );
 }
 
@@ -128,6 +135,7 @@ void test_intertreegram(std::string datadir) {
   std::vector< float> coeffs;
   coeffs.push_back(0.5);
   coeffs.push_back(0.5);
+  //coeffs.push_back(1.0);
 
   InterTreeGram itg(lm_names, coeffs);
   itg.test_write("foo-itg1.arpa", 0);
@@ -142,9 +150,9 @@ int test_main( int argc, char *argv[] )             // note the name!
   std::string datadir(argv[1]);
   
   // FIXME: Write unit test to read and write a arpa file with treegram and hashgram
-  //create_simple_models(datadir);
+  create_simple_models(datadir);
   //test_interpolation(datadir);
-  test_interpolated_different_vocabs(datadir);
+  //test_interpolated_different_vocabs(datadir);
   test_intertreegram(datadir);
 
   return 0;

@@ -11,6 +11,7 @@
 #include <exception>
 #include <stdio.h>
 #include <map>
+#include <cassert>
 typedef std::map<std::string,int> vocabmap;
 
 class Vocabulary {
@@ -62,6 +63,7 @@ Vocabulary::word(int index) const
 {
   if ((unsigned int)index >= (unsigned int)m_words.size()) {
     fprintf(stderr, "Vocabulary::word(): index %d out of range\n", index);
+    assert(false);
     exit(1);
   }
 

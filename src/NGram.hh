@@ -28,7 +28,7 @@ public:
   virtual void read(FILE *in, bool binary=false)=0;
   virtual void write(FILE *out, bool binary=false)=0;
 
-  inline float log_prob(std::vector<int> &gram) {
+  inline float log_prob(const std::vector<int> &gram) {
     assert(gram.size() > 0);
     switch (m_type) {
     case BACKOFF:
@@ -41,7 +41,7 @@ public:
     return(0);
   }
 
-  inline float log_prob(Gram &gram) {
+  inline float log_prob(const Gram &gram) {
     assert(gram.size() > 0);
     switch (m_type) {
     case BACKOFF:
@@ -54,7 +54,7 @@ public:
     return(0);
   }
 
-  inline float log_prob(std::vector<unsigned short> &gram) {
+  inline float log_prob(const std::vector<unsigned short> &gram) {
     assert(gram.size() > 0);
     switch (m_type) {
     case BACKOFF:

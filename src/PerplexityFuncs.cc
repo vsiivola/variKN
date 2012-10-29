@@ -37,7 +37,6 @@ Perplexity::Perplexity(NGram *lm, const std::string ccs_name,
     m_lm->set_oov(unk_symbol);
   else
     m_lm->set_oov("<UNK>");
-
   init_special_symbols(ccs_name,wb_name, mathias_wb);
 }
 
@@ -145,7 +144,8 @@ float Perplexity::raw_logprob(const char *sentence_in) {
 }
 
 float Perplexity::logprob(const char *word, float &cur_word_lp) {
-  //fprintf(stderr, "\"%s\":\n", word);
+  fprintf(stderr, "\"%s\":\n", word);
+  fprintf(stderr, " %d:\n", m_lm->order());
   cur_word_lp=0.0;
   if (m_cur_init_hist && m_cur_init_hist==m_init_hist) history.clear();
   else if (history.size() == m_lm->order())
@@ -182,14 +182,10 @@ float Perplexity::logprob(const char *word, float &cur_word_lp) {
 
   history.push_back(idx);
   float lp=m_lm->log_prob(history);
-  //fprintf(stderr, "  Cur lp %f\n", lp);
   if (m_lm2) {
     float lp2 = m_lm2->log_prob(history);
-    //fprintf(stderr, "  New lp %f\n", lp2);
-      
     lp=(float)safelogprob(m_alpha*pow(10,lp) + 
 		   (1-m_alpha)*pow(10,lp2));
-    //fprintf(stderr, "  Interp lp %f\n", lp);
   }
   ngram_hits[0]++;
   ngram_hits[m_lm->last_order()]++;
@@ -256,6 +252,7 @@ double Perplexity::logprob_file(FILE *in, FILE *out, const int interval) {
   float interval_sum=0.0;
   float cur_full_word_lp;
   const float log2coeff=1/log10(2.0f);
+
   while (1) {
     int fsc=fscanf(in,"%s",word);
     if (!fsc || fsc==EOF) break;

@@ -29,9 +29,12 @@ Vocabulary::add_word(const std::string &word)
 void
 Vocabulary::set_oov(const std::string &word)
 {
-  clear_words();
-  m_words.push_back(word);
-  m_indices[word] = 0;
+  if (m_words[0]!=word) {
+    fprintf(stderr, "Warning: Reinitializing vocab with a new unk symbol '%s', discarding old vocab.\n", word.c_str());
+    clear_words();
+    m_words.push_back(word);
+    m_indices[word] = 0;
+  }
 }
 
 void
