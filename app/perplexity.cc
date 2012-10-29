@@ -89,9 +89,11 @@ int main(int argc, char *argv[]) {
   fprintf(stderr,"\n");
 
   Perplexity *lm=NULL;
+  InterTreeGram *itg=NULL;
   if (config["interpolate"].specified) { 
     // Interpolate the old way, using PerplexityFuncs
     if (config["freegram"].specified) {
+      fprintf(stderr, "freegram\n");
       lm = new Perplexity(lm_name,lm_type,ccs_name, wb_name, unk_symbol, mathias_wb, true);
       lm->set_interpolation(config["interpolate"].get_str());
       if (config["inter_coeff"].specified) {
@@ -99,6 +101,7 @@ int main(int argc, char *argv[]) {
       }
     } else {
       // Interpolate the new way, using InterTreeGram
+      fprintf(stderr, "treegram\n");
       std::vector< std::string > lm_names;
       lm_names.push_back(lm_name);
       lm_names.push_back(config["interpolate"].get_str());
@@ -110,8 +113,8 @@ int main(int argc, char *argv[]) {
       }
       coeffs.push_back(coeff);
       coeffs.push_back(1.0-coeff);
-      InterTreeGram itg(lm_names, coeffs);
-      lm = new Perplexity(&itg, ccs_name, wb_name, unk_symbol, mathias_wb );
+      itg = new InterTreeGram(lm_names, coeffs);
+      lm = new Perplexity(itg, ccs_name, wb_name, unk_symbol, mathias_wb );
     }
   } else {
     lm = new Perplexity(lm_name,lm_type,ccs_name, wb_name, unk_symbol, mathias_wb, freegram);
@@ -120,7 +123,6 @@ int main(int argc, char *argv[]) {
       exit(-1);
     }
   }
-  
   lm->set_unk_warn(unkwarn);
   lm->bryan_wc=bryan_wc;
   
@@ -131,5 +133,6 @@ int main(int argc, char *argv[]) {
   if (print_sami) lm->print_results_sami(out.file);
   lm->print_results(out.file);
   lm->print_hitrates(out.file);
+  if (itg) delete itg;
   delete lm;
 }
