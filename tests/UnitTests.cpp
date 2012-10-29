@@ -110,11 +110,12 @@ void test_interpolation(std::string datadir) {
   fprintf(stderr,"h6 %f\n", h );
   // BOOST_REQUIRE( abs(lp) < 0.01 );
 
+  // FIXME: fix this test
   fprintf(stdout, "Perplexity of ab interp 0.0 against a:\n");
-  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 1.00);
-  h2 = itg_perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 1.00);
+  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 0.00);
+  h2 = itg_perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 0.00);
   fprintf(stderr,"h7 %f\n", h );
-  BOOST_REQUIRE( h < 0.01 );
+  BOOST_REQUIRE( fabs(h-1.0) < 0.01 );
   BOOST_REQUIRE( fabs(h-h2) < 0.01 );
 }
 
@@ -151,8 +152,8 @@ int test_main( int argc, char *argv[] )             // note the name!
   
   // FIXME: Write unit test to read and write a arpa file with treegram and hashgram
   create_simple_models(datadir);
-  //test_interpolation(datadir);
-  //test_interpolated_different_vocabs(datadir);
+  test_interpolation(datadir);
+  test_interpolated_different_vocabs(datadir);
   test_intertreegram(datadir);
 
   return 0;
