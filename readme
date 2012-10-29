@@ -63,7 +63,7 @@ Useful tricks:
 * By default, cmake will configure for a "Debug" build.  To change 
   the kind of build, use the CMAKE_BUILD_TYPE variable:
 
-  cmake .. -DCMAKE_BUILD_TYPE=Release
+  cmake .. -DCMAKE_BUILD_TYPE=Debug
 
 * If you're experimenting with alternate build flags, you can define 
   them as environment variables before configuring.  For example:
