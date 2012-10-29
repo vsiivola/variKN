@@ -22,7 +22,6 @@ InterTreeGram::InterTreeGram(std::vector< std::string > lm_names, std::vector<fl
 
   // Combine vocab from all models
   for ( std::vector<std::string>::iterator it = lm_names.begin(); it != lm_names.end(); it ++) {
-    fprintf(stdout, "INTERTREEGRAM %s\n", it->c_str());
     ArpaReader areader(this);
     io::Stream lm_in(*it, "r");
     

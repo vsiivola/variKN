@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     ('W',"wb=FILE","arg","","Word break symbol file. One token per line.")
     ('u',"unk=STRING","arg","","Unk symbol (defaul <UNK>, case sensitive)")
     ('U',"unkwarn","","","Warn if unknown tokens are seen")
-    ('i',"interpolate=FLOAT","arg","","Interpolate with given arpa LM. Currently mostly broken, do not use.")
+    ('i',"interpolate=FLOAT","arg","","Interpolate with given arpa LM.")
     ('I',"inter_coeff=FLOAT","arg","-1","Interpolation coefficient.")
     //('X',"mathias_wb","","","Assume word break, unless token ends with '>'")
     //('Y',"bryan_wc","","","All underscores '_' are considered word breaks")
@@ -93,7 +93,6 @@ int main(int argc, char *argv[]) {
   if (config["interpolate"].specified) { 
     // Interpolate the old way, using PerplexityFuncs
     if (config["freegram"].specified) {
-      fprintf(stderr, "freegram\n");
       lm = new Perplexity(lm_name,lm_type,ccs_name, wb_name, unk_symbol, mathias_wb, true);
       lm->set_interpolation(config["interpolate"].get_str());
       if (config["inter_coeff"].specified) {
@@ -101,7 +100,6 @@ int main(int argc, char *argv[]) {
       }
     } else {
       // Interpolate the new way, using InterTreeGram
-      fprintf(stderr, "treegram\n");
       std::vector< std::string > lm_names;
       lm_names.push_back(lm_name);
       lm_names.push_back(config["interpolate"].get_str());
@@ -111,8 +109,8 @@ int main(int argc, char *argv[]) {
       if (config["inter_coeff"].specified) {
         coeff =config["inter_coeff"].get_double();
       }
-      coeffs.push_back(coeff);
       coeffs.push_back(1.0-coeff);
+      coeffs.push_back(coeff);
       itg = new InterTreeGram(lm_names, coeffs);
       lm = new Perplexity(itg, ccs_name, wb_name, unk_symbol, mathias_wb );
     }
@@ -132,7 +130,8 @@ int main(int argc, char *argv[]) {
   
   if (print_sami) lm->print_results_sami(out.file);
   lm->print_results(out.file);
-  lm->print_hitrates(out.file);
+  if (!itg) // FIXME: This doesn't work yet for InterTreeGrams
+    lm->print_hitrates(out.file);
   if (itg) delete itg;
   delete lm;
 }
