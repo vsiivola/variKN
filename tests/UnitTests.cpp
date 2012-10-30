@@ -18,10 +18,10 @@ void create_lm(std::string dataname, std::string vocabname, std::string optiname
 }
 
 void create_varigram_lm(std::string dataname, std::string vocabname, std::string optiname, int n,
-                        std::string outfname) {
+                        std::string outfname, float dscale1=1.0, float dscale2=2.0) {
   Varigram_t<unsigned short, int> vg(false, false);
-  vg.set_datacost_scale(1);
-  vg.set_datacost_scale2(2);
+  vg.set_datacost_scale(dscale1);
+  vg.set_datacost_scale2(dscale2);
   vg.initialize(dataname, 100, 0, 9999999, optiname, "", false, vocabname);
   vg.grow(1);
   io::Stream out(outfname,"w");
@@ -82,8 +82,12 @@ void create_simple_models(std::string datadir) {
   fprintf(stdout, "Perplexity of ab against ab:\n");
   create_lm(datadir+"/abx20.txt", "", datadir+"/abx20.txt", 3, datadir+"/ab.arpa");
   h = perplexity(datadir+"/ab.arpa", "", datadir+"/abx20.txt");
-  fprintf(stderr,"h2 %f\n", h );
+  fprintf(stderr,"h2.1 %f\n", h );
   BOOST_REQUIRE( h < 0.01 );
+  create_varigram_lm(datadir+"/abx20.txt", "", datadir+"/abx20.txt", 3, datadir+"/ab-vg.arpa", 0.01, 0.02);
+  h = perplexity(datadir+"/ab-vg.arpa", "", datadir+"/abx20.txt");
+  fprintf(stderr,"h2.2 %f\n", h );
+  BOOST_REQUIRE( h < 0.05 );
 }
 
 void test_interpolation(std::string datadir) {
