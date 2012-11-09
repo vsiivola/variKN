@@ -2,6 +2,7 @@
 // See licence.txt for the terms of distribution.
 
 // The main library for the n-gram model estimation
+#include <limits>
 #include "GramSorter.hh"
 #ifdef _WIN32
 inline double log2( double n ){
@@ -454,6 +455,12 @@ template <typename KT, typename CT> template <typename BOT>
 void InterKn_t<KT, CT>::add_zeroprob_grams_fbase(BOT *dummy) {
   std::vector<KT> v;
   CT num;
+  if (std::numeric_limits<KT>::max() < this->vocab.num_words()) {
+    fprintf(stderr, "Too large vocab for the given key type!!! Abort.\n");
+    exit(-1);
+  }
+
+
   this->set_order(moc->order());
 
   for (int o=this->m_order;o>=2;o--) {
@@ -469,8 +476,10 @@ void InterKn_t<KT, CT>::add_zeroprob_grams_fbase(BOT *dummy) {
     while (this->moc->StepBackoffsOrder(false, o, &v[0], &b))
       if (b.den>0) this->moc->IncrementCount(o-1, &v[0], 0);
   }
+
   // Add zeroprob unigrams:
   for (KT i=0;i<this->vocab.num_words();i++) {
+    fprintf(stderr, "%d/%d %s\n", i, this->vocab.num_words(), this->vocab.word(i).c_str());
     this->moc->IncrementCount(1,&i,0);
   }
 }
@@ -760,7 +769,7 @@ void InterKn_t<KT, CT>::counts2lm(TreeGram *lm) {
       prob=kn_prob(o,&v[0],num);
       coeff=kn_coeff(o+1,&v[0]);
       for (int i=0;i<o;i++) gr[i]=v[i];
-      //fprintf(stderr,"to sorter: %.4f ",safelogprob(prob));print_indices(v); fprintf(stderr," %.4f\n", safelogprob(coeff));
+      //fprintf(stderr,"to sorter: %.4f ",safelogprob(prob));print_indices(stderr, v); fprintf(stderr," %.4f\n", safelogprob(coeff));
       gramsorter.add_gram(gr,safelogprob(prob),safelogprob2(coeff));
       breaker=false;
     }
@@ -769,7 +778,7 @@ void InterKn_t<KT, CT>::counts2lm(TreeGram *lm) {
     for (size_t i = 0; i < gramsorter.num_grams(); i++) {
       GramSorter::Data data = gramsorter.data(i);
       gr = gramsorter.gram(i);
-      //fprintf(stderr,"adding ");print_indices(gr);fprintf(stderr," %.4f %.4f\n", data.log_prob, data.back_off);
+      //fprintf(stderr,"adding ");print_indices(stderr, gr);fprintf(stderr," %.4f %.4f\n", data.log_prob, data.back_off);
       lm->add_gram(gr, data.log_prob, data.back_off);
     }
   }
