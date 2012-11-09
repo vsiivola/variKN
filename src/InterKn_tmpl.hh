@@ -479,7 +479,7 @@ void InterKn_t<KT, CT>::add_zeroprob_grams_fbase(BOT *dummy) {
 
   // Add zeroprob unigrams:
   for (KT i=0;i<this->vocab.num_words();i++) {
-    fprintf(stderr, "%d/%d %s\n", i, this->vocab.num_words(), this->vocab.word(i).c_str());
+    //fprintf(stderr, "%d/%d %s\n", i, this->vocab.num_words(), this->vocab.word(i).c_str());
     this->moc->IncrementCount(1,&i,0);
   }
 }
@@ -614,7 +614,7 @@ void InterKn_t<KT, CT>::constructor_helper(
     if (vocabname.length()) {
       fprintf(stderr,"Using vocab %s\n", vocabname.c_str());
       if (this->vocab.num_words()>1) 
-	fprintf(stderr,"Warning: something is goiong wrong. The vocabularies must be the same (not checked)\n");
+	fprintf(stderr,"Warning: something is going wrong. The vocabularies must be the same (not checked)\n");
       if (this->vocab.num_words()>65534) { 
 	fprintf(stderr,"Too big vocabulary for --smallvocab (%d). Exit.\n", 
 		this->vocab.num_words());
@@ -622,6 +622,10 @@ void InterKn_t<KT, CT>::constructor_helper(
       }
       io::Stream vocabin(vocabname,"r");
       this->vocab.read(vocabin.file);
+      if (this->vocab.num_words()<1) {
+        fprintf(stderr, "Warning: no words from vocab file? Exit\n");
+        exit(-1);
+      }
     }
     if (this->vocab.num_words()>1) {
       fprintf(stderr,"Restricted vocab\n");

@@ -91,8 +91,6 @@ int main(int argc, char **argv) {
   if (dscale>0.0) vg->set_datacost_scale(dscale);
   if (dscale2>0.0) vg->set_datacost_scale2(dscale2); // use also pruning
   if (max_order) vg->set_max_order(max_order);
-  //vg->small_memory=smallmem;
-  //fprintf(stderr,"setting smallmem to %d\n", vg->small_memory);
 
   try {
     if (config["clear_history"].specified)
