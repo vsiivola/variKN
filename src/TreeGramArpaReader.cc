@@ -58,6 +58,7 @@ TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram, bool add_missing_unigr
   // FIXME: Repeating the same code
   // Finally, sort and add the highest order
   assert(sorter->num_grams() == areader.counts.back());
+  sorter->sort();
   for (int i = 0; i < sorter->num_grams(); i++) {
     GramSorter::Data data = sorter->data(i);
     TreeGram::Gram gram = sorter->gram(i);
