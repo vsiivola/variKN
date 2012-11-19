@@ -9,8 +9,6 @@
 #include "ArpaReader.hh"
 
 class InterTreeGram : public NGram {
-  //friend TreeGram;
-  
 public:
   InterTreeGram ( std::vector< std::string >, std::vector<float> );
   ~InterTreeGram ( );
@@ -29,6 +27,7 @@ public:
   inline float log_prob_bo(const Gram &gram) { log_prob(gram); } // Keep this version lean and mean
   float log_prob_i(const Gram &gram) { assert(false); } // Interpolated
 
+  void fetch_bigram_list(int, std::vector<int>&, std::vector<float>&); // For speech recognition LM lookahead
   void test_write(std::string fname, int idx);
 private:
   std::vector<TreeGram *> m_models;

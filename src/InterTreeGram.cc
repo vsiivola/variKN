@@ -84,3 +84,27 @@ void InterTreeGram::test_write(std::string fname, int idx) {
   TreeGramArpaReader tga;
   tga.write(lm_out.file, m_models[idx]);
 }
+
+void InterTreeGram::fetch_bigram_list(int prev_word_id, std::vector<int> &next_word_id,
+                                      std::vector<float> &result_buffer) {
+  /* This may be too slow for real use */
+
+  // Zero the result buffer
+  for (std::vector<float>::iterator it=result_buffer.begin(); it!=result_buffer.end(); ++it) {
+    *it = 0.0f;
+  }
+
+  // Accumulate probs
+  std::vector<float> cresbuf(result_buffer.size());
+  for (int i=0; i<m_models.size(); i++) {
+    m_models[i]->fetch_bigram_list(prev_word_id, next_word_id, cresbuf);
+    for (int j=0; j<result_buffer.size(); j++) {
+      result_buffer[j] += m_coeffs[i] * pow(10, cresbuf[j]);
+    }
+  }
+
+  // logprob results
+  for (std::vector<float>::iterator it=result_buffer.begin(); it!=result_buffer.end(); ++it) {
+    *it = safelogprob(*it);
+  }
+}
