@@ -1,0 +1,258 @@
+<html>
+<head><title>VariKN toolkit manual</title></head>
+
+<H1>VariKN Language Modeling Toolkit manual page</H1> 
+
+Variable-order Kneser-Ney smoothed n-gram model toolkit is a
+specialized toolkit created for growing and pruning Kneser-Ney
+smoothed n-gram models. If you are looking for a general purpose
+language modeling toolkit, you probably should look elsewhere (for
+example <a href="http://www.speech.sri.com/projects/srilm/">SRILM
+toolkit</a>).
+
+<UL>
+<LI><a href="#counts2kn">counts2kn</a>: Performs Kneser-Ney smoothed
+n-gram estimation and pruning for full counts.  
+<LI><a href="#varigram_kn">varigram_kn</a>: Grows an Kneser-Ney smoothed 
+n-gram models incrementally
+<LI><a href="#perplexity">perplexity</a>: Evaluate the model on a test 
+data set.
+</UL>
+
+<H2>General</h2> 
+
+<H3>File processing features</H3>
+The tools support reading and writing for plain ascii files, stdin and
+stdout, gzipped files, bzip2 compressed files and UNIX pipes. Whether a
+file should be used as is, or uncompressed is determined by the file
+suffix (.gz, .bz2, .anything_else). Stdin and stdout are denoted by
+"-". The reading from a pipe can be forced with the unix pipe symbol
+(for example "| cat file.txt | preprocess.pl", note the leading "|").
+
+<H3>Default tags</H3>
+The sentence start "&lt;s&gt;" and end "&lt;/s&gt;" should be put marked to the
+training data by the user. It is also possible to train models without
+explicit sentence boundaries, but this is not theoretically
+justified. For sub-word models, the tag "&lt;w&gt;" is reserved to
+signify word break. For sub-word models with sentence breaks the data
+is assumed to processed in the following format:
+<pre>
+&lt;s&gt; &lt;w&gt; w1-1 w1-2 w1-3 &lt;w&gt; w2-1 &lt;w&gt; w3-1 w3-2 &lt;w&gt; &lt;/s&gt;
+</pre>
+where wA-B is the Bth part of the A:th word.<P>
+
+<H2>Programs:</H2>
+<a name="counts2kn">
+<H3>counts2kn</H3>
+Counts2kn trains a Kneser-Ney smoothed model from the training data
+using all n-grams up to given order n and then possibly pruning the model.
+<P>
+
+counts2kn [OPTIONS] text_in lm_out<P>
+
+text_in should contain the training set (except for the held-out part
+for discount optimization) and the results are written to lm_out.<P>
+
+<b>Mandatory options</b>:
+<table width=100%>
+<tr><td width=20>-o</td><td width=100>--opti</td>
+<td>The file containing the held-out part of training set. This will
+be used for training the discounts. Suitable size for held out set is
+around 100 000 words/tokens.</td></tr>
+<tr><td>-n</td><td>--norder</td><td>The desired n-gram model order.</td></tr>
+</table>
+
+<P>
+<b>Other options:</b>
+<table width=100%>
+<tr><td width=20>-h</td><td width=100>--help</td><td>Print help</td></tr>
+<tr><td>-a</td><td>--arpa</td>
+<td>Output arpa instead of binary. Recommended for compatibility with
+other tools. This is the only output compatible with SRILM toolkit.</td></tr>
+<tr><td>-x</td><td>--narpa</td>
+<td>Output nonstandard interpolated arpa instead of binary. Saves a
+little memory during model creation but the resulting models should be
+converted to standard back-off form.</td></tr>
+<tr><td>-p</td><td>--prunetreshold</td>
+<td>Pruning treshold for removing the least useful n-grams from the
+model. 0.0 for no pruning, 1.0 for lots of pruning. Corresponds to
+epsilon in [1].</td></tr>
+<tr><td>-f</td><td>--nfirst</td>
+<td>Number of the most common words to be included in the language
+model vocabulary</td></tr>
+<tr><td>-d</td><td>--ndrop</td>
+<td>Drop the words seen less than x times from the language model
+vocabulary.</td></tr>
+<tr><td>-s</td><td>--smallvocab</td>
+<td>The vocabulary does not exceed 65000 words. Saves a lot of
+memory.</td></tr>
+<tr><td>-A</td><td>--absolute</td>
+<td>Use absolute discounting instead of Kneser-Ney smoothing.</td></tr>
+<tr><td>-C</td><td>--clear_history</td>
+<td>Clear language model history at the sentence
+boundaries. Recommended.</td></tr>
+<tr><td>-3</td><td>--3nzer</td>
+<td>Use modified KN smoothing, that is 3 discount parameters per model
+order. Recommended. Increases the memory consumption somewhat, should
+  be omitted if memory is tight.</td></tr>
+<tr><td>-O</td><td>--cutoffs</td>
+<td>Use count cutoffs, --cutoffs "val1 val2 ... valN". Remove n-grams
+    seen less or equal than val times. Val is specified for each order of the
+    model, if the cutoffs are only specified for a few first orders,
+    the last cutoff value is used for all higher order n-grams.</td>
+<tr><td>-L</td><td>--longint</td>
+<td>Store the counts in "long int" type of variable instead of
+  "int". This is necessary when the number of tokens in the training
+  set exceeds the number that can be stored in a regular
+  integer. Increases memory consumption somewhat.</td></tr>
+</table>
+
+
+<a name="varigram_kn">
+<H3>varigram_kn</H3>
+Performs an incremental growing of Kneser-Ney smoothed n-gram model.<P>
+
+varigram_kn [OPTIONS] textin LM_out<P>
+
+text_in should contain the training set (except for the held-out part
+for discount optimization) and the results are written to
+lm_out. Suitable size for held out set is around 100 000
+words/tokens.
+<P>
+
+<b>Mandatory options:</b>
+<table width=100%>
+<tr><td width=20>-o</td><td width=100>--opti</td>
+<td>The file containing the held-out part of training set. This will
+be used for training the discounts. Suitable size for held out set is
+around 100 000 words/tokens.</td></tr>
+<tr><td>-D</td><td>--dscale</td>
+<td>The treshold for accepting new n-grams to the model. 0.05 for
+generating a fairly small model, 0.001 for a large model. Corresponds to
+delta in [1].</td></tr>
+</table>
+
+<P>
+<b>Other options:</b>
+<table width=100%>
+<tr><td width=20>-h</td><td width=100>--help</td><td>Print help</td></tr>
+<tr><td>-n</td><td>--norder</td><td>Maximum n-gram order that will be searched.</td></tr>
+<tr><td>-a</td><td>--arpa</td>
+<td>Output arpa instead of binary. Recommended for compatibility with
+other tools. This is the only output compatible with SRILM toolkit.</td></tr>
+<tr><td>-x</td><td>--narpa</td>
+<td>Output nonstandard interpolated arpa instead of binary. Saves a
+little memory during model creation but the resulting models should be
+converted to standard back-off form.</td></tr>
+<tr><td>-E</td><td>--dscale2</td>
+<td>Pruning treshold for removing the least useful n-grams from the
+model. 1.0 for lots of pruning, 0 for no pruning. Corresponds to
+epsilon in [1].</td></tr>
+<tr><td>-f</td><td>--nfirst</td>
+<td>Number of the most common words to be included in the language
+model vocabulary</td></tr>
+<tr><td>-d</td><td>--ndrop</td>
+<td>Drop the words seen less than x times from the language model
+vocabulary.</td></tr>
+<tr><td>-s</td><td>--smallvocab</td>
+<td>The vocabulary does not exceed 65000 words. Saves a lot of
+memory.</td></tr>
+<tr><td>-A</td><td>--absolute</td>
+<td>Use absolute discounting instead of Kneser-Ney smoothing.</td></tr>
+<tr><td>-C</td><td>--clear_history</td>
+<td>Clear language model history at the sentence
+boundaries. Recommended.</td></tr>
+<tr><td>-3</td><td>--3nzer</td>
+<td>Use modified KN smoothing, that is 3 discount parameters per model
+order. Recommended. Increases the memory consumption somewhat, should
+  be omitted if memory is tight.</td></tr>
+<tr><td>-S</td><td>--smallmem</td>
+<td>Do not load the training data into memory. Instead read it from
+the disk each time it is needed. Saves some memory, slows training
+down somewhat.</td></tr>
+<tr><td>-O</td><td>--cutoffs</td>
+<td>Use count cutoffs, --cutoffs "val1 val2 ... valN". Remove n-grams
+    seen less than val times. Val is specified for each order of the
+    model, if the cutoffs are only specified for a few first orders,
+    the last cutoff value is used for all higher order n-grams.</td></tr>
+<tr><td>-L</td><td>--longint</td>
+<td>Store the counts in "long int" type of variable instead of
+  "int". This is necessary when the number of tokens in the training
+  set exceeds the number that can be stored in a regular
+  integer. Increases memory consumption somewhat.</td></tr>
+</table>
+
+<a name="perplexity">
+<H3>perplexity</H3>
+Calculates the model perplexity and cross-entroy with respect to the
+test set.<P>
+
+perplexity [OPTIONS] text_in results_out<P>
+
+text_in should contain the test set and the results are printed to results_out.<P>
+
+<b>Mandatory options:</b>
+<table width=100%>
+<tr><td width=20>-a</td><td width=100>--arpa</td>
+<td>The input language model is in either standard arpa format or
+interpolated arpa.</td></tr>
+<tr><td>-A</td><td>--bin</td>
+<td>The input language model is in binary format. Either "-a" or "-A"
+must be specified.</td></tr>
+</table>
+
+<P>
+<b>Other options:</b>
+<table width=100%>
+<tr><td width=20>-h</td><td width=100>--help</td><td>Print help</td></tr>
+<tr><td>-C</td><td>--ccs</td>
+<td>File containing the list of context cues that should be ignored
+during perpleixty computation. </td></tr>
+<tr><td>-W</td><td>--wb</td>
+<td>File containing word break symbols. The language model is assumed
+to be a sub-word n-gram model and word breaks are explicitly marked.</td></tr>
+<tr><td>-u</td><td>--unk</td>
+<td>The string is used as the unknown word symbols. For compability
+reasons only.</td></tr>
+<tr><td>-t</td><td>--init_hist</td>
+<td>The number of symbols assumed to be known from the sentence
+start. Normally 1, for sub-word n-grams the inital word break should
+be assumed known and this should be set to 2. Default 0 (fix this).</td></tr>
+<tr><td>-S</td><td>--probstream</td>
+<td>The filename, where the individual probabilities given to each
+word should be put.</td></tr>
+</table>
+
+
+<H2>Examples</H2>
+To train a 3-gram model do:<br>
+counts2kn -an 3 -p 0.1 -o held_out.txt train.txt model.arpa<br>
+or<br>
+counts2kn -asn 3 -p 0.1 -o held_out.txt train.txt.gz model.arpa.bz2<br>
+Adding the flag "-s" reduces the memory use, but limits the vocabulary
+< 65000. <P>
+
+To evaluate the just created model:<br>
+perplexity -t 1 -a model.arpa.bz2 test_set.txt -
+<br>
+or <br>
+perplexity -S stream_out.txt.gz -t 1 -a model.arpa.bz2 "| cat test_set.txt | preprocess.pl" out.txt
+<br>
+
+Note, that for evaluating a language model based on subword units, the
+parameter -t 2 should be used since the two first tokens (sentence
+start and word break) are assumed to be known.
+<P>
+
+To create a grown model do:<br>
+varigram_kn -a -o held_out.txt -D 0.1 -E 0.25 -s -C train.txt grown.arpa.gz<P>
+
+<H2>Known needs for improvement</H2>
+<UL> 
+<LI>The documentation should be improved.
+
+<LI>The structure for storing the n-grams could be implemented more
+efficiently. This requires a lot of work as the code has shortcuts
+past the function interface for efficiency. Will be implemented when/if I
+need more efficient memory handling.
+</UL>
