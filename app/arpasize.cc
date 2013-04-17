@@ -1,7 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
-
 // This program prints out the number of n-grams in the language model.
 #include <stdio.h>
 #include <cassert>

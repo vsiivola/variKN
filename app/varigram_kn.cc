@@ -1,6 +1,3 @@
-// Copyright (c) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Program to grow an n-gram model
 #include "VarigramFuncs.hh"
 #include "conf.hh"

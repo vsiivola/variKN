@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Abstract class for common routines in reading arpa
 #ifndef ARPAREADER_HH
 #define ARPAREADER_HH

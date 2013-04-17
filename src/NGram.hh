@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Interface to the different ways of storing n-gram models
 #ifndef NGRAM_HH
 #define NGRAM_HH

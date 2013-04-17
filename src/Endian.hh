@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Check, is the machine big or little endian.
 #ifndef ENDIAN_HH
 #define ENDIAN_HH

@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Library for storing corpuses in memory
 #ifndef STORAGE_HH
 #define STORAGE_HH

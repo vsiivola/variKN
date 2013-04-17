@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Functions for calculating perplexity
 #ifndef PERPLEXITY_HH
 #define PERPLEXITY_HH

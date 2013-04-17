@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // This program adds n-grams to the model so that it can be written as a 
 // full prefix tree ARPA model. This is required for compability with some 
 // other tools. Also, the binary format used requires this.

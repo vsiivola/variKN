@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 /* Check that the lm is ok, that is for given ngram,
    probabilities sum to 1.0 */
 

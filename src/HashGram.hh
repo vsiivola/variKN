@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Easily modifiable presentation of n-gram language model
 #ifndef HASHGRAM_HH
 #define HASHGRAM_HH

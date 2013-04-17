@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // String handling helper functions
 #ifndef STR_HH
 #define STR_HH

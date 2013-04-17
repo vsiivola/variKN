@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // C++ interface to the sparce matrix library
 #ifndef SMATRIX_HH
 #define SMATRIX_HH

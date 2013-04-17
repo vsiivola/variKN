@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // This program converts the extended ARPA formats used by some tools
 // to regular standard ARPA language models.
 #include "conf.hh"

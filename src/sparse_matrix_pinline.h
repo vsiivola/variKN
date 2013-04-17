@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 sm_inline_void SetRawValue(struct matrix *m, const byte *key, const void *value) {
   indextype idx=FindEntry(m,key,1);
   if (memcmp(value,m->default_value,m->size_of_entry)) {

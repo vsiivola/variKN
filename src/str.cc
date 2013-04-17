@@ -1,5 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
 #include <math.h>
 #include <string.h>
 #include <stdarg.h>

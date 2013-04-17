@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // This program creates first creates a full  unpruned language model of 
 // given order. The model can be then pruned, if some options are given.
 #include "conf.hh"

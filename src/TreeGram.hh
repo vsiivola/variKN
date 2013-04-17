@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Fairly compact prefix tree represantation for n-gram language model
 #ifndef TREEGRAM_HH
 #define TREEGRAM_HH

@@ -1,5 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See LICENCE.TXT for the terms of distribution.
 #include "conf.hh"
 #include "io.hh"
 #include "TreeGramArpaReader.hh"
