@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Helper library for storing and modifying the n-gram counts
 #ifndef NGRAMCOUNTS_HH
 #define NGRAMCOUNTS_HH

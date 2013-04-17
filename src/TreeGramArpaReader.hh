@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Routines for reading and writing arpa format files from and to the 
 // internal prefix tree format.
 #ifndef TREEGRAMARPAREADER_HH

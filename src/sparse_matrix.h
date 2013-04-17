@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 /* 
    Basically, this implements a hash and some helper functions for using 
    the hash as an n-dimensional sparse matrix. Reading and writing should 

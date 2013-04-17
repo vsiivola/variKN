@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Numerical search, quadratic fit
 #include "QFit.hh"
 #include <math.h>

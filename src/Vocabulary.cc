@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Conversion of words to word indices and vice versa.
 #include <errno.h>
 #include "io.hh"

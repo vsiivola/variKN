@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Present and interpolated model through the simple NGram interface
 #ifndef INTERTREEGRAM_HH
 #define INTERTREEGRAM_HH

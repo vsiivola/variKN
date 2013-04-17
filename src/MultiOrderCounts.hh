@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Library for storing and modifying the n-gram counts
 #ifndef MULTIORDERCOUNTS_HH
 #define MULTIORDERCOUNTS_HH

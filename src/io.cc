@@ -1,5 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See LICENCE.TXT for the terms of distribution.
 #include "io.hh"
 
 namespace io {

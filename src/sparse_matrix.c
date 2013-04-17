@@ -1,13 +1,8 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "sparse_matrix.h"
-
-
 
 void check_malloc(void *p, char *erstring) {
   if (p != NULL) return;

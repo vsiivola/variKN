@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // The main library for the n-gram model estimation
 #include <limits>
 #include "GramSorter.hh"

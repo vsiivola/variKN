@@ -1,5 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See LICENCE.TXT for the terms of distribution.
 #ifndef DEF_HH
 #define DEF_HH
 

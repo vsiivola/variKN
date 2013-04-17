@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Sort n-grams
 #ifndef GRAMSORTER_HH
 #define GRAMSORTER_HH

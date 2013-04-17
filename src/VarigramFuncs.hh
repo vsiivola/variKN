@@ -1,6 +1,3 @@
-// Copyright (C) 2007  Vesa Siivola. 
-// See licence.txt for the terms of distribution.
-
 // Functions for the n-gram growing algorithm
 #ifndef VARIGRAMFUNCS_HH
 #define VARIGRAMFUNCS_HH
