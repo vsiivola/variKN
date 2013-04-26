@@ -15,10 +15,11 @@ class Perplexity {
 public:
   Perplexity(const char *);
   Perplexity(NGram *lm, const std::string ccs_name, 
-	     const std::string wb_name, const std::string unk_symbol, const bool mathias_wb);
+	     const std::string wb_name, const std::string mb_name, 
+	     const std::string unk_symbol);
   Perplexity(const std::string lm_name, const int type, 
 	     const std::string ccs_name, const std::string wb_name, 
-	     const std::string unk_symbol, const bool mathias_wb, 
+	     const std::string mb_name, const std::string unk_symbol, 
 	     const int hashgram);
   ~Perplexity();
 
@@ -29,7 +30,7 @@ public:
   double print_results(FILE *out);  
   void print_results_sami(FILE *out);
   
-  enum wb_type { EVERYTIME=0, LISTED=1, MATHIAS_INVERSE=2 };
+  enum wb_type { EVERYTIME=0, LISTED=1, MB_LISTED=2 };
 
   void set_wb_type(wb_type type) {m_wb_type=type;}
   void set_unk_warn(bool w) {m_print_unk_warn=w;}
@@ -50,18 +51,21 @@ private:
   NGram *m_lm2;
   std::vector<int> ccs_vector;
   std::vector<int> wb_vector;
+  std::vector<std::string> mb_vector;
   std::deque<int> history;
   std::vector<int> ngram_hits; 
 
   void find_indices(const std::string,std::vector<int> &);
+  void load_mbs(const std::string, std::vector<std::string> &);
   void init_variables();
   void init_special_symbols(const std::string ccs_name, 
 			    const std::string wb_name,
-			    const bool mathias_wb);
+			    const std::string mb_name);
   char *m_tmpstring;
   int m_tmpstring_length;
   wb_type m_wb_type;
   bool is_wb(int idx);
+  bool is_mb(std::string w);
   bool m_print_unk_warn;
   bool m_need_destruct_m_lm;
   int m_init_hist;

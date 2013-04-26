@@ -15,17 +15,18 @@ Perplexity::Perplexity(const char *lm_name) {
   m_print_unk_warn = false;
 
   //try {  Commented out: Let the exceptions rise to surface...
-      io::Stream in(lm_name,"rb");
-      m_lm->read(in.file, 1);
-      //}  catch (std::exception &e) {
-      //std::cerr << e.what() << std::endl;
-      //exit(1); 
-      //}
-  init_special_symbols("","",0);
+  io::Stream in(lm_name,"rb");
+  m_lm->read(in.file, 1);
+  //}  catch (std::exception &e) {
+  //std::cerr << e.what() << std::endl;
+  //exit(1); 
+  //}
+  init_special_symbols("","","");
 }
 
 Perplexity::Perplexity(NGram *lm, const std::string ccs_name, 
-		       const std::string wb_name, const std::string unk_symbol, const bool mathias_wb) {
+		       const std::string wb_name, const std::string mb_name, 
+		       const std::string unk_symbol) {
   init_variables();
   m_lm=lm;
   m_need_destruct_m_lm=false;
@@ -34,14 +35,14 @@ Perplexity::Perplexity(NGram *lm, const std::string ccs_name,
     m_lm->set_oov(unk_symbol);
   else
     m_lm->set_oov("<UNK>");
-  init_special_symbols(ccs_name,wb_name, mathias_wb);
+  init_special_symbols(ccs_name, wb_name, mb_name);
 }
 
 /* This is the old type of constructor */
 Perplexity::Perplexity(const std::string lm_name, const int type, 
-		       const std::string ccs_name, const std::string wb_name,
-		       const std::string unk_symbol, const bool mathias_wb,
-		       const int hashgram){
+		       const std::string ccs_name, const std::string wb_name, 
+		       const std::string mb_name,
+		       const std::string unk_symbol, const int hashgram){
   init_variables();
   if (hashgram) 
     if (hashgram>0) m_lm = new HashGram_t<int>;
@@ -62,20 +63,20 @@ Perplexity::Perplexity(const std::string lm_name, const int type,
     std::cerr << e.what() << std::endl;
     exit(1); 
   }
-  init_special_symbols(ccs_name,wb_name, mathias_wb);
+  init_special_symbols(ccs_name, wb_name, mb_name);
 }
 
 void Perplexity::init_variables() {
   m_use_unk=0;m_use_ccs=0;m_num_unks=0;m_num_tunks=0;m_num_ccs=0;
   m_num_pwords=0;m_num_ptokens=0;m_unkflag=0;m_print_unk_warn=true;
-  m_logprob=0.0;m_perplexity=0.0;m_token_perplexity=0.0; bryan_wc=false;
+  m_logprob=0.0;m_perplexity=0.0;m_token_perplexity=0.0; 
   m_lm2=NULL; m_alpha=0.5; m_init_hist=m_cur_init_hist=0; m_num_sent_ends=0; 
   m_cw_lpsum=0.0; m_word_logprob=0.0;
 }
 
 void Perplexity::init_special_symbols(const std::string ccs_name, 
-				      const std::string wb_name,
-				      const bool mathias_wb) {
+				      const std::string wb_name, 
+				      const std::string mb_name) {
   if (ccs_name.length()) {
     std::cerr << "Reading ccs";
     find_indices(ccs_name,ccs_vector);
@@ -87,8 +88,11 @@ void Perplexity::init_special_symbols(const std::string ccs_name,
     find_indices(wb_name,wb_vector);  
     std::cerr << " ,found " << wb_vector.size() << " word break symbols." << std::endl;
     m_wb_type=LISTED;
-  } else if (mathias_wb) {
-    m_wb_type=MATHIAS_INVERSE;
+  } else if (mb_name.length()) {
+    std::cerr << "Reading mb";
+    load_mbs(mb_name, mb_vector);
+    std::cerr << " ,found " << mb_vector.size() << " morph break expressions." << std::endl;
+    m_wb_type=MB_LISTED;
   } else
     m_wb_type=EVERYTIME;
 
@@ -119,6 +123,17 @@ void Perplexity::find_indices(const std::string fname, std::vector<int> &vec) {
   }
 }
 
+void Perplexity::load_mbs(const std::string fname, std::vector<std::string> &vec) {
+  char buf[1000];
+  io::Stream in(fname,"r");
+  while (true) {
+    int i = fscanf(in.file, "%s", buf);
+    if (!i || i==EOF) break;
+    std::string sbuf(buf);
+    vec.push_back(sbuf);
+  }
+}
+
 float Perplexity::raw_logprob(const char *sentence_in) {
   float lpsum=0.0, foo; 
   char *sentence = strdup(sentence_in);
@@ -142,6 +157,7 @@ float Perplexity::raw_logprob(const char *sentence_in) {
 
 float Perplexity::logprob(const char *word, float &cur_word_lp) {
   //fprintf(stderr, "\"%s\":\n", word);
+  std::string w(word);
   cur_word_lp=0.0;
   if (m_cur_init_hist && m_cur_init_hist==m_init_hist) history.clear();
   else if (history.size() == m_lm->order())
@@ -163,7 +179,13 @@ float Perplexity::logprob(const char *word, float &cur_word_lp) {
   if (!idx) { /* UNK */
     if (m_print_unk_warn) fprintf(stderr,"Unknown token %s\n",word);
     m_num_tunks++;
-    m_unkflag=1;
+    if (m_wb_type==MB_LISTED && !is_mb(w)) {
+      m_num_unks++;
+      cur_word_lp=m_cw_lpsum;
+      m_cw_lpsum=0.0;
+    } else {
+      m_unkflag=1;
+    }
     history.push_back(0);
     m_lm->set_last_order(0);
     return(0.0);
@@ -185,13 +207,6 @@ float Perplexity::logprob(const char *word, float &cur_word_lp) {
   }
   ngram_hits[0]++;
   ngram_hits[m_lm->last_order()]++;
-
-  if (bryan_wc) {
-    for (int i=1;i<((int) strlen(word))-1;i++) {
-      //fprintf(stderr,"word %s i %d, strelen %d\n",word,i,strlen(word));
-      if (word[i]=='_') m_num_ptokens++;
-    }
-  }
 
   m_num_ptokens++;
   m_cw_lpsum+=lp;
@@ -228,18 +243,42 @@ int Perplexity::get_hitorder(int i) {
 
 bool Perplexity::is_wb(int idx) {
   if (m_wb_type==EVERYTIME) return(true);
-  
+
   if (m_wb_type==LISTED && 
-      (std::find(wb_vector.begin(),wb_vector.end(),idx)!=wb_vector.end())) 
+      (std::find(wb_vector.begin(),wb_vector.end(),idx) != wb_vector.end())) 
     return(true);
 
-
-  if (m_wb_type==MATHIAS_INVERSE) {
-    const std::string &w=m_lm->word(idx);
-    if (w.size()==2 && w[w.length()-1]=='>') return(false);
-    return(true);
+  if (m_wb_type==MB_LISTED) {
+    const std::string &w = m_lm->word(idx);
+    bool mb = is_mb(w);
+    if (mb) { 
+      return(false); // there is morph boundary preceeding/following the token
+    } else { 
+      return(true);  // token is followed/preceeded by a word break
+    }
   }
   return(false);
+}
+
+bool Perplexity::is_mb(std::string w) {
+  if (m_wb_type!=MB_LISTED) return(false);
+  bool mb = false;
+  std::vector<std::string>::iterator itr;
+  for (itr = mb_vector.begin(); itr != mb_vector.end(); ++itr) {
+    int l = itr->length();
+    if ((*itr)[0] == '^') {
+  	if ((*itr).substr(1) == w.substr(0, l-1)) {
+  	  mb = true;
+  	  break;
+  	}
+    } else if ((*itr)[l-1] == '$') {
+  	if ((*itr).substr(0, l-1) == w.substr(0, l-1)) {
+  	  mb = true;
+  	  break;
+  	}
+    }
+  }
+  return(mb);
 }
 
 double Perplexity::logprob_file(FILE *in, FILE *out, const int interval) {

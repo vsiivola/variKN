@@ -11,12 +11,11 @@ int main(int argc, char *argv[]) {
     ('A',"bin=FILE","arg","","Binary format LM. Either arpa or binary model must be specified")
     ('C',"ccs=FILE","arg","","Context cue file. One token per line.")
     ('W',"wb=FILE","arg","","Word break symbol file. One token per line.")
+    ('X',"mb=FILE","arg","","Morph boundary prefix/postfix file. One token per line.")
     ('u',"unk=STRING","arg","","Unk symbol (defaul <UNK>, case sensitive)")
     ('U',"unkwarn","","","Warn if unknown tokens are seen")
     ('i',"interpolate=FLOAT","arg","","Interpolate with given arpa LM.")
     ('I',"inter_coeff=FLOAT","arg","-1","Interpolation coefficient.")
-    //('X',"mathias_wb","","","Assume word break, unless token ends with '>'")
-    //('Y',"bryan_wc","","","All underscores '_' are considered word breaks")
     //('Z',"print_sami","","","Print output for Sami's tools")
     ('t',"init_hist=INT","arg","","Take n first tokens after \"</s>\" as initial LM history (no probabilities assigned)")
     ('f',"freegram","","","No prefix requirements on the n-gram model.")
@@ -43,16 +42,15 @@ int main(int argc, char *argv[]) {
     lm_type=1;
   }
 
-  std::string ccs_name, wb_name, unk_symbol;
+  std::string ccs_name, wb_name, mb_name, unk_symbol;
   if (config["ccs"].specified) ccs_name=config["ccs"].get_str();
   if (config["wb"].specified)  wb_name=config["wb"].get_str();
+  if (config["mb"].specified)  mb_name=config["mb"].get_str();
   if (config["unk"].specified) unk_symbol=config["unk"].get_str();
   io::Stream stream_out;
   if (config["probstream"].specified)
     stream_out.open(config["probstream"].get_str(), "w");
   bool print_sami=false; //config["print_sami"].specified;
-  bool mathias_wb=false; //config["mathias_wb"].specified;
-  bool bryan_wc=false; //config["bryan_wc"].specified;
   bool unkwarn=config["unkwarn"].specified;
   int freegram=0;
   if (config["freegram"].specified) {
@@ -74,14 +72,15 @@ int main(int argc, char *argv[]) {
   io::Stream out(config.arguments[1],"w");
   io::Stream::verbose=false;
 
-  if (mathias_wb && wb_name.length()) {
-    fprintf(stderr,"Cannot specify both -mathias_wb and -wb. Remove one. Exit\n");
+  if (wb_name.length() && mb_name.length()) {
+    fprintf(stderr,"Cannot specify both -mb and -wb. Remove one. Exit\n");
     exit(-1);
   }
 
   fprintf(stderr,"lm %s",lm_name.c_str());
   if (ccs_name.length()) fprintf(stderr,", ccs %s", ccs_name.c_str());
   if (wb_name.length()) fprintf(stderr,", wb_name %s", wb_name.c_str());
+  if (mb_name.length()) fprintf(stderr,", mb_name %s", mb_name.c_str());
   if (unk_symbol.length()) fprintf(stderr,", unk_symbol %s", unk_symbol.c_str());
   fprintf(stderr,"\n");
 
@@ -90,7 +89,7 @@ int main(int argc, char *argv[]) {
   if (config["interpolate"].specified) { 
     // Interpolate the old way, using PerplexityFuncs
     if (config["freegram"].specified) {
-      lm = new Perplexity(lm_name,lm_type,ccs_name, wb_name, unk_symbol, mathias_wb, true);
+      lm = new Perplexity(lm_name, lm_type, ccs_name, wb_name, mb_name, unk_symbol, true);
       lm->set_interpolation(config["interpolate"].get_str());
       if (config["inter_coeff"].specified) {
         lm->set_alpha(config["inter_coeff"].get_double());
@@ -109,17 +108,16 @@ int main(int argc, char *argv[]) {
       coeffs.push_back(1.0-coeff);
       coeffs.push_back(coeff);
       itg = new InterTreeGram(lm_names, coeffs);
-      lm = new Perplexity(itg, ccs_name, wb_name, unk_symbol, mathias_wb );
+      lm = new Perplexity(itg, ccs_name, wb_name, mb_name, unk_symbol );
     }
   } else {
-    lm = new Perplexity(lm_name,lm_type,ccs_name, wb_name, unk_symbol, mathias_wb, freegram);
+    lm = new Perplexity(lm_name,lm_type,ccs_name, wb_name, mb_name, unk_symbol, freegram);
     if (config["inter_coeff"].specified) {
       fprintf(stderr, "Only on lm specified, cannot set interpolation coff. Exit\n");
       exit(-1);
     }
   }
   lm->set_unk_warn(unkwarn);
-  lm->bryan_wc=bryan_wc;
   
   if (init_hist) lm->set_init_hist(init_hist);
   if (stream_out.file) lm->logprob_file(txtin.file, stream_out.file, stream_interval);
