@@ -172,7 +172,7 @@ the disk each time it is needed. Saves some memory, slows training
 down somewhat.</td></tr>
 <tr><td>-O</td><td>--cutoffs</td>
 <td>Use count cutoffs, --cutoffs "val1 val2 ... valN". Remove n-grams
-    seen less than val times. Val is specified for each order of the
+    seen less or equal than val times. Val is specified for each order of the
     model, if the cutoffs are only specified for a few first orders,
     the last cutoff value is used for all higher order n-grams.</td></tr>
 <tr><td>-L</td><td>--longint</td>
@@ -211,6 +211,17 @@ during perpleixty computation. </td></tr>
 <tr><td>-W</td><td>--wb</td>
 <td>File containing word break symbols. The language model is assumed
 to be a sub-word n-gram model and word breaks are explicitly marked.</td></tr>
+<tr><td>-X</td><td>--mb</td>
+<td>File containing morph break prefixes or postfixes. The language
+model is assumed to be a sub-word n-gram model and morphs that are not
+preceeded (or followed) by a word break are marked with a prefix (or
+postfix) string. Prefix strings start with "^" (e.g. "^#" tells that a
+token starting with "#" is not preceeded by a word break) and postfix
+strings end with "$" (e.g. "+$" tells that a token ending with "+" is
+not followed by a word break). The file should also include sentence
+start and end tags (e.g. "^&lt;s&gt;" and "^&lt;/s&gt;"), otherwise
+they are considered as words.
+</td></tr>
 <tr><td>-u</td><td>--unk</td>
 <td>The string is used as the unknown word symbols. For compability
 reasons only.</td></tr>
