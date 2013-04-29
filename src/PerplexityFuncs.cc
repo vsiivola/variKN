@@ -263,19 +263,22 @@ bool Perplexity::is_wb(int idx) {
 bool Perplexity::is_mb(std::string w) {
   if (m_wb_type!=MB_LISTED) return(false);
   bool mb = false;
+  int wl = w.length();
   std::vector<std::string>::iterator itr;
   for (itr = mb_vector.begin(); itr != mb_vector.end(); ++itr) {
-    int l = itr->length();
+    int l = (*itr).length();
     if ((*itr)[0] == '^') {
-  	if ((*itr).substr(1) == w.substr(0, l-1)) {
-  	  mb = true;
-  	  break;
-  	}
+      if ((*itr).substr(1) == w.substr(0, l-1)) {
+	mb = true;
+	break;
+      }
     } else if ((*itr)[l-1] == '$') {
-  	if ((*itr).substr(0, l-1) == w.substr(0, l-1)) {
-  	  mb = true;
-  	  break;
-  	}
+      if (wl >= l-1) { 
+	if ((*itr).substr(0, l-1) == w.substr(wl-l+1)) {
+	  mb = true;
+	  break;
+	}
+      }
     }
   }
   return(mb);
