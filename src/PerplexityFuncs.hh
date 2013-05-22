@@ -46,6 +46,8 @@ public:
   void reset_hitrates();
   int get_hitorder(int i);
 
+  void clear_history() { history.clear(); }
+
 private:
   NGram *m_lm;
   NGram *m_lm2;
