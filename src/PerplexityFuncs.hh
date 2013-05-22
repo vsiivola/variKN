@@ -25,7 +25,8 @@ public:
 
   double logprob_file(FILE *in, FILE *out, const int interval=1);
   float logprob(const char *word, float &cur_word_lp);
-  float raw_logprob(const char *sentence);
+  inline float token_logprob(const char *word) { float tmp; return logprob(word, tmp); };
+  float sentence_logprob(const char *sentence);
   void print_hitrates(FILE *out);
   double print_results(FILE *out);  
   void print_results_sami(FILE *out);

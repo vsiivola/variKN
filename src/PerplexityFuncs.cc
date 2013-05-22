@@ -134,11 +134,10 @@ void Perplexity::load_mbs(const std::string fname, std::vector<std::string> &vec
   }
 }
 
-float Perplexity::raw_logprob(const char *sentence_in) {
+float Perplexity::sentence_logprob(const char *sentence_in) {
   float lpsum=0.0, foo; 
   char *sentence = strdup(sentence_in);
   char *cptr=strtok(sentence, " ");
-  int num_words=-2;
 
   if (strlen(sentence) > m_tmpstring_length) {
     m_tmpstring_length = strlen(sentence);
@@ -146,13 +145,12 @@ float Perplexity::raw_logprob(const char *sentence_in) {
   }
 
   while (cptr) {
-    num_words++;
     sscanf(cptr,"%s", m_tmpstring);
     lpsum += logprob(m_tmpstring, foo);
     cptr=strtok(NULL, " ");
   }
   free(sentence);
-  return -lpsum/num_words;
+  return -lpsum;
 }
 
 float Perplexity::logprob(const char *word, float &cur_word_lp) {
