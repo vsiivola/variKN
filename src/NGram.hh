@@ -8,8 +8,6 @@
 #include <assert.h>
 #include "Vocabulary.hh"
 
-template <typename KT> class ClusterMap;
-
 class NGram : public Vocabulary {
 public:
   typedef std::deque<int> Gram; //Compability with old treegram
