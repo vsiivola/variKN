@@ -6,12 +6,12 @@ FIND_PACKAGE(SWIG 2.0)
 # An ugly hack to force cmake to use python3.
 # You need to set the paths manually corresponding
 # to where your py3 is installed.
-if ("${CMAKE_USE_PYTHON_VERSION}" VERSION_GREATER "2.9.9")
-  set(PYTHON_INCLUDE_PATH /usr/include/python3.2mu)
-  set(PYTHON_LIBRARIES /usr/lib/libpython3.2mu.so)
-  set(PYTHON_EXECUTABLE /usr/bin/python3)
-  set(PYTHON_VERSION ${CMAKE_USE_PYTHON_VERSION})
-endif()
+#if ("${CMAKE_USE_PYTHON_VERSION}" VERSION_GREATER "2.9.9")
+set(PYTHON_INCLUDE_PATH /opt/python3/include/python3.3m)
+set(PYTHON_LIBRARIES /opt/python3/lib/libpython3.3m.so)
+set(PYTHON_EXECUTABLE /opt/python3/bin/python3)
+set(PYTHON_VERSION ${CMAKE_USE_PYTHON_VERSION})
+#endif()
 
 if (PYTHONLIBS_FOUND AND SWIG_FOUND)
     INCLUDE(${SWIG_USE_FILE})
@@ -55,11 +55,11 @@ if (PYTHONLIBS_FOUND AND SWIG_FOUND)
     endif()
 
     SET(CMAKE_SWIG_OUTDIR ${LIBRARY_OUTPUT_PATH})
-    SET_SOURCE_FILES_PROPERTIES(Perplexity.i PROPERTIES CPLUSPLUS ON)
+    SET_SOURCE_FILES_PROPERTIES(VariKN.i PROPERTIES CPLUSPLUS ON)
     # create lib    
-    swig_add_module(varikn_python python Perplexity.i )
+    swig_add_module(varikn_python python VariKN.i )
     swig_link_libraries(varikn_python varikn ${PYTHON_LIBRARIES} ${PLATFORM_LINKFLAGS})
-    set_target_properties(${SWIG_MODULE_varikn_python_REAL_NAME} PROPERTIES OUTPUT_NAME "_Perplexity")
+    set_target_properties(${SWIG_MODULE_varikn_python_REAL_NAME} PROPERTIES OUTPUT_NAME "_VariKN")
     # make nice top-level target name
     add_custom_target(varikn_python ALL 
                       DEPENDS ${SWIG_MODULE_varikn_REAL_NAME})

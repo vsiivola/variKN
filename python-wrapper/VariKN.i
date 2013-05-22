@@ -1,5 +1,5 @@
 %include "exception.i"
-%module Perplexity
+%module VariKN
 
 %exception {
   try {
