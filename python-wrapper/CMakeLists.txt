@@ -60,7 +60,7 @@ if (PYTHONLIBS_FOUND AND SWIG_FOUND)
     # create lib    
     swig_add_module(varikn_python python VariKN.i )
     swig_link_libraries(varikn_python varikn ${PYTHON_LIBRARIES} ${PLATFORM_LINKFLAGS})
-    set_target_properties(${SWIG_MODULE_varikn_python_REAL_NAME} PROPERTIES OUTPUT_NAME "_VariKN")
+    set_target_properties(${SWIG_MODULE_varikn_python_REAL_NAME} PROPERTIES OUTPUT_NAME "_varikn")
     # make nice top-level target name
     add_custom_target(varikn_python ALL 
                       DEPENDS ${SWIG_MODULE_varikn_REAL_NAME})
