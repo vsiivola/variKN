@@ -59,3 +59,6 @@
 #include "PerplexityFuncs.hh"
 #include "VarigramFuncs.hh"
 %}
+
+%template(varigram_int_int) Varigram_t<int, int>;
+

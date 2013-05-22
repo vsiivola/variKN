@@ -4,11 +4,12 @@ FIND_PACKAGE(SWIG 2.0)
 
 #################################################
 # An ugly hack to force cmake to use python3.
+# Not needed with a recent version of cmake
 # You need to set the paths manually corresponding
 # to where your py3 is installed.
-#if ("${CMAKE_USE_PYTHON_VERSION}" VERSION_GREATER "2.9.9")
-#  set(PYTHON_INCLUDE_PATH /usr/include/python3.2mu)
-#  set(PYTHON_LIBRARIES /usr/lib/libpython3.2mu.so)
+#if ("${CMAKE_USE_PYTHON_VERSION}" VERSION_GREATER "3.2")
+#  set(PYTHON_INCLUDE_PATH /usr/include/python3.3mu)
+#  set(PYTHON_LIBRARIES /usr/lib/libpython3.3mu.so)
 #  set(PYTHON_EXECUTABLE /usr/bin/python3)
 #  set(PYTHON_VERSION ${CMAKE_USE_PYTHON_VERSION})
 #endif()

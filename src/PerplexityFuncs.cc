@@ -157,7 +157,6 @@ float Perplexity::raw_logprob(const char *sentence_in) {
 
 float Perplexity::logprob(const char *word, float &cur_word_lp) {
   //fprintf(stderr, "\"%s\":\n", word);
-  std::string w(word);
   cur_word_lp=0.0;
   if (m_cur_init_hist && m_cur_init_hist==m_init_hist) history.clear();
   else if (history.size() == m_lm->order())
@@ -179,7 +178,7 @@ float Perplexity::logprob(const char *word, float &cur_word_lp) {
   if (!idx) { /* UNK */
     if (m_print_unk_warn) fprintf(stderr,"Unknown token %s\n",word);
     m_num_tunks++;
-    if (m_wb_type==MB_LISTED && !is_mb(w)) {
+    if (m_wb_type==MB_LISTED && !is_mb(word)) {
       m_num_unks++;
       cur_word_lp=m_cw_lpsum;
       m_cw_lpsum=0.0;
