@@ -1,10 +1,7 @@
 %include "exception.i"
 %include "std_string.i"
-%include "cpointer.i"
+%include "std_vector.i"
 %module varikn
-
-%pointer_functions(int, intp);
-%pointer_functions(float, floatp);
 
 %exception {
   try {
@@ -53,6 +50,10 @@
 #endif
 #endif
 
+%template(stringvector) std::vector<std::string>;
+%template(floatvector) std::vector<float>;
+
+%feature("notabstract") InterTreeGram;
 %include Vocabulary.hh
 %include NGram.hh
 %include InterTreeGram.hh
