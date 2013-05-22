@@ -53,12 +53,18 @@
 #endif
 #endif
 
+%include Vocabulary.hh
+%include NGram.hh
+%include InterTreeGram.hh
 %include PerplexityFuncs.hh
 %include VarigramFuncs.hh
 %{
+#include "Vocabulary.hh"
+#include "NGram.hh"
+#include "InterTreeGram.hh"
 #include "PerplexityFuncs.hh"
 #include "VarigramFuncs.hh"
 %}
 
-%template(varigram_int_int) Varigram_t<int, int>;
+%template(VarigramTrainer) Varigram_t<int, int>;
 
