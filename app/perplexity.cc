@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     ('X',"mb=FILE","arg","","Morph boundary prefix/postfix file. One token per line.")
     ('u',"unk=STRING","arg","","Unk symbol (defaul <UNK>, case sensitive)")
     ('U',"unkwarn","","","Warn if unknown tokens are seen")
-    ('i',"interpolate=FLOAT","arg","","Interpolate with given arpa LM.")
+    ('i',"interpolate=FILE","arg","","Interpolate with given arpa LM.")
     ('I',"inter_coeff=FLOAT","arg","-1","Interpolation coefficient.")
     //('Z',"print_sami","","","Print output for Sami's tools")
     ('t',"init_hist=INT","arg","","Take n first tokens after \"</s>\" as initial LM history (no probabilities assigned)")
