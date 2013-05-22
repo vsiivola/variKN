@@ -42,7 +42,7 @@ float itg_perplexity(std::string model1, std::string model2, std::string infname
   io::Stream txtin(infname,"r");
   io::Stream out("-","w");
   
-  Perplexity lm(&itg, "", "", "", false);
+  Perplexity lm(&itg, "", "", "", "");
   lm.logprob_file(txtin.file, NULL);
   return lm.print_results(out.file);
 }
@@ -51,7 +51,7 @@ float perplexity(std::string model1, std::string model2, std::string infname, bo
   io::Stream txtin(infname,"r");
   io::Stream out("-","w");
   
-  Perplexity lm(model1, 0, "", "", "", false, false);
+  Perplexity lm(model1, 0, "", "", "", "", false);
   if (model2 != "") {
     lm.set_interpolation(model2);
     lm.set_alpha(alpha);
