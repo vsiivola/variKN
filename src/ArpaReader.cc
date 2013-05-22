@@ -87,7 +87,7 @@ ArpaReader::read_header(FILE *file, bool &interpolated, std::string &line)
 bool 
 ArpaReader::next_gram(FILE *file, std::string &line, std::vector<int> &gram, float &log_prob, float &back_off) {
   // Read ngrams order by order  
-  if (m_read_order == 0 || m_gram_num >= counts[m_read_order-1]) {
+  while (m_read_order == 0 || m_gram_num >= counts[m_read_order-1]) {
     m_gram_num = 0;
     m_read_order++;
 
