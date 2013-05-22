@@ -1,5 +1,10 @@
 %include "exception.i"
-%module Perplexity
+%include "std_string.i"
+%include "cpointer.i"
+%module varikn
+
+%pointer_functions(int, intp);
+%pointer_functions(float, floatp);
 
 %exception {
   try {
