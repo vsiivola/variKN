@@ -50,6 +50,10 @@
 #endif
 #endif
 
+%inline %{
+  typedef int indextype;
+%}
+
 %template(stringvector) std::vector<std::string>;
 %template(floatvector) std::vector<float>;
 

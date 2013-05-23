@@ -27,6 +27,8 @@ public:
   bool absolute;
   void write_vocab(FILE *out) {m_vocab->write(out);}
 
+  inline void write_file(std::string lmname, bool arpa) { io::Stream out(lmname, "w"); write(out.file, arpa); }
+
 protected:
   bool m_use_3nzer;
   float m_datacost_scale;
