@@ -8,11 +8,14 @@ FIND_PACKAGE(SWIG 2.0)
 # You need to set the paths manually corresponding
 # to where your py3 is installed.
 #if ("${CMAKE_USE_PYTHON_VERSION}" VERSION_GREATER "3.2")
-set(PYTHON_INCLUDE_PATH /opt/python3/include/python3.3m)
-set(PYTHON_LIBRARIES /opt/python3/lib/libpython3.3m.so)
-set(PYTHON_EXECUTABLE /opt/python3/bin/python3)
-set(PYTHON_VERSION ${CMAKE_USE_PYTHON_VERSION})
+#set(PYTHON_INCLUDE_PATH /opt/python3/include/python3.3m)
+#set(PYTHON_LIBRARIES /opt/python3/lib/libpython3.3m.so)
+#set(PYTHON_EXECUTABLE /opt/python3/bin/python3)
+#set(PYTHON_VERSION ${CMAKE_USE_PYTHON_VERSION})
 #endif()
+
+# Cmake still detects the old python2 executable first
+set(PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}3")
 
 if (PYTHONLIBS_FOUND AND SWIG_FOUND)
     INCLUDE(${SWIG_USE_FILE})

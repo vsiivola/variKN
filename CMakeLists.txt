@@ -70,6 +70,7 @@ add_subdirectory(app)
 add_subdirectory(python-wrapper)   
 IF(CMAKE_ENABLE_TESTING)
   enable_testing()
-  add_subdirectory(tests)   
+  add_subdirectory(tests)  
+  add_subdirectory(python-wrapper/tests)
 ENDIF(CMAKE_ENABLE_TESTING)
 

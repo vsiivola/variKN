@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import unittest, sys
+sys.path.append("../../lib/python")
 import varikn
+
 
 class TestInterpolation(unittest.TestCase):
     
