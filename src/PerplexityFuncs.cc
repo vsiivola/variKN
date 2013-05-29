@@ -348,15 +348,15 @@ double Perplexity::print_results(FILE *out) {
     fprintf(out,"           %d tokens\n",m_num_ptokens);
   fprintf(out,"Total:     %d words\n\n",m_num_pwords+m_num_unks+m_num_ccs);
   
-  //fprintf(out,"Logprob %.2f\n", m_logprob);
-  //fprintf(out,"Word logprob %.2f\n",m_word_logprob);
-  fprintf(out,"Perplexity %.2f (- %dth root)\n",pow(10,-m_perplexity),m_num_pwords);
-  fprintf(out,"    equals %.2f bits\n",-m_perplexity/log10(2.0));
-  fprintf(out,"Perplexity (sentence ends not in normalization) %.2f (- %dth root) = %.2f bits\n", pow(10, -m_perplexity_wo_sent_ends), m_num_pwords-m_num_sent_ends, -m_perplexity_wo_sent_ends/log10(2.0));
+  fprintf(out,"Logprob %f\n", m_logprob);
+  fprintf(out,"Word logprob %f\n",m_word_logprob);
+  fprintf(out,"Perplexity %f (- %dth root)\n",pow(10,-m_perplexity),m_num_pwords);
+  fprintf(out,"    equals %f bits\n",-m_perplexity/log10(2.0));
+  fprintf(out,"Perplexity (sentence ends not in normalization) %f (- %dth root) = %f bits\n", pow(10, -m_perplexity_wo_sent_ends), m_num_pwords-m_num_sent_ends, -m_perplexity_wo_sent_ends/log10(2.0));
 
   if (m_num_pwords != m_num_ptokens) {
-    fprintf(out,"Tokenwise perplexity %.2f (- %dth root)\n",pow(10,-m_token_perplexity),m_num_ptokens);
-    fprintf(out,"    equals %.2f bits\n",-m_token_perplexity/log10(2.0));
+    fprintf(out,"Tokenwise perplexity %f (- %dth root)\n",pow(10,-m_token_perplexity),m_num_ptokens);
+    fprintf(out,"    equals %f bits\n",-m_token_perplexity/log10(2.0));
   }
   return -m_perplexity/log10(2.0);
 }
