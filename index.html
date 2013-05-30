@@ -32,37 +32,322 @@
 
         <section id="main_content">
           <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+            Introduction</h3>
+VariKN language modeling toolkit provides tools for training n-gram
+language models. Amongst the supported methods are: 
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<UL>
+<LI> Absolute discounting 
+<LI> Kneser-Ney smoothing 
+<LI> Revised Kneser pruning 
+<LI> Kneser-Ney growing 
+</UL>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+The descriptions of Revised Kneser pruning and Kneser-Ney growing can
+be found in the paper Vesa Siivola and Teemu Hirsimäki and Sami
+Virpioja, <a href="https://sites.google.com/site/vesassiivola/publications/TASLP2007.pdf">
+"On Growing and Pruning Kneser-Ney Smoothed N-Gram Models"</a>,
+IEEE Transactions on Speech, Audio and Language Processing,
+15(5):1617-1624, 2007. 
+ <p> <br>
+
+The package provides a more accurate pruning for Kneser-Ney smoothed
+models than the other implementations I know of. Also, it is possible
+to train a very high-order n-gram models with the growing
+algorithm. The models can be output to arpa lm format, which is
+compatible with most common other tools in the field. However, the
+toolkit is poorly documented - you can look at the paper Vesa Siivola,
+Mathias Creutz and Mikko Kurimo: <a href="https://sites.google.com/site/vesassiivola/publications/is2007less.pdf">"Morfessor and VariKN machine
+learning tools for speech and language technology"</a>, Proceedings of the
+8th International Conference on Speech Communication and Technology
+(INTERSPEECH'07), 2007 for guidelines on typical use but that is about
+it. If you are interested in a well supported toolkit that provides a
+wide range of functionality, you might want to look at the <a href="http://www-speech.sri.com/projects/srilm/">srilm
+toolkit</a>. <p>
+
+If it looks like there is interest in using the toolkit but the
+documentation is inadequate, let me know the main sticking points
+and I'll try to do something about it.
+
+<h3>Installation</h3>
+
+Building the varikn toolkit requires the CMake tool.  CMake is a
+makefile generator (like Autoconf). The build script is in
+CMakeLists.txt.  
+    
+The convention for CMake is to build "out-of-source", where all the
+work is done in a separate directory from your source directory.
+First, we configure the build (we only need to do this once): 
+
+<pre><code>mkdir build 
+cd build 
+cmake .. -DCMAKE_BUILD_TYPE=Release 
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+Building Unit tests can be enabled with "-DCMAKE_ENABLE_TESTING=1". The tests do not work on Windows yet. Unit tests can be ran with "make test" or "ctest --verbose". Unit tests require the unit test library from Boost.
+<p><br>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+See the file <em>readme</em> for more information on installation.
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<h3>Provided commands and utilities</h3>
+<UL>
+<LI><a href="#counts2kn">counts2kn</a>: Performs Kneser-Ney smoothed
+n-gram estimation and pruning for full counts.  
+<LI><a href="#varigram_kn">varigram_kn</a>: Grows an Kneser-Ney smoothed 
+n-gram models incrementally
+<LI><a href="#perplexity">perplexity</a>: Evaluate the model on a test 
+data set.
+</UL>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+Python wrappers through swig are also provided. See <em>python-wrapper/tests</em> for examples.<br>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<H3>About the tools</h3> 
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<H4>File processing features</H4>
+The tools support reading and writing for plain ascii files, stdin and
+stdout, gzipped files, bzip2 compressed files and UNIX pipes. Whether a
+file should be used as is, or uncompressed is determined by the file
+suffix (.gz, .bz2, .anything_else). Stdin and stdout are denoted by
+"-". The reading from a pipe can be forced with the unix pipe symbol
+(for example "| cat file.txt | preprocess.pl", note the leading "|").
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<H4>Default tags</H4>
+The sentence start "&lt;s&gt;" and end "&lt;/s&gt;" should be put marked to the
+training data by the user. It is also possible to train models without
+explicit sentence boundaries, but this is not theoretically
+justified. For sub-word models, the tag "&lt;w&gt;" is reserved to
+signify word break. For sub-word models with sentence breaks the data
+is assumed to processed in the following format:
+<pre>
+&lt;s&gt; &lt;w&gt; w1-1 w1-2 w1-3 &lt;w&gt; w2-1 &lt;w&gt; w3-1 w3-2 &lt;w&gt; &lt;/s&gt;
+</pre>
+where wA-B is the Bth part of the A:th word.<P>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<H3>Programs:</H3>
+<a name="counts2kn">
+<H4>counts2kn</H4></a>
+Counts2kn trains a Kneser-Ney smoothed model from the training data
+using all n-grams up to given order n and then possibly pruning the model.
+<P>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-        </section>
+counts2kn [OPTIONS] text_in lm_out<P>
+
+text_in should contain the training set (except for the held-out part
+for discount optimization) and the results are written to lm_out.<P>
+
+<b>Mandatory options</b>:
+<table width=100% align="left">
+<tr><td width=20>-o</td><td width=100>--opti</td>
+<td>The file containing the held-out part of training set. This will
+be used for training the discounts. Suitable size for held out set is
+around 100 000 words/tokens.</td></tr>
+<tr><td>-n</td><td>--norder</td><td>The desired n-gram model order.</td></tr>
+</table>
+
+<P>
+<br>
+<b>Other options:</b>
+<table width=100%>
+<tr><td width=20>-h</td><td width=100>--help</td><td>Print help</td></tr>
+<tr><td>-a</td><td>--arpa</td>
+<td>Output arpa instead of binary. Recommended for compatibility with
+other tools. This is the only output compatible with SRILM toolkit.</td></tr>
+<tr><td>-x</td><td>--narpa</td>
+<td>Output nonstandard interpolated arpa instead of binary. Saves a
+little memory during model creation but the resulting models should be
+converted to standard back-off form.</td></tr>
+<tr><td>-p</td><td>--prunetreshold</td>
+<td>Pruning treshold for removing the least useful n-grams from the
+model. 0.0 for no pruning, 1.0 for lots of pruning. Corresponds to
+epsilon in [1].</td></tr>
+<tr><td>-f</td><td>--nfirst</td>
+<td>Number of the most common words to be included in the language
+model vocabulary</td></tr>
+<tr><td>-d</td><td>--ndrop</td>
+<td>Drop the words seen less than x times from the language model
+vocabulary.</td></tr>
+<tr><td>-s</td><td>--smallvocab</td>
+<td>The vocabulary does not exceed 65000 words. Saves a lot of
+memory.</td></tr>
+<tr><td>-A</td><td>--absolute</td>
+<td>Use absolute discounting instead of Kneser-Ney smoothing.</td></tr>
+<tr><td>-C</td><td>--clear_history</td>
+<td>Clear language model history at the sentence
+boundaries. Recommended.</td></tr>
+<tr><td>-3</td><td>--3nzer</td>
+<td>Use modified KN smoothing, that is 3 discount parameters per model
+order. Recommended. Increases the memory consumption somewhat, should
+  be omitted if memory is tight.</td></tr>
+<tr><td>-O</td><td>--cutoffs</td>
+<td>Use count cutoffs, --cutoffs "val1 val2 ... valN". Remove n-grams
+    seen less or equal than val times. Val is specified for each order of the
+    model, if the cutoffs are only specified for a few first orders,
+    the last cutoff value is used for all higher order n-grams.</td>
+<tr><td>-L</td><td>--longint</td>
+<td>Store the counts in "long int" type of variable instead of
+  "int". This is necessary when the number of tokens in the training
+  set exceeds the number that can be stored in a regular
+  integer. Increases memory consumption somewhat.</td></tr>
+</table>
+
+
+<a name="varigram_kn">
+<H4>varigram_kn</H4></a>
+Performs an incremental growing of Kneser-Ney smoothed n-gram model.<P>
+
+varigram_kn [OPTIONS] textin LM_out<P>
+
+text_in should contain the training set (except for the held-out part
+for discount optimization) and the results are written to
+lm_out. Suitable size for held out set is around 100 000
+words/tokens.
+<P><br>
+
+<b>Mandatory options:</b>
+<table width=100%>
+<tr><td width=20>-o</td><td width=100>--opti</td>
+<td>The file containing the held-out part of training set. This will
+be used for training the discounts. Suitable size for held out set is
+around 100 000 words/tokens.</td></tr>
+<tr><td>-D</td><td>--dscale</td>
+<td>The treshold for accepting new n-grams to the model. 0.05 for
+generating a fairly small model, 0.001 for a large model. Corresponds to
+delta in [1].</td></tr>
+</table>
+
+<P><br>
+<b>Other options:</b>
+<table width=100%>
+<tr><td width=20>-h</td><td width=100>--help</td><td>Print help</td></tr>
+<tr><td>-n</td><td>--norder</td><td>Maximum n-gram order that will be searched.</td></tr>
+<tr><td>-a</td><td>--arpa</td>
+<td>Output arpa instead of binary. Recommended for compatibility with
+other tools. This is the only output compatible with SRILM toolkit.</td></tr>
+<tr><td>-x</td><td>--narpa</td>
+<td>Output nonstandard interpolated arpa instead of binary. Saves a
+little memory during model creation but the resulting models should be
+converted to standard back-off form.</td></tr>
+<tr><td>-E</td><td>--dscale2</td>
+<td>Pruning treshold for removing the least useful n-grams from the
+model. 1.0 for lots of pruning, 0 for no pruning. Corresponds to
+epsilon in [1].</td></tr>
+<tr><td>-f</td><td>--nfirst</td>
+<td>Number of the most common words to be included in the language
+model vocabulary</td></tr>
+<tr><td>-d</td><td>--ndrop</td>
+<td>Drop the words seen less than x times from the language model
+vocabulary.</td></tr>
+<tr><td>-s</td><td>--smallvocab</td>
+<td>The vocabulary does not exceed 65000 words. Saves a lot of
+memory.</td></tr>
+<tr><td>-A</td><td>--absolute</td>
+<td>Use absolute discounting instead of Kneser-Ney smoothing.</td></tr>
+<tr><td>-C</td><td>--clear_history</td>
+<td>Clear language model history at the sentence
+boundaries. Recommended.</td></tr>
+<tr><td>-3</td><td>--3nzer</td>
+<td>Use modified KN smoothing, that is 3 discount parameters per model
+order. Recommended. Increases the memory consumption somewhat, should
+  be omitted if memory is tight.</td></tr>
+<tr><td>-S</td><td>--smallmem</td>
+<td>Do not load the training data into memory. Instead read it from
+the disk each time it is needed. Saves some memory, slows training
+down somewhat.</td></tr>
+<tr><td>-O</td><td>--cutoffs</td>
+<td>Use count cutoffs, --cutoffs "val1 val2 ... valN". Remove n-grams
+    seen less or equal than val times. Val is specified for each order of the
+    model, if the cutoffs are only specified for a few first orders,
+    the last cutoff value is used for all higher order n-grams.</td></tr>
+<tr><td>-L</td><td>--longint</td>
+<td>Store the counts in "long int" type of variable instead of
+  "int". This is necessary when the number of tokens in the training
+  set exceeds the number that can be stored in a regular
+  integer. Increases memory consumption somewhat.</td></tr>
+</table>
+
+<a name="perplexity">
+<H4>perplexity</H4></a>
+Calculates the model perplexity and cross-entroy with respect to the
+test set.<P>
+
+perplexity [OPTIONS] text_in results_out<P>
+
+text_in should contain the test set and the results are printed to results_out.<P>
+
+<b>Mandatory options:</b>
+<table width=100%>
+<tr><td width=20>-a</td><td width=100>--arpa</td>
+<td>The input language model is in either standard arpa format or
+interpolated arpa.</td></tr>
+<tr><td>-A</td><td>--bin</td>
+<td>The input language model is in binary format. Either "-a" or "-A"
+must be specified.</td></tr>
+</table>
+
+<P><br>
+<b>Other options:</b>
+<table width=100%>
+<tr><td width=20>-h</td><td width=100>--help</td><td>Print help</td></tr>
+<tr><td>-C</td><td>--ccs</td>
+<td>File containing the list of context cues that should be ignored
+during perpleixty computation. </td></tr>
+<tr><td>-W</td><td>--wb</td>
+<td>File containing word break symbols. The language model is assumed
+to be a sub-word n-gram model and word breaks are explicitly marked.</td></tr>
+<tr><td>-X</td><td>--mb</td>
+<td>File containing morph break prefixes or postfixes. The language
+model is assumed to be a sub-word n-gram model and morphs that are not
+preceeded (or followed) by a word break are marked with a prefix (or
+postfix) string. Prefix strings start with "^" (e.g. "^#" tells that a
+token starting with "#" is not preceeded by a word break) and postfix
+strings end with "$" (e.g. "+$" tells that a token ending with "+" is
+not followed by a word break). The file should also include sentence
+start and end tags (e.g. "^&lt;s&gt;" and "^&lt;/s&gt;"), otherwise
+they are considered as words.
+</td></tr>
+<tr><td>-u</td><td>--unk</td>
+<td>The string is used as the unknown word symbols. For compability
+reasons only.</td></tr>
+<tr><td>-t</td><td>--init_hist</td>
+<td>The number of symbols assumed to be known from the sentence
+start. Normally 1, for sub-word n-grams the inital word break should
+be assumed known and this should be set to 2. Default 0 (fix this).</td></tr>
+<tr><td>-S</td><td>--probstream</td>
+<td>The filename, where the individual probabilities given to each
+word should be put.</td></tr>
+</table>
+
+
+<H3>Examples</H3>
+To train a 3-gram model do:<br>
+<pre><code>counts2kn -an 3 -p 0.1 -o held_out.txt train.txt model.arpa</code></pre>
+or
+<pre><code>counts2kn -asn 3 -p 0.1 -o held_out.txt train.txt.gz model.arpa.bz2</code></pre>
+Adding the flag "-s" reduces the memory use, but limits the vocabulary
+< 65000. <P>
+
+To evaluate the just created model:
+<pre><code>perplexity -t 1 -a model.arpa.bz2 test_set.txt -</code></pre>
+or 
+<pre><code>perplexity -S stream_out.txt.gz -t 1 -a model.arpa.bz2 "| cat test_set.txt | preprocess.pl" out.txt</code></pre>
+
+Note, that for evaluating a language model based on subword units, the
+parameter -t 2 should be used since the two first tokens (sentence
+start and word break) are assumed to be known.
+<P>
+
+To create a grown model do:<br>
+<pre><code>varigram_kn -a -o held_out.txt -D 0.1 -E 0.25 -s -C train.txt grown.arpa.gz</code></pre>
+
+<H2>Known needs for improvement</H2>
+<UL> 
+<LI>The documentation should be improved.
+
+<LI>The structure for storing the n-grams could be implemented more
+efficiently. This requires a lot of work as the code has shortcuts
+past the function interface for efficiency. Will be implemented when/if I
+need more efficient memory handling.
+</UL>
 
         <footer>
           Varikn is maintained by <a href="https://github.com/vsiivola">vsiivola</a><br>
