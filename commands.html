@@ -19,6 +19,8 @@ n-gram models incrementally
 data set.
 </UL>
 
+Python wrappers through swig are also provided. See <em>python-wrapper/tests</em> for examples.<br>
+
 <H2>General</h2> 
 
 <H3>File processing features</H3>
@@ -43,7 +45,7 @@ where wA-B is the Bth part of the A:th word.<P>
 
 <H2>Programs:</H2>
 <a name="counts2kn">
-<H3>counts2kn</H3>
+<H3>counts2kn</H3></a>
 Counts2kn trains a Kneser-Ney smoothed model from the training data
 using all n-grams up to given order n and then possibly pruning the model.
 <P>
@@ -111,7 +113,7 @@ order. Recommended. Increases the memory consumption somewhat, should
 
 
 <a name="varigram_kn">
-<H3>varigram_kn</H3>
+<H3>varigram_kn</H3></a>
 Performs an incremental growing of Kneser-Ney smoothed n-gram model.<P>
 
 varigram_kn [OPTIONS] textin LM_out<P>
@@ -187,7 +189,7 @@ down somewhat.</td></tr>
 </table>
 
 <a name="perplexity">
-<H3>perplexity</H3>
+<H3>perplexity</H3></a>
 Calculates the model perplexity and cross-entroy with respect to the
 test set.<P>
 
