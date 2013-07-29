@@ -99,7 +99,9 @@ order. Recommended. Increases the memory consumption somewhat, should
 <td>Use count cutoffs, --cutoffs "val1 val2 ... valN". Remove n-grams
     seen less or equal than val times. Val is specified for each order of the
     model, if the cutoffs are only specified for a few first orders,
-    the last cutoff value is used for all higher order n-grams.</td>
+    the last cutoff value is used for all higher order n-grams. All unigrams
+    are included in any case, so if several cutoff values are given, val1 has 
+    no real effect.</td></tr>
 <tr><td>-L</td><td>--longint</td>
 <td>Store the counts in "long int" type of variable instead of
   "int". This is necessary when the number of tokens in the training
@@ -174,7 +176,9 @@ down somewhat.</td></tr>
 <td>Use count cutoffs, --cutoffs "val1 val2 ... valN". Remove n-grams
     seen less or equal than val times. Val is specified for each order of the
     model, if the cutoffs are only specified for a few first orders,
-    the last cutoff value is used for all higher order n-grams.</td></tr>
+    the last cutoff value is used for all higher order n-grams. All unigrams
+    are included in any case, so if several cutoff values are given, val1 has 
+    no real effect.</td></tr>
 <tr><td>-L</td><td>--longint</td>
 <td>Store the counts in "long int" type of variable instead of
   "int". This is necessary when the number of tokens in the training
