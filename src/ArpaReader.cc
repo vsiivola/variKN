@@ -35,7 +35,8 @@ ArpaReader::read_header(FILE *file, bool &interpolated, std::string &line)
       exit(1);
     }
 
-    if (line == "\\interpolated")
+    // iARPA is used by the IRSTLM toolkit
+    if (line == "\\interpolated" || line == "iARPA")
       interpolated = true;
 
     if (line == "\\data\\")
