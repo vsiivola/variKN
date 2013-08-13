@@ -65,7 +65,7 @@ public:
   // default with very small log-prob and zero back-off.
   void add_gram(const Gram &gram, float log_prob, float back_off, bool add_missing_unigrams=false);
   void read(FILE *file, bool binary=false);
-  void write(FILE *file, bool binary=false);
+  void write(FILE *file, bool binary=false, std::string field_separator=" ");
   void write_real(FILE *file, bool reflip);
 
   float log_prob_bo(const Gram &gram); // Keep this version lean and mean

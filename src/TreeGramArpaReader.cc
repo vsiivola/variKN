@@ -66,10 +66,10 @@ TreeGramArpaReader::read(FILE *file, TreeGram *tree_gram, bool add_missing_unigr
 }
 
 void
-TreeGramArpaReader::write(FILE *out, TreeGram *tree_gram) 
+TreeGramArpaReader::write(FILE *out, TreeGram *tree_gram, std::string field_separator) 
 {
   if (tree_gram->get_type()==TreeGram::INTERPOLATED) {
-    write_interpolated(out,tree_gram);
+    write_interpolated(out, tree_gram, field_separator);
     return;
   }
 
@@ -88,15 +88,17 @@ TreeGramArpaReader::write(FILE *out, TreeGram *tree_gram)
       
       // Log-probability
       fprintf(out, "%g", iter.node().log_prob);
+      fprintf(out, "%s%s", field_separator.c_str(), 
+	      tree_gram->word(iter.node(1).word).c_str());
 
       // Word indices in the ngram
-      for (int j = 1; j <= order; j++) {
+      for (int j = 2; j <= order; j++) {
 	fprintf(out, " %s", tree_gram->word(iter.node(j).word).c_str());
       }
 
       // Possible backoff
       if (iter.has_children())
-	fprintf(out, " %g\n", iter.node().back_off);
+	fprintf(out, "%s%g\n", field_separator.c_str(), iter.node().back_off);
       else
 	fprintf(out, "\n");
     }
@@ -106,7 +108,7 @@ TreeGramArpaReader::write(FILE *out, TreeGram *tree_gram)
 
 
 void
-TreeGramArpaReader::write_interpolated(FILE *out, TreeGram *tree_gram) 
+TreeGramArpaReader::write_interpolated(FILE *out, TreeGram *tree_gram, std::string field_separator) 
 {
   TreeGram::Iterator iter;
 
@@ -137,15 +139,17 @@ TreeGramArpaReader::write_interpolated(FILE *out, TreeGram *tree_gram)
 	lp=0;
       }
       fprintf(out, "%g", lp);
+      fprintf(out, "%s%s", field_separator.c_str(), 
+	      tree_gram->word(iter.node(1).word).c_str());
 
       // Word indices in the ngram
-      for (int j = 1; j <= order; j++) {
+      for (int j = 2; j <= order; j++) {
 	fprintf(out, " %s", tree_gram->word(indices[j-1]).c_str());
       }
 
       // Possible backoff
       if (iter.has_children()) 
-	fprintf(out, " %g\n", iter.node().back_off);
+	fprintf(out, "%s%g\n", field_separator.c_str(), iter.node().back_off);
       else
 	fprintf(out, "\n");
     }

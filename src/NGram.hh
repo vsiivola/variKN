@@ -21,7 +21,7 @@ public:
   void set_type(Type type) { m_type = type; }
   Type get_type() { return(m_type); }
   virtual void read(FILE *in, bool binary=false)=0;
-  virtual void write(FILE *out, bool binary=false)=0;
+  virtual void write(FILE *out, bool binary=false, std::string field_separator=" ")=0;
 
   inline float log_prob(const std::vector<int> &gram) {
     assert(gram.size() > 0);

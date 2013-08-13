@@ -325,10 +325,10 @@ TreeGram::add_gram(const Gram &gram, float log_prob, float back_off, bool add_mi
 }
 
 void 
-TreeGram::write(FILE *file, bool binary) { 
+TreeGram::write(FILE *file, bool binary, std::string field_separator) { 
   if (!binary) {
     TreeGramArpaReader areader;
-    areader.write(file, this);
+    areader.write(file, this, field_separator);
     return;
   }
   write_real(file, true);

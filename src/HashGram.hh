@@ -12,7 +12,7 @@ public:
   HashGram () : m_print_zerograms(false) {}
   virtual ~HashGram() {}
   virtual void read(FILE *in, bool binary=false) = 0;
-  virtual void write(FILE *out, bool binary=false) = 0;
+  virtual void write(FILE *out, bool binary=false, std::string field_separator=" ") = 0;
   virtual void remove_empty_grams()=0;
   virtual void prune(float treshold)=0;
   virtual void add_zeroprob_grams() = 0;
@@ -45,14 +45,14 @@ public:
     read_real(in);
   }
   void read_real(FILE *in);
-  void write(FILE *out, bool binary=false) {
+  void write(FILE *out, bool binary=false, std::string field_separator=" ") {
     if (binary) {
       fprintf(stderr,"HashGram: Writing binary format unsupported. Exit.\n");
       exit(-1);
     }
-    write_real(out);
+    write_real(out, field_separator);
   }
-  void write_real(FILE *out);
+  void write_real(FILE *out, std::string field_separator=" ");
   void remove_empty_grams();
   void prune(float treshold);
   void add_zeroprob_grams();

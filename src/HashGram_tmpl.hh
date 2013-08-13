@@ -46,7 +46,7 @@ void HashGram_t<KT>::read_real(FILE *file) {
 }
 
 template <typename KT>
-void HashGram_t<KT>::write_real(FILE *out) {
+void HashGram_t<KT>::write_real(FILE *out, std::string field_separator) {
   std::vector<std::string> strbuf;
   strbuf.reserve(100000);
   std::vector<int> num_grams(m_order+1,0);
@@ -87,11 +87,13 @@ void HashGram_t<KT>::write_real(FILE *out) {
     while (probs[o]->stepthrough(false,&gram[0],&logprob)) {
       bo = backoffs[o]->getvalue(&gram[0]);
       if (!m_print_zerograms && (logprob<=MINLOGPROB && bo >= 0 )) continue;
-      fprintf(out,"%.4f",logprob);
-      for (int i=0;i<o;i++) fprintf(out," %s",word(gram[i]).c_str());
+      fprintf(out, "%.4f",logprob);
+      fprintf(out, "%s%s", field_separator.c_str(), word(gram[0]).c_str());
+      for (int i=1;i<o;i++) 
+	fprintf(out, " %s", word(gram[i]).c_str());
       if (bo <0) 
-	fprintf(out, " %.4f",bo);
-      fprintf(out,"\n");
+	fprintf(out, "%s%.4f", field_separator.c_str(), bo);
+      fprintf(out, "\n");
     }
 
   }

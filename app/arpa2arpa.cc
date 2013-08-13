@@ -7,8 +7,11 @@
 
 int main (int argc, char **argv) {
   conf::Config config;
-  config("Usage:  arpa2arpa nonstandard_in standard_out\nConverts interpolated arpa to backoff arpa.\n");
+  config("Usage:  arpa2arpa nonstandard_in standard_out\nConverts interpolated arpa to backoff arpa.\n")
+    ('t',"tabs","","","Use tabs instead of space between the fields when writing the ARPA file.");
   config.parse(argc,argv,2);
+
+  std::string field_separator = config["tabs"].specified?"\t":" ";
 
   io::Stream::verbose=true;
   io::Stream in(config.arguments[0], "r");
@@ -22,6 +25,6 @@ int main (int argc, char **argv) {
   in.close();
 
   fprintf(stderr,"Writing\n");
-  ng.write(out.file);
+  ng.write(out.file, false, field_separator);
   out.close();
 }

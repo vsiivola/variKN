@@ -1,5 +1,5 @@
-// Routines for reading and writing arpa format files from and to the 
-// internal prefix tree format.
+// Routines for reading arpa format files to the internal prefix tree
+// format.
 #include <stdlib.h>
 #include "ArpaReader.hh"
 #include "str.hh"
