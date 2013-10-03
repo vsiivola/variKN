@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     ('u',"unk=STRING","arg","","Unk symbol (defaul <UNK>, case sensitive)")
     ('U',"unkwarn","","","Warn if unknown tokens are seen")
     ('i',"interpolate=FILE","arg","","Interpolate with given arpa LM.")
-    ('I',"inter_coeff=FLOAT","arg","-1","Interpolation coefficient.")
+    ('I',"inter_coeff=FLOAT","arg","-1","Interpolation coefficient. The interpolated model will be weighted by coeff whereas the main model will be weighted by 1.0-coeff.")
     //('Z',"print_sami","","","Print output for Sami's tools")
     ('t',"init_hist=INT","arg","","Take n first tokens after \"</s>\" as initial LM history (no probabilities assigned)")
     ('f',"freegram","","","No prefix requirements on the n-gram model.")

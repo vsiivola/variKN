@@ -213,7 +213,7 @@ must be specified.</td></tr>
 <tr><td width=20>-h</td><td width=100>--help</td><td>Print help</td></tr>
 <tr><td>-C</td><td>--ccs</td>
 <td>File containing the list of context cues that should be ignored
-during perpleixty computation. </td></tr>
+during perplexity computation. </td></tr>
 <tr><td>-W</td><td>--wb</td>
 <td>File containing word break symbols. The language model is assumed
 to be a sub-word n-gram model and word breaks are explicitly marked.</td></tr>
@@ -231,6 +231,12 @@ they are considered as words.
 <tr><td>-u</td><td>--unk</td>
 <td>The string is used as the unknown word symbols. For compability
 reasons only.</td></tr>
+<tr><td>-U</td><td>--unkwarn</td>
+<td>Warn if unknown tokens are seen</td></tr>
+<tr><td>-i</td><td>--interpolate</td>
+<td>Interpolate with given arpa LM.</td></tr>
+<tr><td>-I</td><td>--inter_coeff</td>
+<td>Interpolation coefficient. The interpolated model will be weighted by coeff whereas the main model will be weighted by 1.0-coeff.</td><tr>
 <tr><td>-t</td><td>--init_hist</td>
 <td>The number of symbols assumed to be known from the sentence
 start. Normally 1, for sub-word n-grams the inital word break should
