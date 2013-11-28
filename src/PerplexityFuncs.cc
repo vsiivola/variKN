@@ -13,6 +13,7 @@ Perplexity::Perplexity(const char *lm_name) {
   m_tmpstring_length = 100;
   m_tmpstring = (char *) malloc(m_tmpstring_length * sizeof(char));
   m_print_unk_warn = false;
+  m_skip_unk_prob = true;
 
   //try {  Commented out: Let the exceptions rise to surface...
   io::Stream in(lm_name,"rb");
@@ -26,10 +27,11 @@ Perplexity::Perplexity(const char *lm_name) {
 
 Perplexity::Perplexity(NGram *lm, const std::string ccs_name, 
 		       const std::string wb_name, const std::string mb_name, 
-		       const std::string unk_symbol) {
+		       const std::string unk_symbol, bool skip_unk_prob) {
   init_variables();
   m_lm=lm;
   m_need_destruct_m_lm=false;
+  m_skip_unk_prob = skip_unk_prob;
 
   if (unk_symbol.length())
     m_lm->set_oov(unk_symbol);
@@ -41,14 +43,15 @@ Perplexity::Perplexity(NGram *lm, const std::string ccs_name,
 /* This is the old type of constructor */
 Perplexity::Perplexity(const std::string lm_name, const int type, 
 		       const std::string ccs_name, const std::string wb_name, 
-		       const std::string mb_name,
-		       const std::string unk_symbol, const int hashgram){
+		       const std::string mb_name, const std::string unk_symbol, 
+		       const int hashgram, bool skip_unk_prob){
   init_variables();
   if (hashgram) 
     if (hashgram>0) m_lm = new HashGram_t<int>;
     else m_lm = new HashGram_t<unsigned short>;
   else m_lm = new TreeGram;
   m_need_destruct_m_lm=true;
+  m_skip_unk_prob = skip_unk_prob;
 
   //fprintf(stderr,"UNK SYMBOL: %s\n",unk_symbol);
   if (unk_symbol.length())
@@ -80,18 +83,18 @@ void Perplexity::init_special_symbols(const std::string ccs_name,
   if (ccs_name.length()) {
     std::cerr << "Reading ccs";
     find_indices(ccs_name,ccs_vector);
-    std::cerr << " ,found " << ccs_vector.size() << " context cues." << std::endl;
+    std::cerr << ", found " << ccs_vector.size() << " context cues." << std::endl;
   }
 
   if (wb_name.length()) {
     std::cerr << "Reading wb";
     find_indices(wb_name,wb_vector);  
-    std::cerr << " ,found " << wb_vector.size() << " word break symbols." << std::endl;
+    std::cerr << ", found " << wb_vector.size() << " word break symbols." << std::endl;
     m_wb_type=LISTED;
   } else if (mb_name.length()) {
     std::cerr << "Reading mb";
     load_mbs(mb_name, mb_vector);
-    std::cerr << " ,found " << mb_vector.size() << " morph break expressions." << std::endl;
+    std::cerr << ", found " << mb_vector.size() << " morph break expressions." << std::endl;
     m_wb_type=MB_LISTED;
   } else
     m_wb_type=EVERYTIME;
@@ -180,15 +183,20 @@ float Perplexity::logprob(const char *word, float &cur_word_lp) {
       m_num_unks++;
       cur_word_lp=m_cw_lpsum;
       m_cw_lpsum=0.0;
+    } else if (m_wb_type==EVERYTIME) {
+      m_num_unks++;
     } else {
       m_unkflag=1;
     }
-    history.push_back(0);
-    m_lm->set_last_order(0);
-    return(0.0);
+    if (m_skip_unk_prob) {
+      history.push_back(0);
+      m_lm->set_last_order(0);
+      return(0.0);
+    }
   } 
   
-  if (std::find(ccs_vector.begin(),ccs_vector.end(),idx)!=ccs_vector.end()) { /* Context cue */
+  if (std::find(ccs_vector.begin(),ccs_vector.end(),idx)!=ccs_vector.end()) { 
+    /* Context cue */
     m_num_ccs++;
     history.push_back(idx);
     m_lm->set_last_order(0);
@@ -199,8 +207,7 @@ float Perplexity::logprob(const char *word, float &cur_word_lp) {
   float lp=m_lm->log_prob(history);
   if (m_lm2) {
     float lp2 = m_lm2->log_prob(history);
-    lp=(float)safelogprob(m_alpha*pow(10,lp) + 
-		   (1-m_alpha)*pow(10,lp2));
+    lp = (float)safelogprob(m_alpha*pow(10,lp) + (1-m_alpha)*pow(10,lp2));
   }
   ngram_hits[0]++;
   ngram_hits[m_lm->last_order()]++;
@@ -211,6 +218,10 @@ float Perplexity::logprob(const char *word, float &cur_word_lp) {
     if (m_unkflag) {
       m_unkflag=0;
       m_num_unks++;
+      if (!m_skip_unk_prob) {
+	cur_word_lp=m_cw_lpsum;
+	m_num_pwords++;
+      }
     } else { 
       cur_word_lp=m_cw_lpsum;
       m_num_pwords++;
@@ -320,7 +331,7 @@ double Perplexity::logprob_file(FILE *in, FILE *out, const int interval) {
   //fprintf(stdout,"Setting m_token_perplexity to %.4f / %d = %.4f\n",
   //	  m_logprob, m_num_ptokens, m_token_perplexity);
 
-  if (m_num_pwords == m_num_ptokens) {
+  if (m_wb_type == EVERYTIME) {
     m_num_unks=m_num_tunks;
     m_num_tunks=0; 
   }
@@ -328,35 +339,46 @@ double Perplexity::logprob_file(FILE *in, FILE *out, const int interval) {
   return(m_logprob);
 }
 
-void Perplexity::print_results_sami(FILE *out) {
-  fprintf(out,"Result summary for evaluation scripts:\n");
-  fprintf(out,"- %d (%.2f%%) OOVs removed\n", m_num_unks,
-	  100.0*m_num_unks/(m_num_pwords+m_num_unks+m_num_ccs));
-    fprintf(out,"- Perplexity = %.2f\n", 1/pow(10,m_token_perplexity));
-    fprintf(out,"- Entropy = %.2f bits\n", -m_token_perplexity/log10(2.0));
-    fprintf(out,"- Word perplexity = %.2f\n", pow(10,-m_perplexity));
-    fprintf(out,"- Word entropy = %.2f bits\n\n", -m_perplexity/log10(2.0));
-}
-
 double Perplexity::print_results(FILE *out) {
-  fprintf(out,"\nDropped:   ");
-  fprintf(out,"%d UNKS, %.2f %%\n",m_num_unks,100.0*m_num_unks/(m_num_pwords+m_num_unks+m_num_ccs));
-  fprintf(out,"           %d TUNKS, %.2f %%\n",m_num_tunks,100.0*m_num_tunks/(m_num_ptokens+m_num_tunks+m_num_ccs));
-  fprintf(out,"           %d context cues\n",m_num_ccs);
+  if (m_skip_unk_prob) {
+    fprintf(out,"\nDropped:   ");
+    fprintf(out,"%d UNKS, %.2f %%\n",m_num_unks,100.0*m_num_unks/(m_num_pwords+m_num_unks+m_num_ccs));
+    if (m_wb_type!=EVERYTIME)
+      fprintf(out,"           %d TUNKS, %.2f %%\n",m_num_tunks,100.0*m_num_tunks/(m_num_ptokens+m_num_tunks+m_num_ccs)); 
+  } else {
+    fprintf(out,"\nFound:     ");
+    fprintf(out,"%d UNKS, %.2f %%\n",m_num_unks,100.0*m_num_unks/(m_num_pwords+m_num_ccs));
+    if (m_wb_type!=EVERYTIME)
+      fprintf(out,"           %d TUNKS, %.2f %%\n",m_num_tunks,100.0*m_num_tunks/(m_num_ptokens+m_num_ccs)); 
+  }
+  if (ccs_vector.size()) {
+    if (m_skip_unk_prob) {
+      fprintf(out,"           %d context cues\n",m_num_ccs);
+    } else {
+      fprintf(out,"Dropped:   %d context cues\n",m_num_ccs);
+    }
+  }
   fprintf(out,"Processed: %d words\n",m_num_pwords);
-  if (m_num_pwords != m_num_ptokens)
+  if (m_wb_type!=EVERYTIME)
     fprintf(out,"           %d tokens\n",m_num_ptokens);
-  fprintf(out,"Total:     %d words\n\n",m_num_pwords+m_num_unks+m_num_ccs);
+
+  if (m_skip_unk_prob) {
+    fprintf(out,"Total:     %d words\n",m_num_pwords+m_num_unks+m_num_ccs);
+    if (m_wb_type!=EVERYTIME)
+      fprintf(out,"           %d tokens\n",m_num_ptokens+m_num_tunks+m_num_ccs);
+  } else {
+    fprintf(out,"Total:     %d words\n",m_num_pwords+m_num_ccs);
+    if (m_wb_type!=EVERYTIME)
+      fprintf(out,"           %d tokens\n",m_num_ptokens+m_num_ccs);
+  }
   
-  fprintf(out,"Logprob %f\n", m_logprob);
-  fprintf(out,"Word logprob %f\n",m_word_logprob);
-  fprintf(out,"Perplexity %f (- %dth root)\n",pow(10,-m_perplexity),m_num_pwords);
-  fprintf(out,"    equals %f bits\n",-m_perplexity/log10(2.0));
-  fprintf(out,"Perplexity (sentence ends not in normalization) %f (- %dth root) = %f bits\n", pow(10, -m_perplexity_wo_sent_ends), m_num_pwords-m_num_sent_ends, -m_perplexity_wo_sent_ends/log10(2.0));
+  fprintf(out,"\nLogprob %.6f\n",m_word_logprob);
+  fprintf(out,"Perplexity %.2f (- %dth root) = %.3f bits\n",pow(10,-m_perplexity),m_num_pwords,-m_perplexity/log10(2.0));
+  fprintf(out,"Perplexity (sentence ends not in normalization) %.2f (- %dth root) = %.3f bits\n", pow(10, -m_perplexity_wo_sent_ends), m_num_pwords-m_num_sent_ends, -m_perplexity_wo_sent_ends/log10(2.0));
 
   if (m_num_pwords != m_num_ptokens) {
-    fprintf(out,"Tokenwise perplexity %f (- %dth root)\n",pow(10,-m_token_perplexity),m_num_ptokens);
-    fprintf(out,"    equals %f bits\n",-m_token_perplexity/log10(2.0));
+    fprintf(out,"\nTokenwise logprob %.6f\n", m_logprob);
+    fprintf(out,"Tokenwise perplexity %.2f (- %dth root) = %.3f bits\n",pow(10,-m_token_perplexity),m_num_ptokens,-m_token_perplexity/log10(2.0));
   }
   return -m_perplexity/log10(2.0);
 }

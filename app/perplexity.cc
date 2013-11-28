@@ -14,9 +14,9 @@ int main(int argc, char *argv[]) {
     ('X',"mb=FILE","arg","","Morph boundary prefix/postfix file. One token per line.")
     ('u',"unk=STRING","arg","","Unk symbol (defaul <UNK>, case sensitive)")
     ('U',"unkwarn","","","Warn if unknown tokens are seen")
+    ('o',"includeunks","","","Include unknown tokens in perplexity calculations.")
     ('i',"interpolate=FILE","arg","","Interpolate with given arpa LM.")
     ('I',"inter_coeff=FLOAT","arg","-1","Interpolation coefficient.")
-    //('Z',"print_sami","","","Print output for Sami's tools")
     ('t',"init_hist=INT","arg","","Take n first tokens after \"</s>\" as initial LM history (no probabilities assigned)")
     ('f',"freegram","","","No prefix requirements on the n-gram model.")
     ('s', "smallvocab", "", "", "Vocabulary is less than 65000 entries. Saves some memory.")
@@ -50,8 +50,8 @@ int main(int argc, char *argv[]) {
   io::Stream stream_out;
   if (config["probstream"].specified)
     stream_out.open(config["probstream"].get_str(), "w");
-  bool print_sami=false; //config["print_sami"].specified;
   bool unkwarn=config["unkwarn"].specified;
+  bool skip_unks=!config["includeunks"].specified;
   int freegram=0;
   if (config["freegram"].specified) {
     if (config["smallvocab"].specified) freegram=-1;
@@ -89,7 +89,8 @@ int main(int argc, char *argv[]) {
   if (config["interpolate"].specified) { 
     // Interpolate the old way, using PerplexityFuncs
     if (config["freegram"].specified) {
-      lm = new Perplexity(lm_name, lm_type, ccs_name, wb_name, mb_name, unk_symbol, true);
+      lm = new Perplexity(lm_name, lm_type, ccs_name, wb_name, mb_name, 
+			  unk_symbol, true, skip_unks);
       lm->set_interpolation(config["interpolate"].get_str());
       if (config["inter_coeff"].specified) {
         lm->set_alpha(config["inter_coeff"].get_double());
@@ -108,10 +109,12 @@ int main(int argc, char *argv[]) {
       coeffs.push_back(1.0-coeff);
       coeffs.push_back(coeff);
       itg = new InterTreeGram(lm_names, coeffs);
-      lm = new Perplexity(itg, ccs_name, wb_name, mb_name, unk_symbol );
+      lm = new Perplexity(itg, ccs_name, wb_name, mb_name, unk_symbol, 
+			  skip_unks);
     }
   } else {
-    lm = new Perplexity(lm_name,lm_type,ccs_name, wb_name, mb_name, unk_symbol, freegram);
+    lm = new Perplexity(lm_name,lm_type, ccs_name, wb_name, mb_name, 
+			unk_symbol, freegram, skip_unks);
     if (config["inter_coeff"].specified) {
       fprintf(stderr, "Only on lm specified, cannot set interpolation coff. Exit\n");
       exit(-1);
@@ -121,9 +124,8 @@ int main(int argc, char *argv[]) {
   
   if (init_hist) lm->set_init_hist(init_hist);
   if (stream_out.file) lm->logprob_file(txtin.file, stream_out.file, stream_interval);
-  else lm->logprob_file(txtin.file, NULL);
+  else lm->logprob_file(txtin.file, NULL, 1);
   
-  if (print_sami) lm->print_results_sami(out.file);
   lm->print_results(out.file);
   if (!itg) // FIXME: This doesn't work yet for InterTreeGrams
     lm->print_hitrates(out.file);
