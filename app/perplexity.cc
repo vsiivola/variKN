@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     ('U',"unkwarn","","","Warn if unknown tokens are seen")
     ('o',"includeunks","","","Include unknown tokens in perplexity calculations.")
     ('i',"interpolate=FILE","arg","","Interpolate with given arpa LM.")
-    ('I',"inter_coeff=FLOAT","arg","-1","Interpolation coefficient.")
+    ('I',"inter_coeff=FLOAT","arg","-1","Interpolation coefficient. The interpolated model will be weighted by coeff whereas the main model will be weighted by 1.0-coeff.")
     ('t',"init_hist=INT","arg","","Take n first tokens after \"</s>\" as initial LM history (no probabilities assigned)")
     ('f',"freegram","","","No prefix requirements on the n-gram model.")
     ('s', "smallvocab", "", "", "Vocabulary is less than 65000 entries. Saves some memory.")
