@@ -814,9 +814,9 @@ double InterKn_t<KT, CT>::logprob_file(const char *name) {
   std::vector<KT> indices;
   indices.reserve(this->m_order);
   io::Stream f(name,"r");
-  char w[MAX_WLEN];
+  char w[MAX_WLEN+1];
   long nwords=0;
-  while (fscanf(f.file,"%s",w)==1) {
+  while (fscanf(f.file,MAX_WLEN_FMT_STRING,w)==1) {
     const KT idx=this->m_ng->word_index(w);
     if (idx==this->m_sent_boundary) {
       indices.clear();

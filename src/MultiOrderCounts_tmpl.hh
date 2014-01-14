@@ -21,7 +21,7 @@ CT MultiOrderCounts<KT,CT>::IncrementCount(const std::vector<KT> &v,
 
 template <typename KT, typename CT>
 long MultiOrderCounts<KT, CT>::InitializeCountsFromText(FILE *in, Vocabulary *vocab, const bool grow_vocab, const int read_order, const std::string &sent_start_sym) {
-  char charbuf[MAX_WLEN];
+  char charbuf[MAX_WLEN+1];
   long num_read=0;
   int sent_start_idx;
   KT idx;
@@ -40,7 +40,7 @@ long MultiOrderCounts<KT, CT>::InitializeCountsFromText(FILE *in, Vocabulary *vo
     }
   }
 
-  while (fscanf(in,"%s",charbuf)!=EOF) {
+  while (fscanf(in,MAX_WLEN_FMT_STRING,charbuf)!=EOF) {
     num_read++;
     //if (num_read % 1000000 == 0) fprintf(stderr,"Read %lld words\n",num_read);
     if (grow_vocab) idx=vocab->add_word(charbuf);

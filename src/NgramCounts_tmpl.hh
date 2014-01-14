@@ -27,12 +27,12 @@ NgramCounts_t<K, T>::~NgramCounts_t() {
 
 template <typename K, typename T>
 long NgramCounts_t<K, T>::count(FILE *file, bool grow_vocab) {
-  char charbuf[MAX_WLEN];
+  char charbuf[MAX_WLEN+1];
   long n_entries=0;
   long num_read=0;
   K idx;
 
-  while (fscanf(file,"%s",charbuf)!=EOF) {
+  while (fscanf(file,MAX_WLEN_FMT_STRING,charbuf)!=EOF) {
     if (grow_vocab) idx=vocab->add_word(charbuf);
     else idx=vocab->word_index(charbuf);
 
@@ -133,11 +133,11 @@ void NgramCounts_t<K, T>::read(FILE *countsfile, FILE *vocabfile) {
    vocabulary. This makes merging different countfiles simpler, but
    slows everything down a bit. */
   
-  char sbuf[MAX_WLEN], *cptr;
+  char sbuf[MAX_WLEN+1], *cptr;
 
   if (vocabfile) read_vocab(vocabfile);
 
-  char tmpchar[MAX_WLEN];
+  char tmpchar[MAX_WLEN+1];
   while (fgets(sbuf,MAX_WLEN,countsfile)) {
     //fprintf(stderr,"Looking at line %s",sbuf);
     cptr=strtok(sbuf," ");

@@ -5,10 +5,10 @@
 
 template <typename T>
 void Storage<T>::read(FILE *in, Vocabulary &voc) {
-  char buf[MAX_WLEN];
+  char buf[MAX_WLEN+1];
   datavec.reserve(100000);
   //fprintf(stderr,"storage read:");
-  while (fscanf(in,"%s",buf)==1) {
+  while (fscanf(in,MAX_WLEN_FMT_STRING,buf)==1) {
     datavec.push_back(voc.word_index(buf));
     //fprintf(stderr," %s(%d)", buf, voc.word_index(buf));
   }

@@ -293,14 +293,14 @@ bool Perplexity::is_mb(std::string w) {
 }
 
 double Perplexity::logprob_file(FILE *in, FILE *out, const int interval) {
-  char word[MAX_WLEN];
+  char word[MAX_WLEN+1];
   int read=0;
   float interval_sum=0.0;
   float cur_full_word_lp;
   const float log2coeff=1/log10(2.0f);
 
   while (1) {
-    int fsc=fscanf(in,"%s",word);
+    int fsc=fscanf(in,MAX_WLEN_FMT_STRING,word);
     if (!fsc || fsc==EOF) break;
     double lp=logprob(word, cur_full_word_lp);
     read++;

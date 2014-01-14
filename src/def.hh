@@ -7,6 +7,7 @@
 #include <deque>
 
 const int MAX_WLEN=1000;
+#define MAX_WLEN_FMT_STRING "%1000s" // For limiting fscanf width, must be modified to match MAX_WLEN
 const double MINLOGPROB=-60;
 const double MINPROB=1e-60;
 
