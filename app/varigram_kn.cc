@@ -6,7 +6,7 @@
 int main(int argc, char **argv) {
   conf::Config config;
   config("Usage: varigram_kn [OPTIONS] textin LM_out\nProduces variable span n-gram from given text\n")
-    ('o', "opti=FILE","arg must","","The devel set for optimizing discount parameters")
+    ('o', "opti=FILE","arg","","The devel set for optimizing discount parameters. If not set, use leave-one-out discount estimates.")
     ('n', "norder=INT","arg","0","Maximal order included in the model (default unrestricted)")
     ('D',"dscale=FLOAT","arg","-1.0","Model size scale factor")
     ('E',"dscale2=FLOAT","arg","0","Model size scaling during pruning step (default no pruning=0)")

@@ -7,7 +7,7 @@
 int main(int argc, char **argv) {
   conf::Config config;
   config("Usage: counts2kn [OPTIONS] text_in lm_out.\nCreates an interpolated KN language model based on the give counts\n")
-    ('o', "opti=FILE","arg must","","The devel set for optimizing discount parameters")
+    ('o', "opti=FILE","arg","","The devel set for optimizing discount parameters. If not set, use leave-one-out discount estimates.")
     ('n', "norder=INT", "arg", "0", "Order of the counts in the count file")
     ('a', "arpa","","","Output arpa instead of binary LM")
     ('x', "narpa","","","Output nonstandard interpolated arpa instead of binary LM (uses less memory)")

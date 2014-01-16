@@ -127,6 +127,9 @@ void Varigram_t<KT, ICT>::grow(int iter2_lim) {
 	  goto LAST;
 
 	if (new_history.size()!=old_hist_size) {
+          if (old_hist_size >0) {
+            m_kn->set_leaveoneout_discounts(old_hist_size);
+          }
 	  //update_coeff_counter++;
 	  cur_order=new_history.size();
 	  sikMatrix<KT, ICT> *curref1=(*sik_c)[new_history.size()], *curref2=NULL; 
@@ -142,12 +145,12 @@ void Varigram_t<KT, ICT>::grow(int iter2_lim) {
 	if (reestimate_with_history(new_history)) {
 	  accepted++;
 	  //if (update_coeff_counter) update_coeff_counter++;
-	  if (!(accepted%1000)) {
-	    fprintf(stderr,"New:");
-	    for (size_t j=0;j<new_history.size();j++) 
-	      fprintf(stderr," %s",m_kn->vocab.word(new_history[j]).c_str());
-	    fprintf(stderr,"\n");
-	  }
+	  //if (!(accepted%1000)) {
+	  //  fprintf(stderr,"New:");
+	  //  for (size_t j=0;j<new_history.size();j++) 
+	  //    fprintf(stderr," %s",m_kn->vocab.word(new_history[j]).c_str());
+	  //  fprintf(stderr,"\n");
+	  //}
 	} //else fprintf(stderr,".");
 
 #if 0
@@ -183,7 +186,9 @@ void Varigram_t<KT, ICT>::grow(int iter2_lim) {
     //  fprintf(stderr,"matrix order %d:\n",i);
     //  m_kn->print_matrix(i);
     //}
-
+    if (old_hist_size >0) {
+      m_kn->set_leaveoneout_discounts(old_hist_size);
+    }
     m_kn->find_coeffs(0.007,1e-1,5e-2);
 
     // Ugly fix follows, make this look nicer....

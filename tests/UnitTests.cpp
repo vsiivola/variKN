@@ -90,6 +90,20 @@ void create_simple_models(std::string datadir) {
   BOOST_REQUIRE( h < 0.05 );
 }
 
+void create_models_without_opti(std::string datadir) {
+  float h;
+  create_lm(datadir+"/ax20.txt", datadir+"/vocab.txt", "", 3, datadir+"/a-noopti.arpa");
+  fprintf(stdout, "Perplexity of a against a:\n");
+  h = perplexity(datadir+"/a-noopti.arpa", "", datadir+"/ax20.txt", false);
+  fprintf(stderr,"h1-no_opti %f\n", h );
+  fprintf(stdout, "Perplexity of b against a:\n");
+
+  create_varigram_lm(datadir+"/bx20.txt", datadir+"/vocab.txt", "", 3, datadir+"/b-noopti.arpa");
+  h = perplexity(datadir+"/b-noopti.arpa", "", datadir+"/ax20.txt");
+  fprintf(stderr,"h2-no_opti %f\n", h );
+
+}
+
 void test_interpolation(std::string datadir) {
   float h;
 
@@ -156,6 +170,7 @@ int test_main( int argc, char *argv[] )             // note the name!
   
   // FIXME: Write unit test to read and write a arpa file with treegram and hashgram
   create_simple_models(datadir);
+  create_models_without_opti(datadir);
   test_interpolation(datadir);
   test_interpolated_different_vocabs(datadir);
   test_intertreegram(datadir);

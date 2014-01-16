@@ -57,17 +57,17 @@ for discount optimization) and the results are written to lm_out.<P>
 
 <b>Mandatory options</b>:
 <table width=100%>
-<tr><td width=20>-o</td><td width=100>--opti</td>
-<td>The file containing the held-out part of training set. This will
-be used for training the discounts. Suitable size for held out set is
-around 100 000 words/tokens.</td></tr>
-<tr><td>-n</td><td>--norder</td><td>The desired n-gram model order.</td></tr>
+<tr><td width=20>-n</td><td>--norder</td><td>The desired n-gram model order.</td></tr>
 </table>
 
 <P>
 <b>Other options:</b>
 <table width=100%>
 <tr><td width=20>-h</td><td width=100>--help</td><td>Print help</td></tr>
+<tr><td width=20>-o</td><td width=100>--opti</td>
+<td>The file containing the held-out part of training set. This will
+be used for training the discounts. Suitable size for held out set is
+around 100 000 words/tokens. If not set, use leave-one-out discount estimates.</td></tr>
 <tr><td>-a</td><td>--arpa</td>
 <td>Output arpa instead of binary. Recommended for compatibility with
 other tools. This is the only output compatible with SRILM toolkit.</td></tr>
@@ -126,11 +126,7 @@ words/tokens.
 
 <b>Mandatory options:</b>
 <table width=100%>
-<tr><td width=20>-o</td><td width=100>--opti</td>
-<td>The file containing the held-out part of training set. This will
-be used for training the discounts. Suitable size for held out set is
-around 100 000 words/tokens.</td></tr>
-<tr><td>-D</td><td>--dscale</td>
+<tr><td width=20>-D</td><td>--dscale</td>
 <td>The treshold for accepting new n-grams to the model. 0.05 for
 generating a fairly small model, 0.001 for a large model. Corresponds to
 delta in [1].</td></tr>
@@ -140,6 +136,10 @@ delta in [1].</td></tr>
 <b>Other options:</b>
 <table width=100%>
 <tr><td width=20>-h</td><td width=100>--help</td><td>Print help</td></tr>
+<tr><td width=20>-o</td><td width=100>--opti</td>
+<td>The file containing the held-out part of training set. This will
+be used for training the discounts. Suitable size for held out set is
+around 100 000 words/tokens. If not specified, use leave-one-out estimates for discounts.</td></tr>
 <tr><td>-n</td><td>--norder</td><td>Maximum n-gram order that will be searched.</td></tr>
 <tr><td>-a</td><td>--arpa</td>
 <td>Output arpa instead of binary. Recommended for compatibility with

@@ -40,6 +40,7 @@ public:
   virtual float evaluate(std::vector<float> &discounts)=0;
   virtual void find_coeffs(float brak, float precision, float lin_precision)=0;
   virtual void init_disc(float x)=0;
+  virtual void set_leaveoneout_discounts(int order)=0;
   virtual indextype num_grams()=0;
   
   /* Added for templatized func, too much casting otherwise */
@@ -62,6 +63,7 @@ public:
   
   typedef float disc;
   class disc3 {
+    // FIXME: typedef to std::vector<float> ?
     float disc[3];
   public:
     inline float& operator[] (const int i) {return(disc[i]);}
@@ -173,7 +175,8 @@ protected:
   
   virtual void disc2flatv(std::vector<float> &v)=0;
   virtual float flatv2disc(std::vector<float> &v)=0;
-  
+  std::vector<float> calculate_leaveoneout_discounts(int order, std::vector<float> cur_disc);
+
   CT m_new_treshold;
   CT m_ori_treshold; // Ugly hack...
   
@@ -219,9 +222,14 @@ public:
   void print_matrix(int o) {if (o<this->moc->m_counts.size() && o>=1) this->moc->m_counts[o]->printmatrix();}
   inline void disc2flatv(std::vector<float> &v);
   inline float flatv2disc(std::vector<float> &v);
+  virtual inline void set_leaveoneout_discounts(int order) {
+    std::vector<float> cur_discount(1, m_discount[order]);
+    m_discount[order]=this->calculate_leaveoneout_discounts(order, cur_discount)[0];
+  }
+  
   void set_order(int o);
   std::vector<InterKn::disc> m_discount;
-  
+
 protected:
   template <typename BOT> void remove_sent_start_prob_fbase(BOT *dummy);
   virtual void prune_gram(std::vector<KT> &v, ICT num, bool recorrect_kn, MultiOrderCounts_counter_types::bo_c<ICT> *bo);
@@ -245,7 +253,7 @@ public:
 
   inline void init_disc(float x);
   void estimate_nzer_counts();
-  
+
   //inline sikMatrix <KT, int> *get_ct_matrix(int o, int *foo, InterKn::disc3 *bar) {return this->moc->m_counts[o];}
 
   inline void prune_model(float treshold, bool recorrect_kn, Storage_t<KT, ICT> *real_counts) {
@@ -262,6 +270,15 @@ public:
   }
   inline void disc2flatv(std::vector<float> &v);
   inline float flatv2disc(std::vector<float> &v);
+
+  virtual inline void set_leaveoneout_discounts(int order) {
+    std::vector<float> cur_discount(&m_discount[order][0], &m_discount[order][0]+3);
+    std::vector<float> loo_d(this->calculate_leaveoneout_discounts(order, cur_discount));
+    for (int i=0;i<3;i++) {
+      m_discount[order][i]=loo_d[i];
+    }
+  }
+
   void set_order(int o);
   std::vector<InterKn::disc3> m_discount;
 

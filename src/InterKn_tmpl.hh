@@ -127,6 +127,40 @@ void InterKn_int_disc<KT, ICT>::estimate_nzer_counts() {
 }
 
 template <typename KT, typename ICT>
+std::vector<float> InterKn_t<KT, ICT>::calculate_leaveoneout_discounts(int order, std::vector<float> cur_disc) {
+  const int num_d_coeffs(cur_disc.size());
+  std::vector<ICT> count_of_counts(num_d_coeffs+1);
+  std::vector<KT> v(order);
+  ICT value;
+  std::vector<float> result(cur_disc);
+
+  this->moc->StepCountsOrder(true, order, &v[0], &value);
+  while (this->moc->StepCountsOrder(false, order, &v[0], &value)) {
+    if (value > num_d_coeffs+1 || value <1) continue;
+    count_of_counts[value-1] +=1;
+  }
+  // Leave-one-out estimates for discounts
+  if (count_of_counts[0]==0 || count_of_counts[1]==0) {
+    fprintf(stderr, "Count of counts zero, skipping leave-one-out estimation.\n");
+    return cur_disc;
+  }
+
+  float Y = count_of_counts[0]/(count_of_counts[0]+2.0f*count_of_counts[1]);
+  //fprintf(stderr, "Y = %d / (%d + 2 * %d) = %.2f\n", count_of_counts[0], count_of_counts[0], count_of_counts[1], Y);
+  fprintf(stderr, "set loo_disc order %d -> [", order); 
+  for (int i=0; i<num_d_coeffs; ++i) {
+    if (count_of_counts[i]>0) {
+      result[i]=std::max(0.1f, std::min(i+1-0.2f, i+1-float((i+2)*Y*count_of_counts[i+1])/count_of_counts[i]));
+      //fprintf(stderr, " {%d - (%d * %.2f * %d) / %d} = ",
+      //        i+1, i+2, Y, count_of_counts[i+1], count_of_counts[i]);
+    }
+    fprintf(stderr, " %.2f", result[i]);
+  }
+  fprintf(stderr, " ]\n");
+  return result;
+}
+
+template <typename KT, typename ICT>
 void InterKn_int_disc3<KT, ICT>::estimate_nzer_counts() {
   std::vector<KT> v(this->m_order);
   ICT value;
@@ -255,6 +289,10 @@ float InterKn_int_disc3<KT, ICT>::kn_coeff_3nzer(const int order, const KT *i,
 template <typename KT, typename CT> void InterKn_t<KT, CT>::
 create_model(float prunetreshold) {
   //if (m_sent_boundary>0) clear_lm_sentence_boundaries(); 
+  for (int i=1; i<=this->m_order; ++i) {
+    this->set_leaveoneout_discounts(i);
+  }
+
   find_coeffs(-0.1*m_ori_treshold,1e-1,5e-2);
   if (prunetreshold>0.0 || this->cutoffs.size() || this->discard_ngrams_with_unk) {
     if (!this->prune_with_real_counts) {
@@ -692,8 +730,8 @@ void InterKn_t<KT, CT>::constructor_helper(
     this->estimate_nzer_counts();
   }
 
+  this->m_optistorage=new Storage<KT>;
   if (this->m_opti_name.length()) {
-    this->m_optistorage=new Storage<KT>;
     fprintf(stderr,"Reading optisource\n");
     io::Stream in(this->m_opti_name,"r");
     this->m_optistorage->read(in.file, this->vocab);
@@ -908,6 +946,11 @@ double InterKn_t<KT, CT>::tableprob(std::vector<KT> &indices) {
 template <typename KT, typename CT>
 void InterKn_t<KT, CT>::find_coeffs(float brak, float precision, 
 					float lin_precision) {
+  fprintf(stderr, "Gots opti size %ld\n", this->m_optistorage->size());
+  if (this->m_optistorage->size()==0) {
+    fprintf(stderr, "Skipping numerical parameter optimization, no optimization set specified\n");
+    return;
+  }
   std::vector<float> searchstart;
   disc2flatv(searchstart);
 
