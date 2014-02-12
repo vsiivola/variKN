@@ -24,6 +24,7 @@ public:
   virtual void set_zeroprobgrams(bool)=0;
   virtual void set_cutoffs(std::vector<int> v)=0;
   virtual void set_discard_unks(bool x)=0;
+  virtual void set_all_discounts(float x)=0;
   bool absolute;
   void write_vocab(FILE *out) {m_vocab->write(out);}
 
@@ -67,6 +68,10 @@ public:
   }
   void set_discard_unks(bool x) {
     m_kn->discard_ngrams_with_unk=x;
+  }
+
+  void set_all_discounts(float x) {
+    m_kn->init_disc(x);
   }
 
 private:

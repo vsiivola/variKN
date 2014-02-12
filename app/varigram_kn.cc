@@ -30,7 +30,8 @@ int main(int argc, char **argv) {
     ('U', "write_vocab=FILE", "arg", "", "Write resulting vocabulary FILE.")
     ('O', "cutoffs=\"val1 val2 ... valN\"", "arg", "", "Use the specified cutoffs. The last value is used for all higher order n-grams.")
     ('N', "discard_unks", "", "", "Remove n-grams containing OOV words.")
-    ('L', "longint", "", "", "Store counts in a long int type. Needed for big training sets.")    ;
+    ('L', "longint", "", "", "Store counts in a long int type. Needed for big training sets.")
+    ('F',"forcedisc=FLOAT","arg","-1.0", "Set all discounts to setdisc")    ;
   
   config.parse(argc,argv,2);
   
@@ -53,6 +54,7 @@ int main(int argc, char **argv) {
   const std::string vocabout(config["write_vocab"].get_str());
   const bool discard_unks=config["discard_unks"].specified;
   const bool longint=config["longint"].specified;
+  const float force_disc=config["forcedisc"].get_double();
 
   std::string vocabname;
   if (config["vocabin"].specified) vocabname=config["vocabin"].get_str();
@@ -100,6 +102,10 @@ int main(int argc, char **argv) {
     if (cutoffs.size()) vg->set_cutoffs(cutoffs);
     vg->set_discard_unks(discard_unks);
     vg->grow(iter);
+
+    if (force_disc>0.0f) {
+      vg->set_all_discounts(force_disc);
+    }
 
     if (vocab_outf.file) {
       vg->write_vocab(vocab_outf.file);
