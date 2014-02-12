@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     ('O', "cutoffs=\"val1 val2 ... valN\"", "arg", "", "Use the specified cutoffs. The last value is used for all higher order n-grams.")
     ('N', "discard_unks", "", "", "Remove n-grams containing OOV words.")
     ('L', "longint", "", "", "Store counts in a long int type. Needed for big training sets.")
-    ('F',"forcedisc=FLOAT","arg","-1.0", "Set all discounts to setdisc")    ;
+    ('F',"forcedisc=FLOAT","arg","-1.0", "Set all discounts to the given value.")    ;
   
   config.parse(argc,argv,2);
   
@@ -103,7 +103,8 @@ int main(int argc, char **argv) {
     vg->set_discard_unks(discard_unks);
     vg->grow(iter);
 
-    if (force_disc>0.0f) {
+    if (force_disc>=0.0f) {
+      fprintf(stderr, "Forcing all discounts to %g.\n", force_disc);
       vg->set_all_discounts(force_disc);
     }
 
