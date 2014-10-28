@@ -41,10 +41,12 @@ Vocabulary::read(FILE *file)
 
   while (str::read_line(&word, file, true)) {
 
+#if 0     // Allow "#" as a token/word
     // Remove comments
     int comment = word.find('#');
     if (comment >= 0)
       word = word.substr(0, comment);
+#endif
 
     // Remove leading and trailing spaces.  Skip if word is just
     // spaces.
@@ -52,8 +54,8 @@ Vocabulary::read(FILE *file)
     if (start < 0)
       continue;
     int end = word.find_last_not_of("\t\n\r ");
-    
-    
+
+
     // Check if " " or "(" is present and truncate the word to
     // that symbol. You can use dictionary files in CMUdict
     // and Decoder formats this way.
@@ -61,7 +63,7 @@ Vocabulary::read(FILE *file)
     if ((end_2>-1) && (end_2<end))
       end=end_2;
     word = word.substr(start, end - start + 1);
-    
+
     if (word.compare("_")==0 || word.compare("__")==0)
       continue;
 
