@@ -60,7 +60,7 @@ Vocabulary::read(FILE *file)
     // that symbol. You can use dictionary files in CMUdict
     // and Decoder formats this way.
     int end_2 = word.find_first_of(" (")-1;
-    if ((end_2>-1) && (end_2<end))
+    if ((end_2>-1) && (end_2<end-1))
       end=end_2;
     word = word.substr(start, end - start + 1);
 
