@@ -1,5 +1,5 @@
-FIND_PACKAGE(PythonInterp) 
-FIND_PACKAGE(PythonLibs)
+FIND_PACKAGE(PythonInterp 3.2) 
+FIND_PACKAGE(PythonLibs 3.2)
 FIND_PACKAGE(SWIG 2.0)
 
 #################################################
@@ -15,7 +15,7 @@ FIND_PACKAGE(SWIG 2.0)
 #endif()
 
 # Cmake still detects the old python2 executable first
-set(PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}3")
+#set(PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
 
 if (PYTHONLIBS_FOUND AND SWIG_FOUND)
     INCLUDE(${SWIG_USE_FILE})

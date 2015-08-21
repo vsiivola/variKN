@@ -5,7 +5,7 @@ ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/UnitTests.py"
   ) 
 
 FILE ( COPY "${CMAKE_CURRENT_SOURCE_DIR}/UnitTests.py" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}" )
-add_test( pytest "${PYTHON_EXECUTABLE}3" ${CMAKE_CURRENT_BINARY_DIR}/UnitTests.py )
+add_test( pytest "${PYTHON_EXECUTABLE}" ${CMAKE_CURRENT_BINARY_DIR}/UnitTests.py )
 
 # We should make sure that the c unit tests run before trying to run python unit tests.
 # However, the following does not work. FIXME !
