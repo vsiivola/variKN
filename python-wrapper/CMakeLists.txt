@@ -1,6 +1,6 @@
 FIND_PACKAGE(PythonInterp 3.2)
 FIND_PACKAGE(PythonLibs 3.2)
-# You should be able to compile python3 wrappers just by
+# You should be able to compile python2 wrappers just by
 # decreasing the minimum required python version
 
 FIND_PACKAGE(SWIG 2.0)
