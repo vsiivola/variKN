@@ -353,11 +353,11 @@ void HashGram_t<KT>::normalize_and_set_bo(
         std::vector<KT> &prefix, float explicit_probsum, float full_bo_probsum) {
         float new_bo =safelogprob((1.0f - explicit_probsum) / (1.0f - full_bo_probsum));
         backoffs[prefix.size()]->setvalue(&prefix[0], new_bo);
-        fprintf(stderr, "Bo for prefix");
-        for (auto i: prefix) {
-                fprintf(stderr, " %d", i);
-        }
-        fprintf(stderr, " %f\n", new_bo);
+        // fprintf(stderr, "Bo for prefix");
+        // for (auto i: prefix) {
+        //         fprintf(stderr, " %d", i);
+        // }
+        // fprintf(stderr, " %f\n", new_bo);
 }
 
 template <typename KT>
@@ -431,7 +431,7 @@ template <typename KT>
 void HashGram_t<KT>::fake_interpolate(HashGram_t<KT> &other, float lambda) {
         // Assumes identical vocabs for this and other !
         auto max_order = std::max(m_order, other.order());
-        fprintf(stderr, "Maxorder %d\n", max_order);
+        //fprintf(stderr, "Maxorder %d\n", max_order);
         probs.resize(max_order+1);
         backoffs.resize(max_order+1);
         while (true) {
