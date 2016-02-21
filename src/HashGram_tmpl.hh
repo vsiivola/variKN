@@ -416,7 +416,7 @@ void HashGram_t<KT>::renormalize_backoffs(int order) {
                 normalize_and_set_bo(cur_prefix, explicit_probsum,
                                      full_bo_probsum);
         } else if (explicit_probsum > 0.001) {
-                // Redistribute the remaining bigram mass equally accross unigrams
+                // Redistribute the remaining unigram mass equally accross unigrams
                 const float uniprob = 1.0f - explicit_probsum;
                 probs[1]->stepthrough(true, &gram[0], &gram_logprob);
                 while (probs[1]->stepthrough(false, &gram[0], &gram_logprob)) {
