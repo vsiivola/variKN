@@ -1,7 +1,7 @@
 <html>
 <head><title>VariKN toolkit manual</title></head>
 
-<H1>VariKN Language Modeling Toolkit manual page</H1> 
+<H1>VariKN Language Modeling Toolkit manual page</H1>
 
 Variable-order Kneser-Ney smoothed n-gram model toolkit is a
 specialized toolkit created for growing and pruning Kneser-Ney
@@ -12,16 +12,18 @@ toolkit</a>).
 
 <UL>
 <LI><a href="#counts2kn">counts2kn</a>: Performs Kneser-Ney smoothed
-n-gram estimation and pruning for full counts.  
-<LI><a href="#varigram_kn">varigram_kn</a>: Grows an Kneser-Ney smoothed 
+n-gram estimation and pruning for full counts.
+<LI><a href="#varigram_kn">varigram_kn</a>: Grows an Kneser-Ney smoothed
 n-gram models incrementally
-<LI><a href="#perplexity">perplexity</a>: Evaluate the model on a test 
-data set.
+<LI><a href="#perplexity">perplexity</a>: Evaluate the model on a test
+  data set.
+<LI><a href="#simpleinterpolate2arpa">simpleinterpolate2arpa</a>: Interpolate
+  two arpa backoff models
 </UL>
 
 Python wrappers through swig are also provided. See <em>python-wrapper/tests</em> for examples.<br>
 
-<H2>General</h2> 
+<H2>General</h2>
 
 <H3>File processing features</H3>
 The tools support reading and writing for plain ascii files, stdin and
@@ -102,7 +104,7 @@ order. Recommended. Increases the memory consumption somewhat, should
     seen less or equal than val times. Val is specified for each order of the
     model, if the cutoffs are only specified for a few first orders,
     the last cutoff value is used for all higher order n-grams. All unigrams
-    are included in any case, so if several cutoff values are given, val1 has 
+    are included in any case, so if several cutoff values are given, val1 has
     no real effect.</td></tr>
 <tr><td>-L</td><td>--longint</td>
 <td>Store the counts in "long int" type of variable instead of
@@ -179,7 +181,7 @@ down somewhat.</td></tr>
     seen less or equal than val times. Val is specified for each order of the
     model, if the cutoffs are only specified for a few first orders,
     the last cutoff value is used for all higher order n-grams. All unigrams
-    are included in any case, so if several cutoff values are given, val1 has 
+    are included in any case, so if several cutoff values are given, val1 has
     no real effect.</td></tr>
 <tr><td>-L</td><td>--longint</td>
 <td>Store the counts in "long int" type of variable instead of
@@ -246,6 +248,12 @@ be assumed known and this should be set to 2. Default 0 (fix this).</td></tr>
 word should be put.</td></tr>
 </table>
 
+<a name="simpleinterpolate2arpa">
+<H3>simpleinterpolate2arpa</H3></a>
+    Outputs an approximate interpolation of two arpa backoff models. Exact interpolation
+    cannot be expressed as an arpa model. <I>Experimental code.</I><P>
+
+simpleinterpolate2arpa "lm1_in.arpa,weight1;lm2_in.arpa,weight2" arpa_out<P>
 
 <H2>Examples</H2>
 To train a 3-gram model do:<br>
@@ -271,7 +279,7 @@ To create a grown model do:<br>
 varigram_kn -a -o held_out.txt -D 0.1 -E 0.25 -s -C train.txt grown.arpa.gz<P>
 
 <H2>Known needs for improvement</H2>
-<UL> 
+<UL>
 <LI>The documentation should be improved.
 
 <LI>The structure for storing the n-grams could be implemented more

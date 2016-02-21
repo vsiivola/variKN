@@ -1,10 +1,9 @@
-/* 
-   Basically, this implements a hash and some helper functions for using 
-   the hash as an n-dimensional sparse matrix. Reading and writing should 
-   be fast, deleting relatively fast. Getting the keys and values in order 
+/*
+   Basically, this implements a hash and some helper functions for using
+   the hash as an n-dimensional sparse matrix. Reading and writing should
+   be fast, deleting relatively fast. Getting the keys and values in order
    goes through quicksort. No arithmetic functions are implemented.
 */
-
 #ifndef __SPARSE_MATRIX_HXX
 #define __SPARSE_MATRIX_HXX
 
@@ -12,6 +11,7 @@
 extern "C" {
 #endif
 
+//#define no_inline_funcs // FIXME: This is required for debug compile, figure out why?
 #define PRIME_NUMBERS {5,1009,10007,49999,99991,500009,1064281,10000019,25000033,50000021,100000007,250000013,500000003}
 #define NUM_OF_PRIMES 13
 #include "matrix_common.h"
@@ -20,7 +20,7 @@ extern "C" {
 /* If we don't need too big matrices, use int as array indices (faster,
    more memory efficient). Otherwise use ssize_t. Must be signed type.
 */
-  typedef int indextype; 
+  typedef int indextype;
 /* typedef ssize_t indextype;*/
 
   typedef unsigned char byte;
@@ -33,7 +33,7 @@ extern "C" {
     void *default_value;
     size_t size_of_entry;
     int allow_shrinking;
-    
+
     /* The real data storage */
     indextype *hash;    /* Mapping from hash value to table indices */
     byte *keys; /* Table containing all of the indices */
@@ -41,60 +41,61 @@ extern "C" {
     indextype *next;    /* The links for filled hashes         */
     indextype *prev;    /* This is for making deletions fast */
                         /* positive values: ref from hash, negative-1
-			   ref from next-array. */
+                           ref from next-array. */
     indextype num_entries;
 
     int type_of_entry; /* not necessary */
   };
 
-  struct matrix *CreateMatrixI(const int d, 
-			       const indextype hashs, const int def_value);
-  struct matrix *CreateMatrixF(const int d, 
-			       const indextype hashs, const float def_value);
-  struct matrix *CreateMatrixD(const int d, 
-			       const indextype hashs, const double def_value);
+  struct matrix *CreateMatrixI(const int d,
+                               const indextype hashs, const int def_value);
+  struct matrix *CreateMatrixF(const int d,
+                               const indextype hashs, const float def_value);
+  struct matrix *CreateMatrixD(const int d,
+                               const indextype hashs, const double def_value);
   void DeleteMatrix(struct matrix *);
   void ClearMatrix(struct matrix *);
-  
-  
+
+
   void SetValueI(struct matrix *m, const int *indices, const int value);
   void SetValueF(struct matrix *m, const int *indices, const float value);
   void SetValueD(struct matrix *m, const int *indices, const double value);
-  
+
   int GetValueI(struct matrix *m, const int *indices);
   float GetValueF(struct matrix *m, const int *indices);
   double GetValueD(struct matrix *m, const int *indices);
 
   int IncrementI(struct matrix *m, const int *indices, const int value);
   float IncrementF(struct matrix *m, const int *indices, const float value);
-  
+
   /* If you need to use you own data structures, you can use these */
   void *OrderedStepThrough(struct matrix *m, byte *key, void *value);
   void *StepThrough(struct matrix *mat, byte *key, void *data);
   /*void Create_Intkeys(struct matrix *m, const int dims, const int *dsizes);*/
   struct matrix *CreateMatrix(const int keysize,
-			      const indextype hashs, const void *def_value,
-			      const int toe, const int soe);
-  
+                              const indextype hashs, const void *def_value,
+                              const int toe, const int soe);
+
   /* private funcs */
   indextype FindEntry(struct matrix *m, const byte *indices, const int create);
   void RemoveEntryIdx(struct matrix *m, const indextype idx);
   void DeleteCurrentST();
   void RemoveDefaultValues(struct matrix *m);
 
-/* Wrappers for the raw functions */
-#if !defined no_inline_funcs 
-// Inline next functions in c++ for extra speed
-// Does ansi c define inline ?
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#define sm_inline_void inline void 
+/* Wrappers for the raw functions */
+#if !defined no_inline_funcs
+// Inline next functions in c++ for extra speed
+// Does ansi c define inline ?
+#define sm_inline_void inline void
 #define sm_inline_int  inline int
 #define sm_inline_float inline float
 #define sm_inline_double inline double
 #define sm_inline_indextype  inline indextype
 #include "sparse_matrix_pinline.h"
+
 #else
   void SetRawValue(struct matrix *m, const byte *indices, const void *value);
   void GetRawValue(struct matrix *m, const byte *indices, void *value);

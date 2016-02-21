@@ -1,10 +1,10 @@
 VariKN language modeling toolkit provides tools for training n-gram
-language models. Amongst the supported methods are: 
+language models. Amongst the supported methods are:
 
-- Absolute discounting 
-- Kneser-Ney smoothing 
-- Revised Kneser pruning 
-- Kneser-Ney growing 
+- Absolute discounting
+- Kneser-Ney smoothing
+- Revised Kneser pruning
+- Kneser-Ney growing
 
 The descriptions of Revised Kneser pruning and Kneser-Ney growing can
 be found in the paper Vesa Siivola, Teemu Hirsimäki and Sami Virpioja,
@@ -23,7 +23,7 @@ and language technology", Proceedings of the 8th International
 Conference on Speech Communication and Technology (INTERSPEECH'07),
 2007 (available at
 https://sites.google.com/site/vesassiivola/publications/is2007less.pdf)
-for guidelines on typical use but that is about it.
+for guidelines on typical use.
 
 For help on installing the toolkit, read the file named "install".
 
