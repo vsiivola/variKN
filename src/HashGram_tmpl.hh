@@ -429,6 +429,11 @@ void HashGram_t<KT>::renormalize_backoffs(int order) {
 
 template <typename KT>
 void HashGram_t<KT>::fake_interpolate(HashGram_t<KT> &other, float lambda) {
+        if (m_type != BACKOFF || other.m_type != BACKOFF) {
+                fprintf(stderr, "Cannot interpolate non-backoff arpa models. Use arpa2arpa to convert the models first!");
+                exit(-1);
+        }
+
         // Assumes identical vocabs for this and other !
         auto max_order = std::max(m_order, other.order());
         //fprintf(stderr, "Maxorder %d\n", max_order);

@@ -44,7 +44,7 @@ component_models_and_weights(const std::string inputlist) {
 int main (int argc, char *argv[]) {
         // Assumes that the input is a backoff model! FIXME: Add assert
         conf::Config config;
-        config("Usage: simpleinterpolate2arpa \"lm1_in.arpa,weight1;lm2_in.arpa,weight2\" out_interpolate.arpa\nCreate an arpa LM that approximately contains the linear interpolation of the input ngrams (exact solution cannot be reduced to arpa format).\n\nCaveats: \n\t* Inputs MAY NOT be interpolated arpa (not tested, FIXME).\n\t* Only tests for this code are what is in unit tests (further testing needed, use at your own risk).\n\t* No computational optimizations applied (FIXME)\n\t* currently only supports interpolation between two models (FIXME)\n");
+        config("Usage: simpleinterpolate2arpa \"lm1_in.arpa,weight1;lm2_in.arpa,weight2\" out_interpolate.arpa\nCreate an arpa LM that approximately contains the linear interpolation of the input ngrams (exact solution cannot be reduced to arpa format).\n\nCaveats: \n\t* Only tests for this code are what is in unit tests (further testing needed, use at your own risk).\n\t* No computational optimizations applied (FIXME)\n\t* currently only supports interpolation between two models (FIXME)\n");
         config.parse(argc, argv,2);
 
         auto models_and_weigths = component_models_and_weights(config.arguments.at(0));
