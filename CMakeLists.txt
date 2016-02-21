@@ -23,9 +23,9 @@ message("Build type is ${CMAKE_BUILD_TYPE}")
 message("Generator is ${CMAKE_GENERATOR}")
 
 IF(APPLE)
-   set( CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS}" )   
+   set( CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS}" )
 ELSEIF(UNIX)
-   SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+   SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11")
    SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
    # suppress -rdynamic (see http://www.itk.org/Bug/view.php?id=9985)
    SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
@@ -33,10 +33,10 @@ ELSEIF(UNIX)
 ELSEIF(WIN32)
    #add_debug_flags(/Zi)
    #add_release_flags(/O2 /Ox)
-   
+
    # we always want to statically link to the CRT, so
-   # override the default dynamic CRT linkage (/MD) with 
-   # static linkage (/MT)        
+   # override the default dynamic CRT linkage (/MD) with
+   # static linkage (/MT)
    #replace_flags(/MD /MT)
 ENDIF(APPLE)
 
@@ -63,14 +63,14 @@ set(LIBVARIKN_SRCS ${srcs} ${hdrs})
 add_library(varikn STATIC ${LIBVARIKN_SRCS} )
 set_target_properties(varikn PROPERTIES PREFIX "lib")
 install(TARGETS varikn  ARCHIVE DESTINATION lib/${OUTPUT_DIR_NAME})
-            
+
 # other targets
 #
 add_subdirectory(app)
-add_subdirectory(python-wrapper)   
+add_subdirectory(python-wrapper)
 IF(CMAKE_ENABLE_TESTING)
   enable_testing()
-  add_subdirectory(tests)  
+  add_subdirectory(tests)
   add_subdirectory(python-wrapper/tests)
 ENDIF(CMAKE_ENABLE_TESTING)
 

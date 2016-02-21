@@ -5,6 +5,8 @@
 #include <VarigramFuncs.hh>
 #include <PerplexityFuncs.hh>
 #include <InterTreeGram.hh>
+#include <HashGram.hh>
+#include <TreeGram.hh>
 
 void create_lm(std::string dataname, std::string vocabname, std::string optiname, int n,
                std::string outfname) {
@@ -41,7 +43,7 @@ float itg_perplexity(std::string model1, std::string model2, std::string infname
   InterTreeGram itg(lm_names, coeffs);
   io::Stream txtin(infname,"r");
   io::Stream out("-","w");
-  
+
   Perplexity lm(&itg, "", "", "", "");
   lm.logprob_file(txtin.file, NULL);
   return lm.print_results(out.file);
@@ -50,7 +52,7 @@ float itg_perplexity(std::string model1, std::string model2, std::string infname
 float perplexity(std::string model1, std::string model2, std::string infname, bool use_hashgram=false, float alpha=0.5) {
   io::Stream txtin(infname,"r");
   io::Stream out("-","w");
-  
+
   Perplexity lm(model1, 0, "", "", "", "", false);
   if (model2 != "") {
     lm.set_interpolation(model2);
@@ -128,7 +130,6 @@ void test_interpolation(std::string datadir) {
   fprintf(stderr,"h6 %f\n", h );
   // BOOST_REQUIRE( abs(lp) < 0.01 );
 
-  // FIXME: fix this test
   fprintf(stdout, "Perplexity of ab interp 0.0 against a:\n");
   h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 0.00);
   h2 = itg_perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 0.00);
@@ -161,19 +162,100 @@ void test_intertreegram(std::string datadir) {
   itg.test_write("foo-itg2.arpa", 1);
 }
 
+void test_hashinterpolate_write(std::string datadir) {
+  fprintf(stderr, "hashinterpolate\n");
+  std::vector< std::string > lm_names;
+  HashGram_t<int> main_model, second_model;
+  main_model.set_oov("<UNK>");
+  std::string first_backoff_model(datadir+"/a-novocab-backoff.arpa");
+  { // convert to backoff arpa
+          TreeGram ng;
+          io::Stream firstmodel_in(datadir+"/a-novocab.arpa", "r");
+          io::Stream firstmodel_out(first_backoff_model, "w");
+          ng.read(firstmodel_in.file);
+          firstmodel_in.close();
+          ng.write(firstmodel_out.file);
+          firstmodel_out.close();
+  }
+
+  std::string second_backoff_model(datadir+"/b-novocab-backoff.arpa");
+  { // convert to backoff arpa
+          TreeGram ng;
+          io::Stream secondmodel_in(datadir+"/b-novocab.arpa", "r");
+          io::Stream secondmodel_out(second_backoff_model, "w");
+          ng.read(secondmodel_in.file);
+          secondmodel_in.close();
+          ng.write(secondmodel_out.file);
+          secondmodel_out.close();
+  }
+  io::Stream first_backoff_model_in(first_backoff_model, "r");
+  main_model.read(first_backoff_model_in.file, false);
+  first_backoff_model_in.close();
+  io::Stream second_backoff_model_in(second_backoff_model, "r");
+  second_model.set_oov("<UNK>");
+  main_model.copy_vocab_to(second_model);
+  second_model.read(second_backoff_model_in.file, false);
+  second_model.copy_vocab_to(main_model);
+  main_model.fake_interpolate(second_model, 0.5);
+  std::string fakename(datadir+"/fakeinterpolate.arpa");
+  io::Stream out(fakename, "w");
+  main_model.write(out.file);
+  out.close();
+
+  float h = perplexity(fakename, "", datadir+"/abx20.txt");
+  float h2 = perplexity(datadir+"/a-novocab.arpa", datadir+"/b-novocab.arpa", datadir+"/abx20.txt", 0.5);
+  fprintf(stderr, "fake interpolate %f vs real interpolate %f\n", h, h2);
+  BOOST_REQUIRE( fabs(h-h2) < 0.01 );
+
+  // Check that thing sum to one
+  {
+          std::vector<int> gram0 {1, 1, 0};
+          std::vector<int> gram1 {1, 1, 1};
+          std::vector<int> gram2 {1, 1, 2};
+          float sum = pow(10, main_model.log_prob(gram0))
+                  + pow(10, main_model.log_prob(gram1)) + pow(10, main_model.log_prob(gram2));
+          fprintf(stderr, "Hashfakeinterpolate 3gram sum %f\n", sum);
+          BOOST_REQUIRE( fabs(sum-1.0) < 0.01 );
+  }
+
+  // Check that thing sum to one
+  {
+          std::vector<int> gram0 {1, 0};
+          std::vector<int> gram1 {1, 1};
+          std::vector<int> gram2 {1, 2};
+          float sum = pow(10, main_model.log_prob(gram0))
+                  + pow(10, main_model.log_prob(gram1)) + pow(10, main_model.log_prob(gram2));
+          fprintf(stderr, "Hashfakeinterpolate 2gram sum %f\n", sum);
+          BOOST_REQUIRE( fabs(sum-1.0) < 0.01 );
+  }
+
+    // Check that thing sum to one
+  {
+          std::vector<int> gram0 {0};
+          std::vector<int> gram1 {1};
+          std::vector<int> gram2 {2};
+          float sum = pow(10, main_model.log_prob(gram0))
+                  + pow(10, main_model.log_prob(gram1)) + pow(10, main_model.log_prob(gram2));
+          fprintf(stderr, "Hashfakeinterpolate 1gram sum %f\n", sum);
+          BOOST_REQUIRE( fabs(sum-1.0) < 0.01 );
+  }
+
+}
+
 int test_main( int argc, char *argv[] )             // note the name!
 {
   // FIXME: Use the BOOST unit test framework properly
-  fprintf(stderr, "Running tests\n"); 
+  fprintf(stderr, "Running tests\n");
   fprintf(stderr, "datadir: %s\n", argv[1]);
   std::string datadir(argv[1]);
-  
+
   // FIXME: Write unit test to read and write a arpa file with treegram and hashgram
   create_simple_models(datadir);
   create_models_without_opti(datadir);
   test_interpolation(datadir);
   test_interpolated_different_vocabs(datadir);
   test_intertreegram(datadir);
+  test_hashinterpolate_write(datadir);
 
   return 0;
   /*

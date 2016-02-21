@@ -56,32 +56,34 @@ public:
   void remove_empty_grams();
   void prune(float treshold);
   void add_zeroprob_grams();
+  void fake_interpolate(HashGram_t<KT> &other, float lambda);
 
 private:
   std::vector<sikMatrix<KT, float> *> probs;
   std::vector<sikMatrix<KT, float> *> backoffs;
-
   inline float log_prob_bo(const std::vector<int> &gram); // backoff, default
+
+
   inline float log_prob_bo_cl(const std::vector<int> &gram); // Clustered backoff
   inline float log_prob_i(const std::vector<int> &gram); // Interpolated
 
   inline float log_prob_bo(const std::vector<unsigned short> &gram);
-  inline float log_prob_i(const std::vector<unsigned short> &gram); 
-  float log_prob_bo_helper(const std::vector<KT> &gram); 
+  inline float log_prob_i(const std::vector<unsigned short> &gram);
+  float log_prob_bo_helper(const std::vector<KT> &gram);
   float log_prob_i_helper(const std::vector<KT> &gram);
 
   inline float log_prob_bo(const Gram &gram) {
-    std::vector<KT> g(gram.size());
-    for (size_t i=0;i<gram.size();i++) g[i]=gram[i];
+    std::vector<KT> g(gram.begin(), gram.end());
     return(log_prob_bo(g));
   }
 
   inline float log_prob_i(const Gram &gram){
-    std::vector<KT> g(gram.size());
-    for (size_t i=0;i<gram.size();i++) g[i]=gram[i];
+    std::vector<KT> g(gram.begin(), gram.end());
     return(log_prob_i(g));
   }
 
+  void renormalize_backoffs(int order);
+  void normalize_and_set_bo(std::vector<KT> &prefix, float explicit_probsum, float full_bo_probsum);
 };
 
 #include "HashGram_tmpl.hh"
