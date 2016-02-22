@@ -231,6 +231,17 @@ void test_hashinterpolate_write(std::string datadir) {
 
     // Check that thing sum to one
   {
+          std::vector<int> gram0 {2, 0};
+          std::vector<int> gram1 {2, 1};
+          std::vector<int> gram2 {2, 2};
+          float sum = pow(10, main_model.log_prob(gram0))
+                  + pow(10, main_model.log_prob(gram1)) + pow(10, main_model.log_prob(gram2));
+          fprintf(stderr, "Hashfakeinterpolate 2gramB sum %f\n", sum);
+          BOOST_REQUIRE( fabs(sum-1.0) < 0.01 );
+  }
+
+    // Check that thing sum to one
+  {
           std::vector<int> gram0 {0};
           std::vector<int> gram1 {1};
           std::vector<int> gram2 {2};
