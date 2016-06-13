@@ -55,6 +55,8 @@ if (PYTHONLIBS_FOUND AND SWIG_FOUND)
     # make nice top-level target name
     add_custom_target(varikn_python ALL
                       DEPENDS ${SWIG_MODULE_varikn_REAL_NAME})
+    install(TARGETS ${SWIG_MODULE_varikn_python_REAL_NAME} DESTINATION lib/site-packages)
+    install(FILES ${CMAKE_BINARY_DIR}/lib/python/varikn.py DESTINATION lib/site-packages)
 
     message(STATUS "detecting Python")
     message(STATUS "\t PYTHON_INCLUDE_PATH= ${PYTHON_INCLUDE_PATH}")
