@@ -1,5 +1,11 @@
+option(PYTHON2 "Lower the requirement for python to 2.7")
+if (PYTHON2)
+FIND_PACKAGE(PythonInterp 2.7)
+FIND_PACKAGE(PythonLibs 2.7)
+else()
 FIND_PACKAGE(PythonInterp 3.2)
 FIND_PACKAGE(PythonLibs 3.2)
+endif()
 # You should be able to compile python2 wrappers just by
 # decreasing the minimum required python version
 
