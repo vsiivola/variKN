@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include "conf.hh"
 #include "io.hh"
 #include "HashGram.hh"
@@ -16,6 +17,14 @@ component_models_and_weights(const std::string inputlist) {
                 std::vector<std::string> split_strings2;
                 //std::cout << model_weight << std::endl;
                 str::split(&model_weight, ",", false, &split_strings2);
+                if (split_strings2.size() != 2) {
+                        std::cerr << "Error in model definitions,"\
+                                " cannot find weights "
+                                  << model_weight << std::endl;
+                        throw std::invalid_argument(
+                                "Error in model definitions");
+
+                }
                 const float weight = std::stof(split_strings2[1]);
                 const std::string model_name = split_strings2[0];
                 std::cout << "Model " << model_name
