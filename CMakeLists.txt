@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
+PROJECT(varikn)
 
 macro( check_environment )
     if(WIN32)
@@ -74,3 +75,14 @@ IF(CMAKE_ENABLE_TESTING)
   add_subdirectory(python-wrapper/tests)
 ENDIF(CMAKE_ENABLE_TESTING)
 
+# These are so that package name and install prefix can be overriden
+SET(DEB_INSTALL_PREFIX CACHE STRING "/usr")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "variKN statistical language modeling toolkit")
+SET(CPACK_PACKAGE_VERSION_MAJOR "1")
+SET(CPACK_PACKAGE_VERSION_MINOR "0")
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
+SET(CPACK_GENERATOR "DEB")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Vesa Siivola")
+SET(CPACK_PACKAGING_INSTALL_PREFIX ${DEB_INSTALL_PREFIX})
+
+INCLUDE(CPack)
