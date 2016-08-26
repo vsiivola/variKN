@@ -31,7 +31,8 @@ int main(int argc, char **argv) {
     ('O', "cutoffs=\"val1 val2 ... valN\"", "arg", "", "Use the specified cutoffs. The last value is used for all higher order n-grams.")
     ('N', "discard_unks", "", "", "Remove n-grams containing OOV words.")
     ('L', "longint", "", "", "Store counts in a long int type. Needed for big training sets.")
-    ('F',"forcedisc=FLOAT","arg","-1.0", "Set all discounts to the given value.")    ;
+    ('V',"numngramstarget=INT","arg","0","Scale model down until there are less than V ngrams in the model")
+    ('F',"forcedisc=FLOAT","arg","-1.0", "Set all discounts to the given value.");
   
   config.parse(argc,argv,2);
   
@@ -45,6 +46,7 @@ int main(int argc, char **argv) {
   const std::string optiname(config["opti"].get_str());
   const float dscale=std::max(0.00001, config["dscale"].get_double());
   const float dscale2=config["dscale2"].get_double();
+  const int ngram_prune_target=config["numngramstarget"].get_int();
   const bool smallvocab=config["smallvocab"].specified;
   const bool smallmem=config["smallmem"].specified;
   const bool zpg=config["dontaddzpg"].specified;
@@ -89,6 +91,7 @@ int main(int argc, char **argv) {
 
   if (dscale>0.0) vg->set_datacost_scale(dscale);
   if (dscale2>0.0) vg->set_datacost_scale2(dscale2); // use also pruning
+  if (ngram_prune_target > 0) vg->set_ngram_prune_target(ngram_prune_target);
   if (max_order) vg->set_max_order(max_order);
 
   try {

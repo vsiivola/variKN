@@ -29,6 +29,7 @@ Varigram::Varigram(bool use_3nzer, bool absolute_dc) :
   m_use_3nzer(use_3nzer),
   m_datacost_scale(1),
   m_datacost_scale2(0),
+  m_ngram_prune_target(0),
   m_max_order(INT_MAX),
   m_small_memory(false)
 { }
@@ -186,7 +187,17 @@ void Varigram_t<KT, ICT>::grow(int iter2_lim) {
 
 template <typename KT, typename ICT>
 void Varigram_t<KT, ICT>::prune() {
-  m_kn->prune_model(m_datacost_scale2, 1, m_small_memory ? NULL : m_data);
+  if (m_ngram_prune_target) {
+    double cur_scale = m_datacost_scale;
+    while (double(m_kn->num_grams()) > double(m_ngram_prune_target) * 1.05) {
+      fprintf(stderr, "Currently %d grams\n",m_kn->num_grams());
+      cur_scale = std::max(std::min(double(m_kn->num_grams() - m_ngram_prune_target) / double(m_ngram_prune_target) / 2.0, cur_scale * 1.10), cur_scale * 1.01);
+      fprintf(stderr, "Pruning with E set to %f\n", cur_scale);
+      m_kn->prune_model(cur_scale, 1, m_small_memory ? NULL : m_data);
+    }
+  } else {
+    m_kn->prune_model(m_datacost_scale2, 1, m_small_memory ? NULL : m_data);
+  }
   m_kn->find_coeffs(0.007,8e-2,5e-2);
 }
 
