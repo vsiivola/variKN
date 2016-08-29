@@ -167,6 +167,8 @@ public:
   virtual void add_counts_for_backoffs() = 0;
   virtual void remove_sent_start_prob() {assert(false);}
   inline void write_counts(FILE *f) {moc->WriteCounts(f);}
+
+  virtual void prune_model(float treshold, bool recorrect_kn, Storage_t<KT, CT> *real_counts)=0;
   
 protected:
   inline float kn_prob(const int order, const KT *i);
@@ -186,7 +188,6 @@ protected:
   //virtual inline sikMatrix<KT, CT> *get_ct_matrix(int o, CT *foo, DT *bar) {assert(false);return(0);}
   template <typename BOT> void add_counts_for_backoffs_fbase(BOT *);
   template <typename BOT> void add_zeroprob_grams_fbase(BOT *);
-  virtual void prune_model(float treshold, bool recorrect_kn, Storage_t<KT, CT> *real_counts)=0;
   template <typename BOT> void prune_model_fbase(float treshold, bool recorrect_kn, Storage_t<KT, CT> *real_counts, BOT *dummy);
   virtual void prune_gram(std::vector<KT> &v, CT num, bool recorrect_kn, MultiOrderCounts_counter_types::bo_c<CT> *dummy) {assert(false);}
   virtual void prune_gram(std::vector<KT> &v, CT num, bool recorrect_kn, MultiOrderCounts_counter_types::bo_3c<CT> *dummy) {assert(false);}
