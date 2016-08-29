@@ -75,9 +75,7 @@ public:
   }
 
 private:
-  InterKn_k<KT> *m_kn;
-  InterKn_int_disc<KT, ICT> *m_kn_ic;
-  InterKn_int_disc3<KT, ICT> *m_kn_i3c;
+  InterKn_t<KT, ICT> *m_kn;
   NgramCounts_t<KT, ICT> *m_initial_ng;
 
   bool reestimate_with_history(std::vector<KT> &history);

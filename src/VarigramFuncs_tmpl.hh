@@ -38,8 +38,6 @@ template <typename KT, typename ICT>
 Varigram_t<KT, ICT>::Varigram_t(bool use_3nzero, bool absolute_dc) :
   Varigram(use_3nzero, absolute_dc),
   m_kn(NULL),
-  m_kn_ic(NULL),
-  m_kn_i3c(NULL),
   m_initial_ng(NULL),
   m_data(NULL)
 { }
@@ -67,30 +65,14 @@ initialize(std::string infilename, indextype hashsize, int ndrop, int nfirst,
   fprintf(stderr,"Creating unigram model, ");
   if (hashsize) fprintf(stderr,"hashize %d, ", hashsize);
   /* Construct the unigram model, choose ther right template arguments*/
-  if (!m_use_3nzer && !absolute) {
-    fprintf(stderr,"using Kneser-Ney smoothing.\n");
-    m_kn_ic = new InterKn_int_disc<KT, ICT>(false, infilename, vocabname, optiname, false, 1, ndrop, nfirst, datastorage_tmp, infilename, clhist, hashsize);
-    m_kn=m_kn_ic;
-  } else if (!m_use_3nzer && absolute) {
-    fprintf(stderr,"using absolute discounting.\n");
-    m_kn_ic = new InterKn_int_disc<KT, ICT>(true, infilename, vocabname, optiname, false, 1, ndrop, nfirst, datastorage_tmp, infilename, clhist, hashsize);
-    m_kn=m_kn_ic;
-  } else if (m_use_3nzer && !absolute) {
-    fprintf(stderr,"using modified Kneser-Ney smoothing.\n");
-    m_kn_i3c = new InterKn_int_disc3<KT, ICT>(false, infilename, vocabname, optiname, false, 1, ndrop, nfirst, datastorage_tmp, infilename, clhist, hashsize);    
-    m_kn = m_kn_i3c;
-  } else if (m_use_3nzer && absolute) {
-    fprintf(stderr,"using modified absolute discounting.\n");
-    m_kn_i3c = new InterKn_int_disc3<KT, ICT>(true, infilename, vocabname, optiname, false, 1, ndrop, nfirst, datastorage_tmp, infilename, clhist, hashsize);
-    m_kn = m_kn_i3c;
+  if (!m_use_3nzer) {
+    fprintf(stderr, "using ...\n");
+    m_kn = new InterKn_int_disc<KT, ICT>(absolute, infilename, vocabname, optiname, false, 1, ndrop, nfirst, datastorage_tmp, infilename, clhist, hashsize);
   } else {
-    fprintf(stderr,"Funny combination of init values:\n");
-    fprintf(stderr," use_3nzer %d\n", m_use_3nzer);
-    fprintf(stderr," absolute %d\n", absolute);
-    fprintf(stderr,"Exit.\n");
-    assert(false);
-    exit(-1);
+    fprintf(stderr, "using modified ...\n");
+    m_kn = new InterKn_int_disc3<KT, ICT>(absolute, infilename, vocabname, optiname, false, 1, ndrop, nfirst, datastorage_tmp, infilename, clhist, hashsize);
   }
+
   // Setting discounting
   m_kn->init_disc(0.71);  
   m_vocab=&(m_kn->vocab);
@@ -112,8 +94,7 @@ void Varigram_t<KT, ICT>::grow(int iter2_lim) {
   int accepted;
 
   std::vector<sikMatrix<KT, ICT> *> *sik_c;
-  if (m_use_3nzer) sik_c=&(m_kn_i3c->moc->m_counts);
-  else sik_c=&(m_kn_ic->moc->m_counts);
+  sik_c=&(m_kn->moc->m_counts);
   
   //int update_coeff_counter=1;
   while (iter2<iter2_lim) {
@@ -205,29 +186,8 @@ void Varigram_t<KT, ICT>::grow(int iter2_lim) {
 
 template <typename KT, typename ICT>
 void Varigram_t<KT, ICT>::prune() {
-    if (m_datacost_scale2) {
-      if (!m_small_memory) { 
-	if (m_kn_ic) m_kn_ic->prune_model(m_datacost_scale2, 1, m_data);
-	else if (m_kn_i3c) m_kn_i3c->prune_model(m_datacost_scale2, 1, m_data);
-        else assert(false);
-      } else {
-	if (m_kn_ic) m_kn_ic->prune_model(m_datacost_scale2, 1, NULL);
-	else if (m_kn_i3c) m_kn_i3c->prune_model(m_datacost_scale2, 1, NULL);
-	else assert(false);
-      }
-      m_kn->find_coeffs(0.007,8e-2,5e-2);
-    } else if (m_kn->cutoffs.size()) {
-      if (!m_small_memory) {
-	if (m_kn_ic) m_kn_ic->prune_model(0, 1, m_data);
-	else if (m_kn_i3c) m_kn_i3c->prune_model(0, 1, m_data);
-	else assert(false);
-      } else {
-	if (m_kn_ic) m_kn_ic->prune_model(0, 1, NULL);
-	else if (m_kn_i3c) m_kn_i3c->prune_model(0, 1, NULL);
-	else assert(false);
-      }
-      m_kn->find_coeffs(0.007,8e-2,5e-2);
-    }
+  m_kn->prune_model(m_datacost_scale2, 1, m_small_memory ? NULL : m_data);
+  m_kn->find_coeffs(0.007,8e-2,5e-2);
 }
 
 template <typename KT, typename ICT>
@@ -333,7 +293,7 @@ double Varigram_t<KT, ICT>::modify_model(
   
   if (!m_use_3nzer) {
     for (it = m.begin(); it != m.end(); it++ ) {
-      MultiOrderCounts<KT, ICT> *moc=m_kn_ic->moc;
+      MultiOrderCounts<KT, ICT> *moc=m_kn->moc;
       ind.back()=it->first;
       val=it->second;
 #if 0
@@ -374,7 +334,7 @@ double Varigram_t<KT, ICT>::modify_model(
       }
     }
   } else {
-    MultiOrderCounts<KT, ICT> *moc = m_kn_i3c->moc;
+    MultiOrderCounts<KT, ICT> *moc = m_kn->moc;
     for (it = m.begin(); it != m.end(); it++ ) {
       ind.back()=it->first;
       val=it->second;
