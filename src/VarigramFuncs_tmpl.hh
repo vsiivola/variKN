@@ -189,12 +189,38 @@ template <typename KT, typename ICT>
 void Varigram_t<KT, ICT>::prune() {
   if (m_ngram_prune_target) {
     double cur_scale = m_datacost_scale;
+    indextype prev_num_grams = m_kn->num_grams();
+    double prev_scale = 0.0;
+
+    if (m_kn->num_grams() > m_ngram_prune_target * 2) {
+      prev_scale = cur_scale * 2;
+      prev_num_grams = m_kn->num_grams() * 2;
+    } else {
+      prev_scale = cur_scale * 1.05;
+      prev_num_grams = m_kn->num_grams() * 105 / 100;
+    }
+
     while (double(m_kn->num_grams()) > double(m_ngram_prune_target) * 1.05) {
-      fprintf(stderr, "Currently %d grams\n",m_kn->num_grams());
-      cur_scale = std::max(std::min(double(m_kn->num_grams() - m_ngram_prune_target) / double(m_ngram_prune_target) / 2.0, cur_scale * 1.10), cur_scale * 1.01);
-      fprintf(stderr, "Pruning with E set to %f\n", cur_scale);
+      double scale_diff = cur_scale - prev_scale;
+      indextype gram_diff = prev_num_grams - m_kn->num_grams();
+
+      fprintf(stderr, "Previous round increased E from %.4f to %.4f and this pruned the model from %d to %d ngrams (this data is faked for the first iteration\n", prev_scale, cur_scale, prev_num_grams, m_kn->num_grams());
+      fprintf(stderr, "I still need to remove %d grams\n", m_kn->num_grams() - m_ngram_prune_target);
+
+      double increase = (double)(m_kn->num_grams() - m_ngram_prune_target) / (double)(gram_diff);
+      fprintf(stderr, "Without limits I would increase E with %.4f (which is %.4f %%) to %.4f\n", increase*scale_diff, (increase*scale_diff)/cur_scale, cur_scale+(increase*scale_diff));
+
+      prev_scale = cur_scale;
+      prev_num_grams = m_kn->num_grams();
+
+      cur_scale = std::max(std::min(cur_scale+(increase*scale_diff), cur_scale * 1.5), cur_scale * 1.05);
+
+      fprintf(stderr, "With limits I increase E with %.4f (which is %.4f %%) to %.4f\n", cur_scale - prev_scale, (cur_scale-prev_scale)/prev_scale, cur_scale);
+
       m_kn->prune_model(cur_scale, 1, m_small_memory ? NULL : m_data);
     }
+
+    fprintf(stderr, "Finally, %d grams, which is %.4f %% off target\n", m_kn->num_grams(), (double)(m_ngram_prune_target-m_kn->num_grams())/(double)(m_ngram_prune_target));
   } else {
     m_kn->prune_model(m_datacost_scale2, 1, m_small_memory ? NULL : m_data);
   }
