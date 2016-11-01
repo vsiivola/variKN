@@ -189,22 +189,24 @@ template <typename KT, typename ICT>
 void Varigram_t<KT, ICT>::prune() {
   if (m_ngram_prune_target) {
     double cur_scale = m_datacost_scale;
-    indextype prev_num_grams = m_kn->num_grams();
-    double prev_scale = 0.0;
 
-    if (m_kn->num_grams() > m_ngram_prune_target * 2) {
-      prev_scale = cur_scale * 2;
-      prev_num_grams = m_kn->num_grams() * 2;
-    } else {
-      prev_scale = cur_scale * 1.05;
-      prev_num_grams = m_kn->num_grams() * 105 / 100;
-    }
+    int round = 0;
+    indextype prev_num_grams = 0;
+    double prev_scale = cur_scale * 2;
 
-    while (double(m_kn->num_grams()) > double(m_ngram_prune_target) * 1.05) {
+    while (double(m_kn->num_grams()) > double(m_ngram_prune_target) * 1.03) {
+
+        if (round == 0) {
+          fprintf(stderr, "Currently %d ngrams. First prune with E=D= %.5f", m_kn->num_grams(), cur_scale);
+          m_kn->prune_model(cur_scale, 1, m_small_memory ? NULL : m_data);
+          ++round;
+          continue;
+      }
+
       double scale_diff = cur_scale - prev_scale;
       indextype gram_diff = prev_num_grams - m_kn->num_grams();
 
-      fprintf(stderr, "Previous round increased E from %.4f to %.4f and this pruned the model from %d to %d ngrams (this data is faked for the first iteration\n", prev_scale, cur_scale, prev_num_grams, m_kn->num_grams());
+      fprintf(stderr, "Previous round increased E from %.4f to %.4f and this pruned the model from %d to %d ngrams\n", prev_scale, cur_scale, prev_num_grams, m_kn->num_grams());
       fprintf(stderr, "I still need to remove %d grams\n", m_kn->num_grams() - m_ngram_prune_target);
 
       double increase = (double)(m_kn->num_grams() - m_ngram_prune_target) / (double)(gram_diff);
@@ -221,6 +223,9 @@ void Varigram_t<KT, ICT>::prune() {
     }
 
     fprintf(stderr, "Finally, %d grams, which is %.4f %% off target\n", m_kn->num_grams(), (double)(m_ngram_prune_target-m_kn->num_grams())/(double)(m_ngram_prune_target));
+    if (double(m_kn->num_grams()) < double(m_ngram_prune_target) * 0.97) {
+      fprintf(stderr, "WARNING: we pruned a bit too much! Increase D and run model training again to get the desired amount of n-grams\n");
+    }
   } else {
     m_kn->prune_model(m_datacost_scale2, 1, m_small_memory ? NULL : m_data);
   }

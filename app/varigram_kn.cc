@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     ('O', "cutoffs=\"val1 val2 ... valN\"", "arg", "", "Use the specified cutoffs. The last value is used for all higher order n-grams.")
     ('N', "discard_unks", "", "", "Remove n-grams containing OOV words.")
     ('L', "longint", "", "", "Store counts in a long int type. Needed for big training sets.")
-    ('V',"numngramstarget=INT","arg","0","Scale model down until there are less than V ngrams in the model")
+    ('V',"numngramstarget=INT","arg","0","Scale model down until there are less than V*1.03 ngrams in the model")
     ('F',"forcedisc=FLOAT","arg","-1.0", "Set all discounts to the given value.");
   
   config.parse(argc,argv,2);
