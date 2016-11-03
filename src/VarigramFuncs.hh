@@ -11,6 +11,7 @@ public:
   virtual ~Varigram() {}
   inline void set_datacost_scale(double f) {m_datacost_scale=f;}
   inline void set_datacost_scale2(double f) {m_datacost_scale2=f;}
+  inline void set_ngram_prune_target(indextype i) {m_ngram_prune_target=i;}
   inline void set_max_order(int i) {m_max_order=i;}
   
   virtual void initialize(std::string infilename, indextype hashsize, int ndrop, 
@@ -34,6 +35,7 @@ protected:
   bool m_use_3nzer;
   float m_datacost_scale;
   float m_datacost_scale2;
+  indextype m_ngram_prune_target;
   int m_max_order;
   std::string m_infilename;
   Vocabulary *m_vocab;
