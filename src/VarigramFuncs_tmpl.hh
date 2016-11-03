@@ -191,13 +191,13 @@ void Varigram_t<KT, ICT>::prune() {
     double cur_scale = m_datacost_scale;
 
     int round = 0;
-    indextype prev_num_grams = 0;
+    indextype prev_num_grams = m_kn->num_grams();
     double prev_scale = cur_scale * 2;
 
     while (double(m_kn->num_grams()) > double(m_ngram_prune_target) * 1.03) {
 
         if (round == 0) {
-          fprintf(stderr, "Currently %d ngrams. First prune with E=D= %.5f", m_kn->num_grams(), cur_scale);
+          fprintf(stderr, "Currently %d ngrams. First prune with E=D=%.5f\n", m_kn->num_grams(), cur_scale);
           m_kn->prune_model(cur_scale, 1, m_small_memory ? NULL : m_data);
           ++round;
           continue;
