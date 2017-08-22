@@ -56,6 +56,7 @@
 
 %template(stringvector) std::vector<std::string>;
 %template(floatvector) std::vector<float>;
+%template(intvector) std::vector<int>;
 
 %feature("notabstract") InterTreeGram;
 %include Vocabulary.hh
@@ -72,4 +73,3 @@
 %}
 
 %template(VarigramTrainer) Varigram_t<int, int>;
-
