@@ -14,20 +14,13 @@
 class Perplexity {
 public:
   Perplexity(const char *);
-  // FIXME: Perplexity should take ownership of the itg LM with std::move(unique_ptr),
-  // not just assume it remains undeleted for the lifetime.
-  // Cannot be fixed neatly before SWIG supports unique_ptr -
-  // It is possible to ignore that version of constructor, but then we lose
-  // the functionality on python side.
-
-  Perplexity(NGram *lm, const std::string ccs_name, const std::string wb_name,
-             const std::string mb_name, const std::string unk_symbol,
-             bool skip_unk_prob = true);
+  Perplexity(std::shared_ptr<NGram> lm, const std::string ccs_name,
+             const std::string wb_name, const std::string mb_name,
+             const std::string unk_symbol, bool skip_unk_prob = true);
   Perplexity(const std::string lm_name, const int type,
              const std::string ccs_name, const std::string wb_name,
              const std::string mb_name, const std::string unk_symbol,
              const int hashgram, bool skip_unk_prob = true);
-  ~Perplexity();
 
   double logprob_file(FILE *in, FILE *out, const int interval = 1);
   float logprob(const char *word, float &cur_word_lp);
@@ -65,8 +58,8 @@ public:
   inline int get_num_tunks() { return m_num_tunks; }
 
 private:
-  NGram *m_lm;
-  NGram *m_lm2;
+  std::shared_ptr<NGram> m_lm;
+  std::shared_ptr<NGram> m_lm2;
   std::vector<int> ccs_vector;
   std::vector<int> wb_vector;
   std::vector<std::string> mb_vector;
@@ -86,7 +79,6 @@ private:
   bool is_mb(std::string w);
   bool m_print_unk_warn;
   bool m_skip_unk_prob;
-  bool m_need_destruct_m_lm;
   int m_init_hist;
   int m_cur_init_hist;
 

@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
   fprintf(stderr, "\n");
 
   std::unique_ptr<Perplexity> lm;
-  std::unique_ptr<InterTreeGram> itg;
+  bool knows_hitrates = true;
   if (config["interpolate"].specified) {
     // Interpolate the old way, using PerplexityFuncs
     if (config["freegram"].specified) {
@@ -121,6 +121,7 @@ int main(int argc, char *argv[]) {
       }
     } else {
       // Interpolate the new way, using InterTreeGram
+      knows_hitrates = false;
       std::vector<std::string> lm_names;
       lm_names.push_back(lm_name);
       lm_names.push_back(config["interpolate"].get_str());
@@ -132,7 +133,7 @@ int main(int argc, char *argv[]) {
       }
       coeffs.push_back(1.0 - coeff);
       coeffs.push_back(coeff);
-      itg.reset(new InterTreeGram(lm_names, coeffs));
+      std::shared_ptr<NGram> itg(new InterTreeGram(lm_names, coeffs));
       lm.reset(new Perplexity(itg, ccs_name, wb_name, mb_name, unk_symbol,
                               skip_unks));
     }
@@ -156,6 +157,6 @@ int main(int argc, char *argv[]) {
     lm->logprob_file(txtin.file, nullptr, 1);
   }
   lm->print_results(out.file);
-  if (!itg) // FIXME: This doesn't work yet for InterTreeGrams
+  if (knows_hitrates) // FIXME: This doesn't work yet for InterTreeGrams
     lm->print_hitrates(out.file);
 }

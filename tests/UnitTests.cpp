@@ -44,11 +44,11 @@ float itg_perplexity(std::string model1, std::string model2,
   coeffs.push_back(alpha);
   coeffs.push_back(1.0 - alpha);
 
-  InterTreeGram itg(lm_names, coeffs);
+  auto itg = std::make_shared<InterTreeGram>(lm_names, coeffs);
   io::Stream txtin(infname, "r");
   io::Stream out("-", "w");
 
-  Perplexity lm(&itg, "", "", "", "");
+  Perplexity lm(itg, "", "", "", "");
   lm.logprob_file(txtin.file, NULL);
   return lm.print_results(out.file);
 }

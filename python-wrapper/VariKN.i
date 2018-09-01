@@ -16,9 +16,9 @@
     std::cerr << e << std::endl;
     SWIG_exception(SWIG_RuntimeError, "Exception");
   }
-	catch (...) {
+  catch (...) {
     SWIG_exception(SWIG_RuntimeError, "Unknown Exception");
-	}
+  }
 }
 
 #if defined(SWIGPYTHON)
@@ -39,7 +39,7 @@
   $result = Py_BuildValue("s#",$1->c_str(),$1->size());
 }
 
-#ifndef PYTHON3 
+#ifndef PYTHON3
 ## Python 3 no longer supports FILE* typemaps, this can be enabled for py2
 %typemap(in) FILE* {
         if (!(PyFile_Check($input))) {
@@ -58,6 +58,10 @@
 %template(floatvector) std::vector<float>;
 %template(intvector) std::vector<int>;
 
+%include <std_shared_ptr.i>
+%shared_ptr(InterTreeGram)
+%shared_ptr(NGram)
+%shared_ptr(Vocabulary)
 %feature("notabstract") InterTreeGram;
 %include Vocabulary.hh
 %include NGram.hh

@@ -7,8 +7,7 @@
 
 Perplexity::Perplexity(const char *lm_name) {
   init_variables();
-  m_lm = new TreeGram;
-  m_need_destruct_m_lm = true;
+  m_lm.reset(new TreeGram());
   m_lm->set_oov("<UNK>");
   m_tmpstring_length = 100;
   m_tmpstring = (char *)malloc(m_tmpstring_length * sizeof(char));
@@ -25,14 +24,11 @@ Perplexity::Perplexity(const char *lm_name) {
   init_special_symbols("", "", "");
 }
 
-Perplexity::Perplexity(NGram *lm, const std::string ccs_name,
+Perplexity::Perplexity(std::shared_ptr<NGram> lm, const std::string ccs_name,
                        const std::string wb_name, const std::string mb_name,
                        const std::string unk_symbol, bool skip_unk_prob) {
   init_variables();
-  // FIXME: Perplexity should take ownership of the itg LM, not just
-  // assume it remains undeleted for the lifetime
   m_lm = lm;
-  m_need_destruct_m_lm = false;
   m_skip_unk_prob = skip_unk_prob;
 
   if (unk_symbol.length())
@@ -50,12 +46,11 @@ Perplexity::Perplexity(const std::string lm_name, const int type,
   init_variables();
   if (hashgram)
     if (hashgram > 0)
-      m_lm = new HashGram_t<int>;
+      m_lm.reset(new HashGram_t<int>());
     else
-      m_lm = new HashGram_t<unsigned short>;
+      m_lm.reset(new HashGram_t<unsigned short>());
   else
-    m_lm = new TreeGram;
-  m_need_destruct_m_lm = true;
+    m_lm.reset(new TreeGram());
   m_skip_unk_prob = skip_unk_prob;
 
   // fprintf(stderr,"UNK SYMBOL: %s\n",unk_symbol);
@@ -87,7 +82,7 @@ void Perplexity::init_variables() {
   m_logprob = 0.0;
   m_perplexity = 0.0;
   m_token_perplexity = 0.0;
-  m_lm2 = NULL;
+  m_lm2.reset();
   m_alpha = 0.5;
   m_init_hist = m_cur_init_hist = 0;
   m_num_sent_ends = 0;
@@ -124,13 +119,6 @@ void Perplexity::init_special_symbols(const std::string ccs_name,
 
   /* Space for the hit rates, zeroth is for the requesed amount */
   ngram_hits.resize(m_lm->order() + 1, 0);
-}
-
-Perplexity::~Perplexity() {
-  if (m_need_destruct_m_lm)
-    delete (m_lm);
-  if (m_lm2)
-    delete (m_lm2);
 }
 
 void Perplexity::find_indices(const std::string fname, std::vector<int> &vec) {
@@ -432,8 +420,7 @@ double Perplexity::print_results(FILE *out) {
 }
 
 void Perplexity::set_interpolation(std::string lm_name) {
-  HashGram_t<int> *tmp_lm;
-  tmp_lm = new HashGram_t<int>;
+  auto tmp_lm = std::make_shared<HashGram_t<int> >();
 
   // Add all words from m_lm to tmp_lm
   std::vector<int> gram(1);
