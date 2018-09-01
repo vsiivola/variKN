@@ -2,17 +2,18 @@
 #ifndef VOCABULARY_HH
 #define VOCABULARY_HH
 
+#include <cassert>
+#include <exception>
+#include <map>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <vector>
-#include <exception>
-#include <stdio.h>
-#include <map>
-#include <cassert>
-typedef std::map<std::string,int> vocabmap;
+typedef std::map<std::string, int> vocabmap;
 
 class Vocabulary {
   friend class VCluster;
+
 public:
   Vocabulary();
 
@@ -39,7 +40,7 @@ public:
   // removed.  Spaces are removed.
   void read(FILE *file);
   void read(const std::string &filename);
-  
+
   // Write vocabulary to a stream.
   void write(FILE *file) const;
 
@@ -47,17 +48,19 @@ public:
   void clear_words();
 
   // Copies vocabulary to Voc, ugly implementation
-  inline void copy_vocab_to(Vocabulary &Voc){Voc.copy_helper(m_indices, m_words);}
-  inline void copy_helper(vocabmap &ind, std::vector<std::string> &w) {m_indices=ind,m_words=w;}
+  inline void copy_vocab_to(Vocabulary &Voc) {
+    Voc.copy_helper(m_indices, m_words);
+  }
+  inline void copy_helper(vocabmap &ind, std::vector<std::string> &w) {
+    m_indices = ind, m_words = w;
+  }
 
 protected:
   vocabmap m_indices;
   std::vector<std::string> m_words;
 };
 
-const std::string&
-Vocabulary::word(int index) const
-{
+const std::string &Vocabulary::word(int index) const {
   if ((unsigned int)index >= (unsigned int)m_words.size()) {
     fprintf(stderr, "Vocabulary::word(): index %d out of range\n", index);
     assert(false);
@@ -67,9 +70,7 @@ Vocabulary::word(int index) const
   return m_words[index];
 }
 
-int
-Vocabulary::word_index(const std::string &word) const
-{
+int Vocabulary::word_index(const std::string &word) const {
   vocabmap::const_iterator i = m_indices.find(word);
   if (i == m_indices.end())
     return 0;

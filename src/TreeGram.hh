@@ -9,8 +9,8 @@ public:
   struct Node {
     Node() : word(-1), log_prob(0), back_off(0), child_index(-1) {}
     Node(int word, float log_prob, float back_off, int child_index)
-      : word(word), log_prob(log_prob), back_off(back_off), 
-	child_index(child_index) {}
+        : word(word), log_prob(log_prob), back_off(back_off),
+          child_index(child_index) {}
     int word;
     float log_prob;
     float back_off;
@@ -18,8 +18,7 @@ public:
   };
 
   struct ReadError : public std::exception {
-    virtual const char *what() const throw()
-      { return "TreeGram: read error"; }
+    virtual const char *what() const throw() { return "TreeGram: read error"; }
   };
 
   class Iterator {
@@ -51,77 +50,88 @@ public:
     bool has_children();
 
     friend class TreeGram;
+
   private:
     TreeGram *m_gram;
     std::vector<int> m_index_stack;
   };
 
-  void reserve_nodes(int nodes); 
+  void reserve_nodes(int nodes);
 
   /// Adds a new gram to the language model.
-  // 
+  //
   // The grams must be inserted in sorted order.  The only exception
   // is the OOV 1-gram, which can be updated any time.  It exists by
   // default with very small log-prob and zero back-off.
-  void add_gram(const Gram &gram, float log_prob, float back_off, bool add_missing_unigrams=false);
-  void read(FILE *file, bool binary=false);
-  void write(FILE *file, bool binary=false, std::string field_separator=" ");
+  void add_gram(const Gram &gram, float log_prob, float back_off,
+                bool add_missing_unigrams = false);
+  void read(FILE *file, bool binary = false);
+  void write(FILE *file, bool binary = false,
+             std::string field_separator = " ");
   void write_real(FILE *file, bool reflip);
 
-  float log_prob_bo(const Gram &gram); // Keep this version lean and mean
+  float log_prob_bo(const Gram &gram);    // Keep this version lean and mean
   float log_prob_bo_cl(const Gram &gram); // Clustered backoff
-  float log_prob_i(const Gram &gram); // Interpolated
-  float log_prob_i_cl(const Gram &gram); //Interpolated backoff
+  float log_prob_i(const Gram &gram);     // Interpolated
+  float log_prob_i_cl(const Gram &gram);  // Interpolated backoff
 
   inline float log_prob_bo(const std::vector<int> &gram) {
     Gram g(gram.size());
-    for (size_t i=0;i<gram.size();i++) g[i]=gram[i];
-    return(log_prob_bo(g));
+    for (size_t i = 0; i < gram.size(); i++)
+      g[i] = gram[i];
+    return (log_prob_bo(g));
   }
 
   inline float log_prob_bo_cl(const std::vector<int> &gram) {
     Gram g(gram.size());
-    for (size_t i=0;i<gram.size();i++) g[i]=gram[i];
-    return(log_prob_bo_cl(g));
+    for (size_t i = 0; i < gram.size(); i++)
+      g[i] = gram[i];
+    return (log_prob_bo_cl(g));
   }
 
-  inline float log_prob_i(const std::vector<int> &gram){
+  inline float log_prob_i(const std::vector<int> &gram) {
     Gram g(gram.size());
-    for (size_t i=0;i<gram.size();i++) g[i]=gram[i];
-    return(log_prob_i(g));
+    for (size_t i = 0; i < gram.size(); i++)
+      g[i] = gram[i];
+    return (log_prob_i(g));
   }
 
-  inline float log_prob_i_cl(const std::vector<int> &gram){
+  inline float log_prob_i_cl(const std::vector<int> &gram) {
     Gram g(gram.size());
-    for (size_t i=0;i<gram.size();i++) g[i]=gram[i];
-    return(log_prob_i_cl(g));
+    for (size_t i = 0; i < gram.size(); i++)
+      g[i] = gram[i];
+    return (log_prob_i_cl(g));
   }
 
   inline float log_prob_bo(const std::vector<unsigned short> &gram) {
     Gram g(gram.size());
-    for (size_t i=0;i<gram.size();i++) g[i]=gram[i];
-    return(log_prob_bo(g));
+    for (size_t i = 0; i < gram.size(); i++)
+      g[i] = gram[i];
+    return (log_prob_bo(g));
   }
 
   inline float log_prob_bo_cl(const std::vector<unsigned short> &gram) {
     Gram g(gram.size());
-    for (size_t i=0;i<gram.size();i++) g[i]=gram[i];
-    return(log_prob_bo_cl(g));
+    for (size_t i = 0; i < gram.size(); i++)
+      g[i] = gram[i];
+    return (log_prob_bo_cl(g));
   }
 
-  inline float log_prob_i(const std::vector<unsigned short> &gram){
+  inline float log_prob_i(const std::vector<unsigned short> &gram) {
     Gram g(gram.size());
-    for (size_t i=0;i<gram.size();i++) g[i]=gram[i];
-    return(log_prob_i(g));
+    for (size_t i = 0; i < gram.size(); i++)
+      g[i] = gram[i];
+    return (log_prob_i(g));
   }
 
-  inline float log_prob_i_cl(const std::vector<unsigned short> &gram){
+  inline float log_prob_i_cl(const std::vector<unsigned short> &gram) {
     Gram g(gram.size());
-    for (size_t i=0;i<gram.size();i++) g[i]=gram[i];
-    return(log_prob_i_cl(g));
+    for (size_t i = 0; i < gram.size(); i++)
+      g[i] = gram[i];
+    return (log_prob_i_cl(g));
   }
 
-  int gram_count(int order) { return m_order_count.at(order-1); }
+  int gram_count(int order) { return m_order_count.at(order - 1); }
 
   /* Don't use this function, unles you really need to*/
   int find_child(int word, int node_index);
@@ -136,25 +146,25 @@ public:
                           std::vector<float> &result_buffer);
 
   void print_debuglist();
-  void finalize(bool add_missing_unigrams=false);
+  void finalize(bool add_missing_unigrams = false);
   void convert_to_backoff();
 
 private:
   int binary_search(int word, int first, int last);
   void print_gram(FILE *file, const Gram &gram);
   void find_path(const Gram &gram);
-  void check_order(const Gram &gram, bool add_missing_unigrams=false);
+  void check_order(const Gram &gram, bool add_missing_unigrams = false);
   void flip_endian();
   void fetch_gram(const Gram &gram, int first);
 
-  std::vector<int> m_order_count;	// number of grams in each order
-  std::vector<Node> m_nodes;		// storage for the nodes
-  std::vector<int> m_fetch_stack;	// indices of the gram requested
-  //int m_last_order;			// order of the last hit
+  std::vector<int> m_order_count; // number of grams in each order
+  std::vector<Node> m_nodes;      // storage for the nodes
+  std::vector<int> m_fetch_stack; // indices of the gram requested
+  // int m_last_order;			// order of the last hit
 
   // For creating the model
-  std::vector<int> m_insert_stack;	// indices of the last gram inserted
-  Gram m_last_gram;			// the last ngram added to the model
+  std::vector<int> m_insert_stack; // indices of the last gram inserted
+  Gram m_last_gram;                // the last ngram added to the model
 };
 
 #endif /* TREEGRAM_HH */

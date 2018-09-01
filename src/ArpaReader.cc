@@ -1,20 +1,17 @@
 // Routines for reading arpa format files to the internal prefix tree
 // format.
-#include <stdlib.h>
 #include "ArpaReader.hh"
-#include "str.hh"
 #include "def.hh"
+#include "str.hh"
+#include <stdlib.h>
 
-void
-ArpaReader::read_error()
-{
+void ArpaReader::read_error() {
   fprintf(stderr, "ArpaReader::read(): error on line %d\n", m_lineno);
   exit(1);
 }
 
-void
-ArpaReader::read_header(FILE *file, bool &interpolated, std::string &line)
-{
+void ArpaReader::read_header(FILE *file, bool &interpolated,
+                             std::string &line) {
   int order;
   // Just for efficiency
   m_vec.reserve(16);
@@ -30,8 +27,10 @@ ArpaReader::read_header(FILE *file, bool &interpolated, std::string &line)
     m_lineno++;
 
     if (!ok) {
-      fprintf(stderr, "ArpaReader::read(): "
-	      "error on line %d while waiting \\data\\", m_lineno);
+      fprintf(stderr,
+              "ArpaReader::read(): "
+              "error on line %d while waiting \\data\\",
+              m_lineno);
       exit(1);
     }
 
@@ -51,11 +50,13 @@ ArpaReader::read_header(FILE *file, bool &interpolated, std::string &line)
     m_lineno++;
 
     if (!ok) {
-      fprintf(stderr, "ArpaReader::read(): "
-	      "error on line %d while reading counts", m_lineno);
+      fprintf(stderr,
+              "ArpaReader::read(): "
+              "error on line %d while reading counts",
+              m_lineno);
       exit(1);
     }
-    
+
     // Header ends in a \-command
     if (line[0] == '\\')
       break;
@@ -78,20 +79,20 @@ ArpaReader::read_header(FILE *file, bool &interpolated, std::string &line)
     if (count > max_order_count)
       max_order_count = count;
     counts.push_back(count);
-    
+
     if (atoi(m_vec[0].c_str()) != order || counts.back() < 0)
       read_error();
     order++;
   }
 }
 
-bool 
-ArpaReader::next_gram(FILE *file, std::string &line, std::vector<int> &gram, float &log_prob, float &back_off) {
-  // Read ngrams order by order  
-  while (m_read_order == 0 || m_gram_num >= counts[m_read_order-1]) {
+bool ArpaReader::next_gram(FILE *file, std::string &line,
+                           std::vector<int> &gram, float &log_prob,
+                           float &back_off) {
+  // Read ngrams order by order
+  while (m_read_order == 0 || m_gram_num >= counts[m_read_order - 1]) {
     m_gram_num = 0;
     m_read_order++;
-
 
     // Skip empty lines before the next order.
     bool skip_empty_lines = line != "\\1-grams:";
@@ -111,28 +112,35 @@ ArpaReader::next_gram(FILE *file, std::string &line, std::vector<int> &gram, flo
     // We must always have the correct header line at this point
     if (m_read_order > counts.size()) {
       if (line != "\\end\\") {
-        fprintf(stderr, "ArpaReader::next_gram():"
-                "expected end, got '%s' on line %d\n", line.c_str(), m_lineno);
+        fprintf(stderr,
+                "ArpaReader::next_gram():"
+                "expected end, got '%s' on line %d\n",
+                line.c_str(), m_lineno);
         exit(1);
       }
       return false;
     }
 
-    fprintf(stderr,"Found %d grams for order %d\n", counts[m_read_order-1], m_read_order);
-
+    fprintf(stderr, "Found %d grams for order %d\n", counts[m_read_order - 1],
+            m_read_order);
 
     if (line[0] != '\\') {
-      fprintf(stderr, "ArpaReader::next_gram(): "
-              "\\%d-grams expected on line %d\n", m_read_order, m_lineno);
+      fprintf(stderr,
+              "ArpaReader::next_gram(): "
+              "\\%d-grams expected on line %d\n",
+              m_read_order, m_lineno);
       exit(1);
     }
 
     str::clean(&line, " \t");
     str::split(&line, "-", false, &m_vec);
 
-    if (atoi(m_vec[0].substr(1).c_str()) != m_read_order || m_vec[1] != "grams:") {
-      fprintf(stderr, "ArpaReader::next_gram(): "
-	      "unexpected command on line %d: %s\n", m_lineno, line.c_str());
+    if (atoi(m_vec[0].substr(1).c_str()) != m_read_order ||
+        m_vec[1] != "grams:") {
+      fprintf(stderr,
+              "ArpaReader::next_gram(): "
+              "unexpected command on line %d: %s\n",
+              m_lineno, line.c_str());
       exit(1);
     }
   }
@@ -156,15 +164,17 @@ ArpaReader::next_gram(FILE *file, std::string &line, std::vector<int> &gram, flo
 
   // Check the number of columns on the line
   if (m_vec.size() < m_read_order + 1 || m_vec.size() > m_read_order + 2) {
-    fprintf(stderr, "ArpaReader::next_gram(): "
-            "%d columns on line %d\n", (int) m_vec.size(), m_lineno);
+    fprintf(stderr,
+            "ArpaReader::next_gram(): "
+            "%d columns on line %d\n",
+            (int)m_vec.size(), m_lineno);
     exit(1);
   }
   if (m_read_order == counts.size() && m_vec.size() != m_read_order + 1) {
-    fprintf(stderr, "WARNING: %d columns on line %d\n", (int) m_vec.size(), 
+    fprintf(stderr, "WARNING: %d columns on line %d\n", (int)m_vec.size(),
             m_lineno);
   }
-  
+
   // FIXME: should we deny new words in higher order ngrams?
 
   // Parse log-probability, back-off weight and word indices
@@ -175,7 +185,7 @@ ArpaReader::next_gram(FILE *file, std::string &line, std::vector<int> &gram, flo
     back_off = strtod(m_vec[m_read_order + 1].c_str(), NULL);
 
   // Add the gram to sorter
-  //fprintf(stderr,"add gram [");
+  // fprintf(stderr,"add gram [");
   for (int i = 0; i < m_read_order; i++) {
     gram[i] = m_vocab->add_word(m_vec[i + 1]);
   }

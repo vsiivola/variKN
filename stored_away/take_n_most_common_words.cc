@@ -1,44 +1,52 @@
-// Copyright (C) 2007  Vesa Siivola. 
+// Copyright (C) 2007  Vesa Siivola.
 // See licence.txt for the terms of distribution.
 
 // Program to remove the least common words from counts file
-#include "io.hh"
-#include "conf.hh"
 #include "NgramCounts.hh"
+#include "conf.hh"
+#include "io.hh"
 
-int main (int argc, char **argv) {
+int main(int argc, char **argv) {
   conf::Config config;
-  config("Usage: take_n_most_common_words counts_in counts_out\nDrops the least common words and trims the counts and vocab files accordingly.\n")
-    ('n',"norder=INT","arg must","3","n-gram order")
-    ('B',"vocabin=FILE", "arg", "", "Input count file contains indices, this is the corresponding vocabulary")
-    ('b',"vocabout=FILE", "arg", "", "Write indices to output counts. Write the corresponding vocabulary to this file")
-    ('f',"nfirst=INT", "arg", "99999999", "Number of most common words to be included")
-    ('d',"ndrop=FLOAT", "arg", "0", "Drop all words with less than ndrop occurances. If both nfirst and ndrop options are specified, the tighter bound is taken");
-  
-  config.parse(argc,argv,2);
-  int nfirst=config["nfirst"].get_int();
-  int n=config["norder"].get_int();
-  int ndrop=(int) (n*config["ndrop"].get_double());
+  config(
+      "Usage: take_n_most_common_words counts_in counts_out\nDrops the least "
+      "common words and trims the counts and vocab files accordingly.\n")(
+      'n', "norder=INT", "arg must", "3",
+      "n-gram order")('B', "vocabin=FILE", "arg", "",
+                      "Input count file contains indices, this is the "
+                      "corresponding vocabulary")(
+      'b', "vocabout=FILE", "arg", "",
+      "Write indices to output counts. Write the corresponding vocabulary to "
+      "this file")('f', "nfirst=INT", "arg", "99999999",
+                   "Number of most common words to be included")(
+      'd', "ndrop=FLOAT", "arg", "0",
+      "Drop all words with less than ndrop occurances. If both nfirst and "
+      "ndrop options are specified, the tighter bound is taken");
 
-  io::Stream::verbose=true;
-  io::Stream trigramin(config.arguments.at(0),"r");
-  io::Stream trigramout(config.arguments.at(1),"w");
-  
+  config.parse(argc, argv, 2);
+  int nfirst = config["nfirst"].get_int();
+  int n = config["norder"].get_int();
+  int ndrop = (int)(n * config["ndrop"].get_double());
+
+  io::Stream::verbose = true;
+  io::Stream trigramin(config.arguments.at(0), "r");
+  io::Stream trigramout(config.arguments.at(1), "w");
+
   io::Stream vocabin, vocabout;
-  if (config["vocabin"].specified) 
-    vocabin.open(config["vocabin"].get_str(),"r");
+  if (config["vocabin"].specified)
+    vocabin.open(config["vocabin"].get_str(), "r");
   if (config["vocabout"].specified)
-    vocabout.open(config["vocabout"].get_str(),"w");
+    vocabout.open(config["vocabout"].get_str(), "w");
 
   if (!ndrop && nfirst == 99999999) {
-    fprintf(stderr,"Must specify either -ndrop or -nfirst.\nExit.\n");
+    fprintf(stderr, "Must specify either -ndrop or -nfirst.\nExit.\n");
     exit(0);
   }
 
-  NgramCounts_t<int, int> nc(n,0,0);
-  nc.read(trigramin.file,vocabin.file);
-  nc.shrink(ndrop,nfirst);
-  nc.write(trigramout.file,vocabout.file,true);
+  NgramCounts_t<int, int> nc(n, 0, 0);
+  nc.read(trigramin.file, vocabin.file);
+  nc.shrink(ndrop, nfirst);
+  nc.write(trigramout.file, vocabout.file, true);
 }
 
 #if 0

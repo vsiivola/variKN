@@ -3,6 +3,8 @@ PROJECT(varikn)
 
 set( CMAKE_CXX_STANDARD 11)
 
+include(cmake/clang-cxx-dev-tools.cmake)
+
 macro( check_environment )
     if(WIN32)
         if (${CMAKE_GENERATOR} MATCHES "NMake")

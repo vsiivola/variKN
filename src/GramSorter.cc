@@ -1,17 +1,13 @@
 // Sort n-grams
-#include <stdio.h>
-#include <cassert>
 #include "GramSorter.hh"
+#include <cassert>
+#include <stdio.h>
 
-GramSorter::GramSorter(int order, int grams)
-  : m_sorted(true)
-{
+GramSorter::GramSorter(int order, int grams) : m_sorted(true) {
   reset(order, grams);
 }
 
-void
-GramSorter::reset(int order, int grams)
-{
+void GramSorter::reset(int order, int grams) {
   m_order = order;
   m_sorted = true;
 
@@ -20,8 +16,8 @@ GramSorter::reset(int order, int grams)
   m_indices.clear();
 
   if (grams > 0) {
-    fprintf(stderr, "GramSorter: reserving %d grams for order %d...",
-	    grams, order);
+    fprintf(stderr, "GramSorter: reserving %d grams for order %d...", grams,
+            order);
     m_grams.reserve(grams * order);
     m_data.reserve(grams);
     m_indices.reserve(grams);
@@ -30,13 +26,11 @@ GramSorter::reset(int order, int grams)
   fprintf(stderr, "done\n");
 }
 
-void 
-GramSorter::add_gram(const Gram &gram, float log_prob, float back_off)
-{
+void GramSorter::add_gram(const Gram &gram, float log_prob, float back_off) {
   // Check the length of the gram
   if (gram.size() != m_order) {
     fprintf(stderr, "GramSorter: got %d-gram while expecting %d-grams\n",
-	    (int) gram.size(), m_order);
+            (int)gram.size(), m_order);
     exit(1);
   }
 
@@ -56,23 +50,18 @@ GramSorter::add_gram(const Gram &gram, float log_prob, float back_off)
     const int i1 = (m_indices.size() - 2) * m_order;
     const int i2 = (m_indices.size() - 1) * m_order;
     if (lessthan(&m_grams[i2], &m_grams[i1], m_order)) {
-      fprintf(stderr, "GramSorter: %d-grams not sorted, sorting soon\n", 
-	      m_order);
+      fprintf(stderr, "GramSorter: %d-grams not sorted, sorting soon\n",
+              m_order);
       m_sorted = false;
     }
   }
 }
 
-void
-GramSorter::sort()
-{
+void GramSorter::sort() {
   if (!m_sorted) {
     fprintf(stderr, "GramSorter: sorting %d-grams now\n", m_order);
     std::sort(m_indices.begin(), m_indices.end(), Sorter(m_grams, m_order));
     fprintf(stderr, "GramSorter: sorted %d-grams\n", m_order);
-  }
-  else
+  } else
     fprintf(stderr, "GramSorter: %d-grams were sorted already\n", m_order);
 }
-
-

@@ -1,4 +1,4 @@
-// Copyright (C) 2007  Vesa Siivola. 
+// Copyright (C) 2007  Vesa Siivola.
 // See licence.txt for the terms of distribution.
 
 // Test the numerical search
@@ -34,32 +34,35 @@ min(min(A))
 class Funkkis : public QFitEvaluator {
 public:
   inline float evaluate(std::vector<float> &v) {
-    fprintf(stderr,"Evaluating at [%f %f]:",v[0],v[1]);
-    float res=(17*v[0]*v[0]+20*v[1]*v[1]-15*v[1]-15*v[0]+19*(v[0]-0.5)*(v[1]-0.5));
-    fprintf(stderr,"%g\n",res);
-    return(res);
+    fprintf(stderr, "Evaluating at [%f %f]:", v[0], v[1]);
+    float res = (17 * v[0] * v[0] + 20 * v[1] * v[1] - 15 * v[1] - 15 * v[0] +
+                 19 * (v[0] - 0.5) * (v[1] - 0.5));
+    fprintf(stderr, "%g\n", res);
+    return (res);
   }
 };
 
 int main(int argc, char **argv) {
   Funkkis f;
-  QFit qfit(1e-4,0.9e-4,&f);
+  QFit qfit(1e-4, 0.9e-4, &f);
 
-  std::vector<float> res(2,1.0);
+  std::vector<float> res(2, 1.0);
   qfit.set_initial_point(res);
-  res.clear(); res.resize(2,-0.5);
+  res.clear();
+  res.resize(2, -0.5);
   qfit.set_minimum(res);
-  res.clear(); res.resize(2,1.5);
+  res.clear();
+  res.resize(2, 1.5);
   qfit.set_maximum(res);
 
-  fprintf(stderr,"Minimization\n");
-  res=qfit.minimize(10000);
+  fprintf(stderr, "Minimization\n");
+  res = qfit.minimize(10000);
 
-  fprintf(stderr,"Output of results\n");
-  fprintf(stdout,"Minimum: [");
-  for (int i=0;i<res.size();i++) {
-    fprintf(stdout,"%g ",res[i]);
+  fprintf(stderr, "Output of results\n");
+  fprintf(stdout, "Minimum: [");
+  for (int i = 0; i < res.size(); i++) {
+    fprintf(stdout, "%g ", res[i]);
   }
-  fprintf(stdout,"]\n");
-  fprintf(stdout,"Value at minimum: %g\n",f.evaluate(res));
+  fprintf(stdout, "]\n");
+  fprintf(stdout, "Value at minimum: %g\n", f.evaluate(res));
 }

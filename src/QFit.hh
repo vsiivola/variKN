@@ -8,18 +8,18 @@
 class QFitEvaluator {
 public:
   virtual float evaluate(std::vector<float> &) = 0;
-  virtual ~QFitEvaluator() {};
+  virtual ~QFitEvaluator(){};
 };
 
 class QFit {
 public:
-  inline QFit(float ltol, float atol, QFitEvaluator *qe): 
-    m_ltol(ltol), m_atol(atol), m_qe(qe) {}
+  inline QFit(float ltol, float atol, QFitEvaluator *qe)
+      : m_ltol(ltol), m_atol(atol), m_qe(qe) {}
   std::vector<float> minimize(int maxiter);
-  inline void set_initial_point(std::vector<float> v) {m_initial_point=v;}
-  inline void set_minimum(std::vector<float> v) {m_low_limits=v;}
-  inline void set_maximum(std::vector<float> v) {m_high_limits=v;}
-  inline void set_searchstartlim(std::vector<float> v) {m_sslim=v;}
+  inline void set_initial_point(std::vector<float> v) { m_initial_point = v; }
+  inline void set_minimum(std::vector<float> v) { m_low_limits = v; }
+  inline void set_maximum(std::vector<float> v) { m_high_limits = v; }
+  inline void set_searchstartlim(std::vector<float> v) { m_sslim = v; }
 
 private:
   float m_ltol;
@@ -31,7 +31,7 @@ private:
   std::vector<float> m_high_limits;
   std::vector<float> m_sslim;
   void check_limits(int biter, int c, float &l1, float &l2, float &l3,
-		    float &t1, float &t2, float &t3);
+                    float &t1, float &t2, float &t3);
 };
 
 #endif
