@@ -14,6 +14,12 @@
 class Perplexity {
 public:
   Perplexity(const char *);
+  // FIXME: Perplexity should take ownership of the itg LM with std::move(unique_ptr),
+  // not just assume it remains undeleted for the lifetime.
+  // Cannot be fixed neatly before SWIG supports unique_ptr -
+  // It is possible to ignore that version of constructor, but then we lose
+  // the functionality on python side.
+
   Perplexity(NGram *lm, const std::string ccs_name, const std::string wb_name,
              const std::string mb_name, const std::string unk_symbol,
              bool skip_unk_prob = true);

@@ -133,6 +133,8 @@ int main(int argc, char *argv[]) {
       coeffs.push_back(1.0 - coeff);
       coeffs.push_back(coeff);
       itg.reset(new InterTreeGram(lm_names, coeffs));
+      // FIXME: Perplexity should take ownership of the itg LM, not just
+      // assume it remains undeleted for the lifetime.
       lm.reset(new Perplexity(itg.get(), ccs_name, wb_name, mb_name, unk_symbol,
                               skip_unks));
     }
