@@ -29,6 +29,8 @@ Perplexity::Perplexity(NGram *lm, const std::string ccs_name,
                        const std::string wb_name, const std::string mb_name,
                        const std::string unk_symbol, bool skip_unk_prob) {
   init_variables();
+  // FIXME: Perplexity should take ownership of the itg LM, not just
+  // assume it remains undeleted for the lifetime
   m_lm = lm;
   m_need_destruct_m_lm = false;
   m_skip_unk_prob = skip_unk_prob;
