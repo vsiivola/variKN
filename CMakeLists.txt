@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 PROJECT(varikn)
+
+set( CMAKE_CXX_STANDARD 11)
 
 macro( check_environment )
     if(WIN32)

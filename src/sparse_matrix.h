@@ -11,19 +11,24 @@
 extern "C" {
 #endif
 
-//#define no_inline_funcs // FIXME: This is required for debug compile, figure out why?
-#define PRIME_NUMBERS {5,1009,10007,49999,99991,500009,1064281,10000019,25000033,50000021,100000007,250000013,500000003,1000000007,2500000001}
-#define NUM_OF_PRIMES 15
-#include "matrix_common.h"
-//#include "unistd.h"
-
+#ifndef HUGE_MATRICES
 /* If we don't need too big matrices, use int as array indices (faster,
    more memory efficient). Otherwise use ssize_t. Must be signed type.
 */
-  typedef int indextype;
-/* typedef ssize_t indextype;*/
+typedef int indextype;
+#define PRIME_NUMBERS {5,1009,10007,49999,99991,500009,1064281,10000019,25000033,50000021,100000007,250000013,500000003,1000000007}
+#define NUM_OF_PRIMES 14
+#else
+typedef ssize_t indextype;*/
+#define PRIME_NUMBERS {5,1009,10007,49999,99991,500009,1064281,10000019,25000033,50000021,100000007,250000013,500000003,1000000007,2500000001}
+#define NUM_OF_PRIMES 15
+#endif
 
-  typedef unsigned char byte;
+#include "matrix_common.h"
+//#include "unistd.h"
+//#define no_inline_funcs // FIXME: This is required for debug compile, figure out why?
+
+typedef unsigned char byte;
 
   struct matrix {
   /* General information */

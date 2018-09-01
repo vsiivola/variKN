@@ -115,26 +115,26 @@ void test_interpolation(std::string datadir) {
   BOOST_REQUIRE( h < 0.01 );
 
   fprintf(stdout, "Perplexity of ab interp 0.0:\n");
-  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.01);
+  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", false, 0.01);
   fprintf(stderr,"h4 %f\n", h );
 
   fprintf(stdout, "Perplexity of ab interp 0.5:\n");
-  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.5);
-  float h2 = itg_perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.5);
+  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", false, 0.5);
+  float h2 = itg_perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", false, 0.5);
   fprintf(stderr,"h5 %f %f\n", h, fabs(h-1.0) );
   BOOST_REQUIRE( fabs(h-1.0) < 0.01 );
   BOOST_REQUIRE( fabs(h-h2) < 0.01 );
 
   fprintf(stdout, "Perplexity of ab interp 1.0:\n");
-  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", 0.99);
+  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", false, 0.99);
   fprintf(stderr,"h6 %f\n", h );
   // BOOST_REQUIRE( abs(lp) < 0.01 );
 
   fprintf(stdout, "Perplexity of ab interp 0.0 against a:\n");
-  h = perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 0.00);
-  h2 = itg_perplexity(datadir+"/a.arpa", datadir+"/b.arpa", datadir+"/ax20.txt", 0.00);
+  h = perplexity(datadir+"/ab.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", false, 1.0);
+  h2 = itg_perplexity(datadir+"/ab.arpa", datadir+"/b.arpa", datadir+"/abx20.txt", false, 1.0);
   fprintf(stderr,"h7 %f\n", h );
-  BOOST_REQUIRE( fabs(h-1.0) < 0.01 );
+  BOOST_REQUIRE( fabs(h) < 0.01 );
   BOOST_REQUIRE( fabs(h-h2) < 0.01 );
 }
 
@@ -142,7 +142,7 @@ void test_interpolated_different_vocabs(std::string datadir) {
   create_lm(datadir+"/ax20.txt", "", datadir+"/ax20.txt", 3, datadir+"/a-novocab.arpa");
   create_varigram_lm(datadir+"/bx20.txt", "", datadir+"/bx20.txt", 3, datadir+"/b-novocab.arpa");
   fprintf(stdout, "Perplexity of ab interp 0.5 (novocab):\n");
-  float h = perplexity(datadir+"/a-novocab.arpa", datadir+"/b-novocab.arpa", datadir+"/abx20.txt", 0.5);
+  float h = perplexity(datadir+"/a-novocab.arpa", datadir+"/b-novocab.arpa", datadir+"/abx20.txt", false, 0.5);
   fprintf(stderr,"novocab %f\n", h );
   BOOST_REQUIRE( fabs(h-1.0) < 0.01 );
 }
@@ -203,7 +203,7 @@ void test_hashinterpolate_write(std::string datadir) {
   out.close();
 
   float h = perplexity(fakename, "", datadir+"/abx20.txt");
-  float h2 = perplexity(datadir+"/a-novocab.arpa", datadir+"/b-novocab.arpa", datadir+"/abx20.txt", 0.5);
+  float h2 = perplexity(datadir+"/a-novocab.arpa", datadir+"/b-novocab.arpa", datadir+"/abx20.txt", false, 0.5);
   fprintf(stderr, "fake interpolate %f vs real interpolate %f\n", h, h2);
   BOOST_REQUIRE( fabs(h-h2) < 0.01 );
 

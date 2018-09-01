@@ -2,6 +2,8 @@ FIND_PACKAGE(Boost)
 set( TESTPATH ${CMAKE_CURRENT_BINARY_DIR} )
 message("Building tests at ${TESTPATH}")
 
+include_directories(${Boost_INCLUDE_DIRS})
+
 add_executable(UnitTests UnitTests.cpp )
 target_link_libraries(UnitTests varikn)
 set_target_properties( UnitTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TESTPATH} )
