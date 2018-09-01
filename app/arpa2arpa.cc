@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
          "arpa to backoff arpa.\n")('t', "tabs", "", "",
                                     "Use tabs instead of space between the "
                                     "fields when writing the ARPA file.");
-  config.parse(argc, argv, 2);
+  config.parse(argc, argv, 2, true);
 
   std::string field_separator = config["tabs"].specified ? "\t" : " ";
 

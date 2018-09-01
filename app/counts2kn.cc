@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
           'N', "discard_unks", "", "", "Remove n-grams containing OOV words.")(
           'L', "longint", "", "",
           "Store counts in a long int type. Needed for big training sets.");
-  config.parse(argc, argv, 2);
+  config.parse(argc, argv, 2, true);
 
   std::string optiname(config["opti"].get_str());
   const int n = config["norder"].get_int();
@@ -143,46 +143,46 @@ int main(int argc, char **argv) {
   try {
     /* Construct the base kn-smoothed model */
     fprintf(stderr, "Estimating counts\n");
-    InterKn *kn = NULL;
+    std::unique_ptr<InterKn> kn;
     bool init_disc = true;
 
     /* Parse the arguments, create the right kind of model*/
     if (!use_3nzer && !smallvocab) {
       if (!longint)
-        kn = new InterKn_int_disc<int, int>(
+        kn.reset(new InterKn_int_disc<int, int>(
             absolute, dataname, vocabname, optiname, counts_in, n, ndrop,
-            nfirst, NULL, prunedata_name, ss_sym, hashs);
+            nfirst, nullptr, prunedata_name, ss_sym, hashs));
       else
-        kn = new InterKn_int_disc<int, long>(
+        kn.reset(new InterKn_int_disc<int, long>(
             absolute, dataname, vocabname, optiname, counts_in, n, ndrop,
-            nfirst, NULL, prunedata_name, ss_sym, hashs);
+            nfirst, nullptr, prunedata_name, ss_sym, hashs));
     } else if (!use_3nzer && smallvocab) {
       if (!longint)
-        kn = new InterKn_int_disc<unsigned short, int>(
+        kn.reset(new InterKn_int_disc<unsigned short, int>(
             absolute, dataname, vocabname, optiname, counts_in, n, ndrop,
-            nfirst, NULL, prunedata_name, ss_sym, hashs);
+            nfirst, nullptr, prunedata_name, ss_sym, hashs));
       else
-        kn = new InterKn_int_disc<unsigned short, long>(
+        kn.reset(new InterKn_int_disc<unsigned short, long>(
             absolute, dataname, vocabname, optiname, counts_in, n, ndrop,
-            nfirst, NULL, prunedata_name, ss_sym, hashs);
+            nfirst, nullptr, prunedata_name, ss_sym, hashs));
     } else if (use_3nzer && !smallvocab) {
       if (!longint)
-        kn = new InterKn_int_disc3<int, int>(
+        kn.reset(new InterKn_int_disc3<int, int>(
             absolute, dataname, vocabname, optiname, counts_in, n, ndrop,
-            nfirst, NULL, prunedata_name, ss_sym, hashs);
+            nfirst, nullptr, prunedata_name, ss_sym, hashs));
       else
-        kn = new InterKn_int_disc3<int, long>(
+        kn.reset(new InterKn_int_disc3<int, long>(
             absolute, dataname, vocabname, optiname, counts_in, n, ndrop,
-            nfirst, NULL, prunedata_name, ss_sym, hashs);
+            nfirst, nullptr, prunedata_name, ss_sym, hashs));
     } else if (use_3nzer && smallvocab) {
       if (!longint)
-        kn = new InterKn_int_disc3<unsigned short, int>(
+        kn.reset(new InterKn_int_disc3<unsigned short, int>(
             absolute, dataname, vocabname, optiname, counts_in, n, ndrop,
-            nfirst, NULL, prunedata_name, ss_sym, hashs);
+            nfirst, nullptr, prunedata_name, ss_sym, hashs));
       else
-        kn = new InterKn_int_disc3<unsigned short, long>(
+        kn.reset(new InterKn_int_disc3<unsigned short, long>(
             absolute, dataname, vocabname, optiname, counts_in, n, ndrop,
-            nfirst, NULL, prunedata_name, ss_sym, hashs);
+            nfirst, nullptr, prunedata_name, ss_sym, hashs));
     }
     kn->prune_with_real_counts = prune_with_real_counts;
     fprintf(stderr, "The model will use ");
@@ -197,8 +197,9 @@ int main(int argc, char **argv) {
     else
       fprintf(stderr, "Kneser-Ney smoothing.\n");
 
-    if (init_disc)
+    if (init_disc) {
       kn->init_disc(0.71);
+    }
 
     // if (ehist) kn->use_ehist_pruning(kn->input_data_size);
     kn->cutoffs = cutoffs;
@@ -220,10 +221,10 @@ int main(int argc, char **argv) {
     if (!narpa) {
       kn->counts2lm(&lm);
       lm.write(out.file, !arpa);
-    } else
+    } else {
       kn->counts2asciilm(out.file);
+    }
     out.close();
-    delete kn;
   } catch (std::exception &e) {
     fprintf(stderr, "%s\n", e.what());
     exit(1);

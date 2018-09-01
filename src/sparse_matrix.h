@@ -34,6 +34,7 @@ typedef ssize_t indextype;
 #endif
 
 #include "matrix_common.h"
+#include <stdlib.h>
 //#include "unistd.h"
 //#define no_inline_funcs // FIXME: This is required for debug compile, figure
 //out why?

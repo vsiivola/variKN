@@ -5,7 +5,7 @@
 int main(int argc, char **argv) {
   conf::Config config;
   config("Usage: arpa2bin arpa_in bin_out\nConverts arpa LMs to binary.\n");
-  config.parse(argc, argv, 2);
+  config.parse(argc, argv, 2, true);
 
   io::Stream::verbose = true;
   io::Stream in(config.arguments[0], "r");

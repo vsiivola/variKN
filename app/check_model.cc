@@ -6,7 +6,7 @@
 #include "conf.hh"
 #include "def.hh"
 #include "io.hh"
-#include <math.h>
+#include <cmath>
 
 NGram *tg;
 
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
       "second argument is a filename, sum ovaer all grams in the file")(
       'f', "freegram", "", "", "Freeprefix arpa model instead of binary model");
 
-  config.parse(argc, argv, 2);
+  config.parse(argc, argv, 2, true);
 
   io::Stream::verbose = true;
   io::Stream in(config.arguments[0], "r");

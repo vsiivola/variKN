@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
           "model")('F', "forcedisc=FLOAT", "arg", "-1.0",
                    "Set all discounts to the given value.");
 
-  config.parse(argc, argv, 2);
+  config.parse(argc, argv, 2, true);
 
   const int nfirst = config["nfirst"].get_int();
   const int max_order = config["norder"].get_int();
@@ -112,25 +112,29 @@ int main(int argc, char **argv) {
   io::Stream out(config.arguments.at(1), "w");
   io::Stream::verbose = false;
 
-  Varigram *vg;
+  std::unique_ptr<Varigram> vg;
   if (!smallvocab)
     if (!longint)
-      vg = new Varigram_t<int, int>(use_3nzer, absolute);
+      vg.reset(new Varigram_t<int, int>(use_3nzer, absolute));
     else
-      vg = new Varigram_t<int, long>(use_3nzer, absolute);
+      vg.reset(new Varigram_t<int, long>(use_3nzer, absolute));
   else if (!longint)
-    vg = new Varigram_t<unsigned short, int>(use_3nzer, absolute);
+    vg.reset(new Varigram_t<unsigned short, int>(use_3nzer, absolute));
   else
-    vg = new Varigram_t<unsigned short, long>(use_3nzer, absolute);
+    vg.reset(new Varigram_t<unsigned short, long>(use_3nzer, absolute));
 
-  if (dscale > 0.0)
+  if (dscale > 0.0) {
     vg->set_datacost_scale(dscale);
-  if (dscale2 > 0.0)
+  }
+  if (dscale2 > 0.0) {
     vg->set_datacost_scale2(dscale2); // use also pruning
-  if (ngram_prune_target > 0)
+  }
+  if (ngram_prune_target > 0) {
     vg->set_ngram_prune_target(ngram_prune_target);
-  if (max_order)
+  }
+  if (max_order != 0) {
     vg->set_max_order(max_order);
+  }
 
   try {
     if (config["clear_history"].specified)
@@ -163,12 +167,12 @@ int main(int argc, char **argv) {
     if (!narpa) {
       vg->write(out.file, arpa);
     } else {
-      if (zpg)
+      if (zpg) {
         vg->set_zeroprobgrams(false);
+      }
       vg->write_narpa(out.file);
     }
     out.close();
-    delete vg;
   } catch (std::exception &e) {
     fprintf(stderr, "%s\n", e.what());
     exit(1);

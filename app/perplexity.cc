@@ -2,7 +2,7 @@
 #include "InterTreeGram.hh"
 #include "PerplexityFuncs.hh"
 #include "conf.hh"
-#include <math.h>
+#include <cmath>
 
 int main(int argc, char *argv[]) {
   conf::Config config;
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
       //('N',"stream_interval=INT","arg","","Sum every N tokens for each stream
       // output")
       ;
-  config.parse(argc, argv, 2);
+  config.parse(argc, argv, 2, true);
   int lm_type = 0;
 
   std::string lm_name;
@@ -108,13 +108,13 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, ", unk_symbol %s", unk_symbol.c_str());
   fprintf(stderr, "\n");
 
-  Perplexity *lm = NULL;
-  InterTreeGram *itg = NULL;
+  std::unique_ptr<Perplexity> lm;
+  std::unique_ptr<InterTreeGram> itg;
   if (config["interpolate"].specified) {
     // Interpolate the old way, using PerplexityFuncs
     if (config["freegram"].specified) {
-      lm = new Perplexity(lm_name, lm_type, ccs_name, wb_name, mb_name,
-                          unk_symbol, true, skip_unks);
+      lm.reset(new Perplexity(lm_name, lm_type, ccs_name, wb_name, mb_name,
+                              unk_symbol, true, skip_unks));
       lm->set_interpolation(config["interpolate"].get_str());
       if (config["inter_coeff"].specified) {
         lm->set_alpha(config["inter_coeff"].get_double());
@@ -132,13 +132,13 @@ int main(int argc, char *argv[]) {
       }
       coeffs.push_back(1.0 - coeff);
       coeffs.push_back(coeff);
-      itg = new InterTreeGram(lm_names, coeffs);
-      lm = new Perplexity(itg, ccs_name, wb_name, mb_name, unk_symbol,
-                          skip_unks);
+      itg.reset(new InterTreeGram(lm_names, coeffs));
+      lm.reset(new Perplexity(itg.get(), ccs_name, wb_name, mb_name, unk_symbol,
+                              skip_unks));
     }
   } else {
-    lm = new Perplexity(lm_name, lm_type, ccs_name, wb_name, mb_name,
-                        unk_symbol, freegram, skip_unks);
+    lm.reset(new Perplexity(lm_name, lm_type, ccs_name, wb_name, mb_name,
+                            unk_symbol, freegram, skip_unks));
     if (config["inter_coeff"].specified) {
       fprintf(stderr,
               "Only on lm specified, cannot set interpolation coff. Exit\n");
@@ -147,17 +147,15 @@ int main(int argc, char *argv[]) {
   }
   lm->set_unk_warn(unkwarn);
 
-  if (init_hist)
+  if (init_hist != 0) {
     lm->set_init_hist(init_hist);
-  if (stream_out.file)
+  }
+  if (stream_out.file) {
     lm->logprob_file(txtin.file, stream_out.file, stream_interval);
-  else
-    lm->logprob_file(txtin.file, NULL, 1);
-
+  } else {
+    lm->logprob_file(txtin.file, nullptr, 1);
+  }
   lm->print_results(out.file);
   if (!itg) // FIXME: This doesn't work yet for InterTreeGrams
     lm->print_hitrates(out.file);
-  if (itg)
-    delete itg;
-  delete lm;
 }

@@ -19,11 +19,9 @@ int main(int argc, char *argv[]) {
   io::Stream in(config.arguments[0], "r");
   io::Stream out(config.arguments[1], "w");
 
-  HashGram *hg;
-  if (smallvocab)
-    hg = new HashGram_t<unsigned short>;
-  else
-    hg = new HashGram_t<int>;
+  std::unique_ptr<HashGram> hg(
+      smallvocab ? std::unique_ptr<HashGram>(new HashGram_t<unsigned short>())
+                 : std::unique_ptr<HashGram>(new HashGram_t<int>()));
   fprintf(stderr, "Reading\n");
   hg->read(in.file);
   in.close();
@@ -34,5 +32,4 @@ int main(int argc, char *argv[]) {
   fprintf(stderr, "Writing\n");
   hg->write(out.file);
   out.close();
-  delete hg;
 }
