@@ -104,11 +104,11 @@ void RemoveDefaultValues(struct matrix *m);
 #if !defined no_inline_funcs
 // Inline next functions in c++ for extra speed
 // Does ansi c define inline ?
-#define sm_inline_void inline void
-#define sm_inline_int inline int
-#define sm_inline_float inline float
-#define sm_inline_double inline double
-#define sm_inline_indextype inline indextype
+#define sm_inline_void static inline void
+#define sm_inline_int static inline int
+#define sm_inline_float static inline float
+#define sm_inline_double static inline double
+#define sm_inline_indextype static inline indextype
 #include "sparse_matrix_pinline.h"
 
 #else
