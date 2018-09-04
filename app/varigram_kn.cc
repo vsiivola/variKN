@@ -1,4 +1,5 @@
 // Program to grow an n-gram model
+#include <memory>
 #include "VarigramFuncs.hh"
 #include "conf.hh"
 #include "io.hh"

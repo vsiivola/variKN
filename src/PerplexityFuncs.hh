@@ -2,6 +2,7 @@
 #ifndef PERPLEXITY_HH
 #define PERPLEXITY_HH
 
+#include <memory>
 #include <deque>
 #include <iostream>
 #include <math.h>
