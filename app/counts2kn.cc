@@ -1,5 +1,6 @@
 // This program creates first creates a full  unpruned language model of
 // given order. The model can be then pruned, if some options are given.
+#include <memory>
 #include "InterKn.hh"
 #include "conf.hh"
 #include "io.hh"
