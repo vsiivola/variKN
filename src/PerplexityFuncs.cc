@@ -181,6 +181,9 @@ float Perplexity::logprob(const char *word, float &cur_word_lp) {
 
   int idx = m_lm->word_index(word);
   if (m_cur_init_hist > 0) {
+    if (strncmp("<s>", word, 3) && is_wb(idx)) {
+      m_num_pwords++;
+    }
     m_cur_init_hist--;
     history.push_back(idx);
     m_lm->set_last_order(0);
