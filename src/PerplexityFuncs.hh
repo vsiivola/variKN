@@ -29,6 +29,17 @@ public:
     float tmp;
     return logprob(word, tmp);
   };
+  inline float word_logprob(const char *word) {
+    float tmp, lp = 0;
+    logprob(word, lp);
+    return lp;
+  };
+  inline int processed_tokens() {
+    return m_num_ptokens;
+  };
+  inline int processed_words() {
+    return m_num_pwords;
+  };
   float sentence_logprob(const char *sentence);
   void print_hitrates(FILE *out);
   double print_results(FILE *out);
@@ -52,6 +63,7 @@ public:
   void reset_hitrates();
   int get_hitorder(int i);
 
+  void init_variables();
   void clear_history() {
     history.clear();
     m_cur_init_hist = m_init_hist;
@@ -69,7 +81,6 @@ private:
 
   void find_indices(const std::string, std::vector<int> &);
   void load_mbs(const std::string, std::vector<std::string> &);
-  void init_variables();
   void init_special_symbols(const std::string ccs_name,
                             const std::string wb_name,
                             const std::string mb_name);
