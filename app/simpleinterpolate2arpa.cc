@@ -54,16 +54,18 @@ int main(int argc, char *argv[]) {
          "the linear interpolation of the input ngrams (exact solution cannot "
          "be reduced to arpa format).\n\nCaveats: \n\t* Only tests for this "
          "code are what is in unit tests (further testing needed, use at your "
-         "own risk).\n\t* No computational optimizations applied (FIXME)\n\t* "
-         "currently only supports interpolation between two models (FIXME)\n");
+         "own risk).\n\t* No computational optimizations applied (FIXME)\n");
   config.parse(argc, argv, 2);
 
   auto models_and_weigths =
       component_models_and_weights(config.arguments.at(0));
 
-  // FIXME: Only interpolates the two first models
-  models_and_weigths[0].first->fake_interpolate(
-      *(models_and_weigths[1].first.get()), models_and_weigths[0].second);
+  float cur_tot_weight = models_and_weigths[0].second;
+  for(int i=1; i < models_and_weigths.size(); i++) {
+    auto local_lambda = cur_tot_weight / (cur_tot_weight + models_and_weigths[i].second);
+    models_and_weigths[0].first->fake_interpolate(*(models_and_weigths[i].first.get()), local_lambda);
+    cur_tot_weight += models_and_weigths[i].second;
+  }
 
   io::Stream out(config.arguments.at(1), "w");
   models_and_weigths[0].first->write(out.file);
