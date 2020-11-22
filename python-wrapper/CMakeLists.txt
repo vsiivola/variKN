@@ -55,7 +55,7 @@ if (PYTHONLIBS_FOUND AND SWIG_FOUND)
     SET(CMAKE_SWIG_OUTDIR ${LIBRARY_OUTPUT_PATH})
     SET_SOURCE_FILES_PROPERTIES(VariKN.i PROPERTIES CPLUSPLUS ON)
     # create lib
-    swig_add_module(varikn_python python VariKN.i )
+    swig_add_library(varikn_python LANGUAGE python SOURCES VariKN.i )
     swig_link_libraries(varikn_python varikn ${PYTHON_LIBRARIES} ${PLATFORM_LINKFLAGS})
     set_target_properties(${SWIG_MODULE_varikn_python_REAL_NAME} PROPERTIES OUTPUT_NAME "_varikn")
     # make nice top-level target name

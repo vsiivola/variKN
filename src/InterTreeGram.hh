@@ -2,6 +2,7 @@
 #ifndef INTERTREEGRAM_HH
 #define INTERTREEGRAM_HH
 
+#include <stdexcept>
 #include "ArpaReader.hh"
 #include "TreeGram.hh"
 
