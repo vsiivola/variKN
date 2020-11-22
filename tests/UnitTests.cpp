@@ -1,4 +1,6 @@
-#include <boost/test/minimal.hpp>
+#define BOOST_TEST_MODULE varikn_unit_tests
+#include <boost/test/included/unit_test.hpp>
+
 #include <cstdio>
 
 #include <HashGram.hh>
@@ -276,33 +278,14 @@ void test_hashinterpolate_write(std::string datadir) {
   }
 }
 
-int test_main(int argc, char *argv[]) // note the name!
-{
-  // FIXME: Use the BOOST unit test framework properly
-  fprintf(stderr, "Running tests\n");
-  fprintf(stderr, "datadir: %s\n", argv[1]);
-  std::string datadir(argv[1]);
-
-  // FIXME: Write unit test to read and write a arpa file with treegram and
-  // hashgram
+BOOST_AUTO_TEST_CASE(test_create_simple_models) {
+  std::string datadir(boost::unit_test::framework::master_test_suite().argv[1]);
   create_simple_models(datadir);
   create_models_without_opti(datadir);
   test_interpolation(datadir);
   test_interpolated_different_vocabs(datadir);
   test_intertreegram(datadir);
   test_hashinterpolate_write(datadir);
-
-  return 0;
-  /*
-    // six ways to detect and report the same error:
-    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
-    BOOST_REQUIRE( add( 2,2 ) == 4 );      // #2 throws on error
-    if( add( 2,2 ) != 4 )
-      BOOST_ERROR( "Ouch..." );            // #3 continues on error
-    if( add( 2,2 ) != 4 )
-      BOOST_FAIL( "Ouch..." );             // #4 throws on error
-    if( add( 2,2 ) != 4 ) throw "Oops..."; // #5 throws on error
-
-    return add( 2, 2 ) == 4 ? 0 : 1;       // #6 returns error code
-  */
+  // FIXME: Write unit test to read and write a arpa file with treegram and
+  // hashgram
 }
