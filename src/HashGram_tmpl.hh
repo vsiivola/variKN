@@ -436,7 +436,7 @@ template <typename KT> void HashGram_t<KT>::renormalize_backoffs(int order) {
   // Remember to sum the last prefix too !
   if (order > 1) {
     normalize_and_set_bo(cur_prefix, explicit_probsum, full_bo_probsum);
-  } else if (explicit_probsum > 0.001) {
+  } else if (explicit_probsum > 0.001 && explicit_probsum < 1.0) {
     // Redistribute the remaining unigram mass equally accross unigrams
     const float uniprob = (1.0f - explicit_probsum) / probs[1]->num_entries();
     probs[1]->stepthrough(true, &gram[0], &gram_logprob);
@@ -444,6 +444,10 @@ template <typename KT> void HashGram_t<KT>::renormalize_backoffs(int order) {
       probs[1]->setvalue(&gram[0],
                          safelogprob(pow(10, gram_logprob) + uniprob));
     }
+  } else {
+    fprintf(stderr,
+            "Cannot smooth unigrams, explicit_probsum %f not between 0.001 and 1.0.\n",
+            explicit_probsum);
   }
 }
 
@@ -451,7 +455,7 @@ template <typename KT>
 void HashGram_t<KT>::fake_interpolate(HashGram_t<KT> &other, float lambda) {
   if (m_type != BACKOFF || other.m_type != BACKOFF) {
     fprintf(stderr, "Cannot interpolate non-backoff arpa models. Use arpa2arpa "
-                    "to convert the models first!");
+                    "to convert the models first!\n");
     exit(-1);
   }
 

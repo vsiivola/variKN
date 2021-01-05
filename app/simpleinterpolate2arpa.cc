@@ -57,16 +57,16 @@ int main(int argc, char *argv[]) {
          "own risk).\n\t* No computational optimizations applied (FIXME)\n");
   config.parse(argc, argv, 2);
 
-  auto models_and_weigths =
+  auto models_and_weights =
       component_models_and_weights(config.arguments.at(0));
 
-  float cur_tot_weight = models_and_weigths[0].second;
-  for(int i=1; i < models_and_weigths.size(); i++) {
-    auto local_lambda = cur_tot_weight / (cur_tot_weight + models_and_weigths[i].second);
-    models_and_weigths[0].first->fake_interpolate(*(models_and_weigths[i].first.get()), local_lambda);
-    cur_tot_weight += models_and_weigths[i].second;
+  float cur_tot_weight = models_and_weights[0].second;
+  for(int i=1; i < models_and_weights.size(); i++) {
+    auto local_lambda = cur_tot_weight / (cur_tot_weight + models_and_weights[i].second);
+    models_and_weights[0].first->fake_interpolate(*(models_and_weights[i].first.get()), local_lambda);
+    cur_tot_weight += models_and_weights[i].second;
   }
 
   io::Stream out(config.arguments.at(1), "w");
-  models_and_weigths[0].first->write(out.file);
+  models_and_weights[0].first->write(out.file);
 }
