@@ -3,11 +3,9 @@ PROJECT(varikn)
 
 set( CMAKE_CXX_STANDARD 11)
 
-# Should fix the cmakelists for NEW policy
-cmake_policy(SET CMP0002 OLD)
-cmake_policy(SET CMP0054 OLD)
-cmake_policy(SET CMP0078 OLD)
-cmake_policy(SET CMP0086 OLD)
+cmake_policy(SET CMP0054 NEW)
+cmake_policy(SET CMP0078 OLD) # Should fix to work with NEW policy
+cmake_policy(SET CMP0086 NEW)
 
 include(cmake/clang-cxx-dev-tools.cmake)
 

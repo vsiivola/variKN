@@ -58,9 +58,6 @@ if (PYTHONLIBS_FOUND AND SWIG_FOUND)
     swig_add_library(varikn_python LANGUAGE python SOURCES VariKN.i )
     swig_link_libraries(varikn_python varikn ${PYTHON_LIBRARIES} ${PLATFORM_LINKFLAGS})
     set_target_properties(${SWIG_MODULE_varikn_python_REAL_NAME} PROPERTIES OUTPUT_NAME "_varikn")
-    # make nice top-level target name
-    add_custom_target(varikn_python ALL
-                      DEPENDS ${SWIG_MODULE_varikn_REAL_NAME})
     install(TARGETS ${SWIG_MODULE_varikn_python_REAL_NAME} DESTINATION lib/site-packages)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/../lib/python/varikn.py DESTINATION lib/site-packages)
 
