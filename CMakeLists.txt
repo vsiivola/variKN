@@ -4,6 +4,8 @@ PROJECT(varikn)
 set( CMAKE_CXX_STANDARD 11)
 
 # Should fix the cmakelists for NEW policy
+cmake_policy(SET CMP0002 OLD)
+cmake_policy(SET CMP0054 OLD)
 cmake_policy(SET CMP0078 OLD)
 cmake_policy(SET CMP0086 OLD)
 
