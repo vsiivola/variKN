@@ -1,7 +1,7 @@
 %include "exception.i"
 %include "std_string.i"
 %include "std_vector.i"
-%module varikn
+%module(package="varikn") wrapper
 
 %exception {
   try {
