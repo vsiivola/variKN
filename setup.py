@@ -4,6 +4,7 @@ import pathlib
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext as build_ext_orig
 
+# Based on https://stackoverflow.com/a/48015772
 
 class CMakeExtension(Extension):
 
@@ -38,8 +39,7 @@ class build_ext(build_ext_orig):
 
         # example of build args
         build_args = [
-            # '--config', config,
-            # '--', '-j4'
+            '--', '-j2'
         ]
 
         os.chdir(str(build_temp))
@@ -49,6 +49,7 @@ class build_ext(build_ext_orig):
         # Troubleshooting: if fail on line above then delete all possible
         # temporary CMake files including "CMakeCache.txt" in top level dir.
         os.chdir(str(cwd))
+
 
 with open('readme', 'r') as fh:
     long_description = fh.read()
@@ -64,9 +65,6 @@ setup(
     long_description=long_description,
     packages=['varikn'],
     package_dir={'': 'python-wrapper'},
-    # package_data={
-    #     'varikn': ['_varikn.so']
-    # },
     cmdclass={
         'build_ext': build_ext,
     },
