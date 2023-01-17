@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 PROJECT(varikn)
 
+SET(REQUIRE_PYTHON_WRAPPER 0 CACHE BOOL "Set true to fail if Python wrapper cannot be installed")
+
 set( CMAKE_CXX_STANDARD 11)
 
 cmake_policy(SET CMP0054 NEW)

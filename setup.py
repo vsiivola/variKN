@@ -34,7 +34,8 @@ class build_ext(build_ext_orig):
         config = 'Debug' if self.debug else 'Release'
         cmake_args = [
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + str(extdir.parent.absolute()),
-            '-DCMAKE_BUILD_TYPE=' + config
+            '-DCMAKE_BUILD_TYPE=' + config,
+            '-DREQUIRE_PYTHON_WRAPPER=1'
         ]
 
         # example of build args
