@@ -1,4 +1,10 @@
-FIND_PACKAGE(Python COMPONENTS Interpreter Development)
+# manylinux dockers contain only Development.Module, but building on
+# macOS-11 fails without full Development
+IF (APPLE)
+  FIND_PACKAGE(Python 3.2 COMPONENTS Interpreter Development)
+ELSE()
+  FIND_PACKAGE(Python 3.2 COMPONENTS Interpreter Development.Module)
+ENDIF()
 
 FIND_PACKAGE(SWIG 2.0)
 

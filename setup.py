@@ -1,5 +1,6 @@
 import os
 import pathlib
+import sys
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext as build_ext_orig
@@ -33,6 +34,9 @@ class build_ext(build_ext_orig):
         # example of cmake args
         config = 'Debug' if self.debug else 'Release'
         cmake_args = [
+            # Python_EXECUTABLE tells CMake's FindPython which Python executable to use.
+            # Required for cibuildwheel to work.
+            '-DPython_EXECUTABLE=' + sys.executable,
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + str(extdir.parent.absolute()),
             '-DCMAKE_BUILD_TYPE=' + config,
             '-DREQUIRE_PYTHON_WRAPPER=1'
