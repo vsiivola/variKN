@@ -1,4 +1,4 @@
-FIND_PACKAGE(Python 3.2 COMPONENTS Interpreter Development)
+FIND_PACKAGE(Python COMPONENTS Interpreter Development)
 
 FIND_PACKAGE(SWIG 2.0)
 
