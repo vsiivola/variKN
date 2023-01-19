@@ -39,7 +39,8 @@ class build_ext(build_ext_orig):
             '-DPython_EXECUTABLE=' + sys.executable,
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + str(extdir.parent.absolute()),
             '-DCMAKE_BUILD_TYPE=' + config,
-            '-DREQUIRE_PYTHON_WRAPPER=1'
+            '-DREQUIRE_PYTHON_WRAPPER=1',
+            '-DENABLE_EXECUTABLES=0'
         ]
 
         # example of build args

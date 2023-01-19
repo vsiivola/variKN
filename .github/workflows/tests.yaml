@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_ENABLE_TESTING=1
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=1
           cmake --build .
         env:
           BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
