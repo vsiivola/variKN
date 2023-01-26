@@ -65,15 +65,24 @@ Useful tricks:
 
 * Language wrappers DLLs can be built for Python using Swig.
   These are built automatically if the languages are detected by
-  cmake. You can explicitly enable/disable building for these
-  wrappers by passing -DPYTHON=1 (-DPYTHON=0). On Mac OS X, you can
+  cmake. You can explicitly enable or disable building for these
+  wrappers by passing -DENABLE_PYTHON_WRAPPER=1 or 0. On Mac OS X, you can
   force the python version to macports with -DMACPORTS_PYTHON_VERSION=2.6 .
   The default target is python3, see python_wrappers/Cmakelists.txt
   if you want to compile for python2.
 
+PYTHON INSTALL:
+
+The Python wrapper package (varikn) can be installed directly using pip:
+
+  pip install .
+
+Note that this installs only the Python wrapper, not the executables
+of the toolkit.
+
 TEST:
 
-Building Unit tests can be enabled with "-DCMAKE_ENABLE_TESTING=1". The tests
+Building Unit tests can be enabled with "-DENABLE_TESTING=1". The tests
 do not work on Windows yet. Unit tests can be run with "make test" or
 "ctest --verbose". Unit tests require the unit test library from Boost.
 
@@ -88,7 +97,7 @@ docker build -t varikn_test_container .
 # Log in container
 docker container run --interactive --tty  varikn_test_container
 # Inside container
-mkdir build; (cd build; cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_ENABLE_TESTING=1 && make && ctest --verbose)
+mkdir build; (cd build; cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=1 && make && ctest --verbose)
 
 # clean up
 docker image rm varikn_test_container

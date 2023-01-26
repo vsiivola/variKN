@@ -1,5 +1,10 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.12)
 PROJECT(varikn)
+
+SET(ENABLE_EXECUTABLES ON CACHE BOOL "Set false to skip building the executables")
+SET(ENABLE_TESTING OFF CACHE BOOL "Set true to enable testing")
+SET(ENABLE_PYTHON_WRAPPER ON CACHE BOOL "Set false to skip building the Python wrapper")
+SET(REQUIRE_PYTHON_WRAPPER OFF CACHE BOOL "Set true to fail if Python wrapper cannot be installed")
 
 set( CMAKE_CXX_STANDARD 11)
 
@@ -49,12 +54,25 @@ ELSEIF(WIN32)
    #replace_flags(/MD /MT)
 ENDIF(APPLE)
 
-# setup custom output dirs
+# setup custom output dirs (unless defined)
 #
-set( EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin/${OUTPUT_DIR_NAME} )
-set( LIBRARY_OUTPUT_PATH    ${CMAKE_CURRENT_BINARY_DIR}/lib/${OUTPUT_DIR_NAME} )
-file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
-file(MAKE_DIRECTORY ${LIBRARY_OUTPUT_PATH})
+IF(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+ENDIF()
+IF(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+  set(PYTHON_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib/python/varikn)
+ELSE()
+  set(PYTHON_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+ENDIF()
+IF(NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+  set(PYTHON_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib/python/varikn)
+ELSE()
+  set(PYTHON_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
+ENDIF()
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/src )
 file(GLOB c_srcs   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/[^.]*.c")
@@ -75,13 +93,21 @@ install(TARGETS varikn  ARCHIVE DESTINATION lib/${OUTPUT_DIR_NAME})
 
 # other targets
 #
-add_subdirectory(app)
-add_subdirectory(python-wrapper)
-IF(CMAKE_ENABLE_TESTING)
+IF(ENABLE_EXECUTABLES)
+  add_subdirectory(app)
+ENDIF(ENABLE_EXECUTABLES)
+
+IF(ENABLE_PYTHON_WRAPPER)
+  add_subdirectory(python-wrapper)
+ENDIF(ENABLE_PYTHON_WRAPPER)
+
+IF(ENABLE_TESTING)
   enable_testing()
   add_subdirectory(tests)
-  add_subdirectory(python-wrapper/tests)
-ENDIF(CMAKE_ENABLE_TESTING)
+  IF(ENABLE_PYTHON_WRAPPER)
+    add_subdirectory(python-wrapper/tests)
+  ENDIF(ENABLE_PYTHON_WRAPPER)
+ENDIF(ENABLE_TESTING)
 
 # These are so that package name and install prefix can be overriden
 SET(DEB_INSTALL_PREFIX CACHE STRING "/usr")
