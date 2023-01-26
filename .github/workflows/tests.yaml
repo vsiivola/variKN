@@ -13,9 +13,15 @@ jobs:
           - os: ubuntu-20.04
             boost_platform: 20.04
             boost_version: 1.73.0
+          - os: ubuntu-22.04
+            boost_platform: 22.04
+            boost_version: 1.81.0
           - os: macos-11
             boost_platform: 11
             boost_version: 1.73.0
+          - os: macos-12
+            boost_platform: 11
+            boost_version: 1.81.0
 
     runs-on: ${{ matrix.os }}
 
