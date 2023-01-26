@@ -62,8 +62,10 @@ with open('readme', 'r') as fh:
 
 setup(
     name='varikn',
-    use_scm_version=True,
     setup_requires=['setuptools_scm'],
+    use_scm_version={
+        'write_to': 'python-wrapper/varikn/_version.py'
+    },
     author='Vesa Siivola',
     url='https://github.com/vsiivola/variKN',
     license='BSD 3-Clause License',
