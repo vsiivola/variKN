@@ -62,7 +62,7 @@ with open('readme', 'r') as fh:
 
 setup(
     name='varikn',
-    setup_requires=['setuptools_scm'],
+    setup_requires=['setuptools_scm>=3.4'],
     use_scm_version={
         'write_to': 'python-wrapper/varikn/_version.py'
     },
