@@ -11,15 +11,27 @@ jobs:
       matrix:
         include:
           - os: ubuntu-20.04
+            python-version: 3.8
             boost_platform: 20.04
             boost_version: 1.73.0
           - os: ubuntu-22.04
+            python-version: 3.9
+            boost_platform: 22.04
+            boost_version: 1.81.0
+          - os: ubuntu-22.04
+            python-version: '3.10'
+            boost_platform: 22.04
+            boost_version: 1.81.0
+          - os: ubuntu-22.04
+            python-version: 3.11
             boost_platform: 22.04
             boost_version: 1.81.0
           - os: macos-11
+            python-version: 3.11
             boost_platform: 11
             boost_version: 1.73.0
           - os: macos-12
+            python-version: 3.11
             boost_platform: 11
             boost_version: 1.81.0
 
@@ -27,6 +39,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.1
         id: install-boost
