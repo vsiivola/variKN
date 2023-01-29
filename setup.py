@@ -57,7 +57,7 @@ class build_ext(build_ext_orig):
         os.chdir(str(cwd))
 
 
-with open('readme', 'r') as fh:
+with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setup(

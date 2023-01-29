@@ -1,3 +1,5 @@
 *~
 build
 build-*
+python-wrapper/varikn.egg-info/
+python-wrapper/varikn/_version.py
