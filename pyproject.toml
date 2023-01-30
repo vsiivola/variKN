@@ -1,7 +1,14 @@
 [build-system]
 requires = [
-  "setuptools",
-  "setuptools_scm<7.0.0",  # For python3.6 support
+  "setuptools>=45",
+  "setuptools_scm[toml]>=3.4",
   "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "varikn"
+dynamic = ["version"]
+
+[tool.setuptools_scm]
+write_to = "python-wrapper/varikn/_version.py"

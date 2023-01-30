@@ -57,13 +57,15 @@ class build_ext(build_ext_orig):
         os.chdir(str(cwd))
 
 
-with open('readme', 'r') as fh:
+with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setup(
     name='varikn',
-    use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    setup_requires=['setuptools_scm>=3.4'],
+    use_scm_version={
+        'write_to': 'python-wrapper/varikn/_version.py'
+    },
     author='Vesa Siivola',
     url='https://github.com/vsiivola/variKN',
     license='BSD 3-Clause License',
