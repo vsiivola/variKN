@@ -41,7 +41,7 @@ brew install boost cmake swig
 
 ### How to install Linux requirements
 
-Check the [Dockerfile](Dockerfile) for an example
+Check the [Dockerfile](Dockerfile) for an example.
 
 ## Install Python tools only
 
