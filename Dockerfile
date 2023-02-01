@@ -1,4 +1,4 @@
-FROM ubuntu:groovy
+FROM ubuntu:jammy
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Berlin
 RUN apt-get update -y && \
@@ -8,7 +8,7 @@ RUN apt-get install -y --no-install-recommends\
                     build-essential \
                     libboost-all-dev \
                     swig \
-                    python-dev \
+                    python3-dev \
                     cmake && \
     apt-get autoclean && \
     apt-get autoremove && \
