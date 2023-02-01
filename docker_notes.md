@@ -37,7 +37,7 @@ On Apple silicon processor based mac (M1, M2), you can install
 
 ```sh
 # Create container
-finch build -t varikn_test_container .
+finch build -t varikn_test_container --platform=Linux/amd64 .
 # Log in container
 finch container run --interactive --tty varikn_test_container
 # Inside container
