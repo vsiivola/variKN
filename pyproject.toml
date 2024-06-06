@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "varikn"
-dynamic = ["version"]
+dynamic = ["version", "description", "authors", "license", "readme"]
 
 [tool.setuptools_scm]
 write_to = "python-wrapper/varikn/_version.py"

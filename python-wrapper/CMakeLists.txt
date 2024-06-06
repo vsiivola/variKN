@@ -44,7 +44,7 @@ if (Python_FOUND AND SWIG_FOUND)
 
     # swig settings
     message("Python version ${Python_VERSION}")
-    SET(CMAKE_SWIG_FLAGS "-shadow" "-DPYTHON3" "-py3")
+    SET(CMAKE_SWIG_FLAGS "-shadow" "-DPYTHON3")
 
     SET(CMAKE_SWIG_OUTDIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
     SET_SOURCE_FILES_PROPERTIES(VariKN.i PROPERTIES CPLUSPLUS ON)

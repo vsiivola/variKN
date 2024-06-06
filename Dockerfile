@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:noble-20240530
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Berlin
 RUN apt-get update -y && \
