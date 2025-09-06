@@ -10,12 +10,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
-            python-version: '3.10'
-            boost_platform: 24.04
-            boost_version: 1.88.0
-            arch: 'x86'
-            toolset: 'gcc'
           - os: ubuntu-22.04
             python-version: 3.9
             boost_platform: 22.04
@@ -30,7 +24,13 @@ jobs:
             toolset: 'gcc'
           - os: ubuntu-24.04
             python-version: '3.11'
-            boost_platform: 22.04
+            boost_platform: 24.04
+            boost_version: 1.88.0
+            arch: 'x86'
+            toolset: 'gcc'
+          - os: ubuntu-24.04
+            python-version: '3.12'
+            boost_platform: 24.04
             boost_version: 1.88.0
             arch: 'x86'
             toolset: 'gcc'
@@ -67,6 +67,9 @@ jobs:
             platform_version: ${{ matrix.boost_platform }}
             arch: ${{ matrix.arch }}
             toolset: ${{ matrix.toolset }}
+      - name: Install SWIG via Homebrew
+        if: runner.arch == 'ARM64'
+        run: brew install swig
       - name: Build
         run: |
           mkdir build
@@ -79,7 +82,5 @@ jobs:
         run: make test
         working-directory: ./build/tests
       - name: Python test
-        # Skip if aarch64, no swig installed so no wrapper created
-        if: runner.arch != 'ARM64'
         run: make test
         working-directory: ./build/python-wrapper/tests
